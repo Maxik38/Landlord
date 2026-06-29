@@ -1348,16 +1348,19 @@ function updateTopbar() {
 
 // ===================== TICK =====================
 function startTicks() {
-  // Rent income every 30 seconds
+  // Rent sa počíta server-side (pg_cron každých 30 min)
+  // Klient len syncuje cash zo Supabase každých 5 minút
   setInterval(async () => {
-    const rent = getMyRentIncome();
-    if (rent > 0) {
-      STATE.cash += rent;
-      toast(`💰 Príjem z nájmu: +${fmt(rent)}`);
+    if (!STATE.supabase || !STATE.user) return;
+    const { data } = await STATE.supabase
+      .from('profiles').select('cash').eq('id', STATE.user.id).single();
+    if (data && data.cash !== STATE.cash) {
+      const diff = data.cash - STATE.cash;
+      STATE.cash = data.cash;
+      if (diff > 0) toast(`💰 Príjem z nájmu: +${fmt(diff)}`);
       renderAll();
-      await saveCash();
     }
-  }, 30000);
+  }, 300000); // každých 5 minút
 
   // Market fluctuations every 45 seconds
   setInterval(() => {
