@@ -9,325 +9,246 @@
 <meta name="apple-mobile-web-app-title" content="PropertyEmpire">
 <meta name="theme-color" content="#0f0f0f">
 <title>PropertyEmpire</title>
-<link rel="manifest" href="manifest.json">
-<!-- PWA icons inline via meta for single-file -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
-
 :root {
-  --bg: #0f0f0f;
-  --surface: #1a1a1a;
-  --surface2: #222;
-  --surface3: #2a2a2a;
-  --border: #2e2e2e;
-  --border2: #3a3a3a;
-  --text: #f0ede8;
-  --text2: #9a9690;
-  --text3: #6a6660;
-  --gold: #c9a84c;
-  --gold2: #e8c56a;
-  --gold-dim: #c9a84c22;
-  --green: #4caf7d;
-  --green-dim: #4caf7d18;
-  --red: #e05a5a;
-  --red-dim: #e05a5a18;
-  --blue: #5a9fe0;
-  --blue-dim: #5a9fe018;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --nav-h: 64px;
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --bg:#0f0f0f;--surface:#1a1a1a;--surface2:#222;--surface3:#2a2a2a;
+  --border:#2e2e2e;--border2:#3a3a3a;--text:#f0ede8;--text2:#9a9690;--text3:#6a6660;
+  --gold:#c9a84c;--gold2:#e8c56a;--gold-dim:#c9a84c22;
+  --green:#4caf7d;--green-dim:#4caf7d18;--red:#e05a5a;--red-dim:#e05a5a18;
+  --blue:#5a9fe0;--blue-dim:#5a9fe018;--purple:#9b59b6;--purple-dim:#9b59b618;
+  --radius:12px;--radius-sm:8px;--nav-h:64px;--safe-b:env(safe-area-inset-bottom,0px);
 }
-
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { height: 100%; }
-body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; height: 100%; overflow: hidden; }
-
-/* ===== LAYOUT ===== */
-#app { display: flex; flex-direction: column; height: 100dvh; height: 100vh; }
-
-/* ===== TOPBAR ===== */
-#topbar {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 10px 16px;
-  padding-top: calc(10px + env(safe-area-inset-top, 0px));
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-  z-index: 10;
-}
-.logo { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--gold); flex-shrink: 0; }
-.topbar-stats { display: flex; gap: 6px; flex: 1; overflow: hidden; }
-.tstat { display: flex; flex-direction: column; align-items: center; background: var(--surface2); border-radius: 8px; padding: 4px 8px; flex: 1; min-width: 0; }
-.tstat-val { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-.tstat-val.g { color: var(--green); }
-.tstat-val.gold { color: var(--gold); }
-.tstat-label { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
-#top-user-btn { font-size: 20px; cursor: pointer; flex-shrink: 0; }
-
-/* ===== MAIN CONTENT ===== */
-#main-content {
-  flex: 1;
-  overflow: hidden;
-  position: relative;
-}
-
-/* ===== PANELS ===== */
-.screen { position: absolute; inset: 0; overflow-y: auto; display: none; -webkit-overflow-scrolling: touch; }
-.screen.active { display: block; }
-.screen-inner { padding: 16px; padding-bottom: calc(var(--nav-h) + 16px + var(--safe-bottom)); }
-
-/* ===== BOTTOM NAV ===== */
-#bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0; right: 0;
-  height: calc(var(--nav-h) + var(--safe-bottom));
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  display: flex;
-  z-index: 100;
-  padding-bottom: var(--safe-bottom);
-}
-.bnav-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  cursor: pointer;
-  position: relative;
-  transition: all 0.15s;
-  padding: 8px 4px;
-}
-.bnav-icon { font-size: 22px; transition: transform 0.15s; }
-.bnav-label { font-size: 10px; color: var(--text3); font-weight: 500; }
-.bnav-item.active .bnav-icon { transform: translateY(-2px); }
-.bnav-item.active .bnav-label { color: var(--gold); }
-.bnav-dot { position: absolute; top: 6px; right: calc(50% - 16px); width: 8px; height: 8px; background: var(--red); border-radius: 50%; display: none; border: 2px solid var(--surface); }
-.bnav-dot.show { display: block; }
-
-/* ===== CATEGORY CHIPS ===== */
-.chip-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 0 0 12px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-.chip-scroll::-webkit-scrollbar { display: none; }
-.chip { padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; border: 1px solid var(--border2); color: var(--text3); background: var(--surface2); white-space: nowrap; cursor: pointer; flex-shrink: 0; transition: all 0.15s; }
-.chip.active { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
-
-/* ===== PROPERTY CARDS ===== */
-.prop-list { display: flex; flex-direction: column; gap: 10px; }
-.prop-card {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  cursor: pointer;
-  transition: border-color 0.15s;
-  position: relative;
-  overflow: hidden;
-}
-.prop-card:active { transform: scale(0.98); }
-.prop-card.owned { border-color: var(--green); }
-.prop-card.partial { border-color: var(--gold); }
-.prop-emoji-wrap { width: 52px; height: 52px; background: var(--surface3); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
-.prop-info { flex: 1; min-width: 0; }
-.prop-name { font-size: 14px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.prop-loc { font-size: 11px; color: var(--text3); margin: 1px 0 5px; }
-.prop-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-.prop-price { font-family: 'DM Serif Display', serif; font-size: 15px; color: var(--gold); }
-.prop-rent-badge { font-size: 10px; color: var(--green); background: var(--green-dim); padding: 2px 6px; border-radius: 4px; }
-.prop-status-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
-.badge-available { background: var(--green-dim); color: var(--green); }
-.badge-mine { background: var(--gold-dim); color: var(--gold); }
-.badge-partial { background: var(--blue-dim); color: var(--blue); }
-.badge-taken { background: var(--red-dim); color: var(--red); }
-.prop-own-bar { position: absolute; bottom: 0; left: 0; height: 2px; background: var(--gold); border-radius: 0; transition: width 0.3s; }
-
-/* ===== SECTION HEADER ===== */
-.section-hdr { margin-bottom: 14px; }
-.section-hdr h2 { font-family: 'DM Serif Display', serif; font-size: 22px; }
-.section-hdr p { font-size: 12px; color: var(--text3); margin-top: 2px; }
-
-/* ===== MODAL (BOTTOM SHEET) ===== */
-#modal-overlay {
-  position: fixed; inset: 0; z-index: 200;
-  background: rgba(0,0,0,0.7);
-  display: none; align-items: flex-end;
-  backdrop-filter: blur(3px);
-}
-#modal-overlay.open { display: flex; }
-#modal {
-  background: var(--surface);
-  border-radius: 20px 20px 0 0;
-  width: 100%; max-height: 90dvh; max-height: 90vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: calc(20px + var(--safe-bottom));
-  animation: slideUp 0.25s ease;
-}
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.modal-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 12px auto 0; }
-.modal-header { padding: 14px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
-.modal-title { font-family: 'DM Serif Display', serif; font-size: 20px; }
-.modal-close { font-size: 22px; color: var(--text3); cursor: pointer; padding: 4px; }
-.modal-body { padding: 0 20px 20px; }
-.modal-emoji { font-size: 52px; display: block; text-align: center; margin: 6px 0 10px; }
-.modal-loc { text-align: center; font-size: 12px; color: var(--text3); margin-bottom: 14px; }
-.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
-.info-cell { background: var(--surface2); border-radius: var(--radius-sm); padding: 10px 12px; }
-.info-cell-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
-.info-cell-val { font-size: 16px; font-weight: 600; }
-.info-cell-val.g { color: var(--green); }
-.info-cell-val.gold { color: var(--gold); }
-.own-bar-wrap { margin: 12px 0 6px; }
-.own-bar-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); margin-bottom: 5px; }
-.own-bar { height: 8px; background: var(--surface3); border-radius: 4px; overflow: hidden; display: flex; }
-.own-bar-mine { background: var(--gold); transition: width 0.4s; }
-.own-bar-others { background: var(--blue); transition: width 0.4s; }
-.owner-list { margin: 10px 0; }
-.owner-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
-.owner-avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
-.owner-pct { margin-left: auto; color: var(--text2); font-weight: 500; }
-.offer-btn { font-size: 12px; padding: 4px 10px; background: var(--blue-dim); color: var(--blue); border: 1px solid var(--blue); border-radius: 6px; cursor: pointer; }
-.share-slider { margin: 14px 0; }
-.share-slider label { font-size: 13px; color: var(--text2); display: flex; justify-content: space-between; margin-bottom: 8px; }
-.share-slider input[type=range] { width: 100%; accent-color: var(--gold); height: 6px; }
-.divider { height: 1px; background: var(--border); margin: 12px 0; }
-
-/* ===== BUTTONS ===== */
-.btn { display: block; width: 100%; padding: 13px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; text-align: center; margin-top: 8px; font-family: 'DM Sans', sans-serif; }
-.btn:active { transform: scale(0.97); }
-.btn-gold { background: var(--gold); color: #000; }
-.btn-gold:hover, .btn-gold:active { background: var(--gold2); }
-.btn-gold:disabled { opacity: 0.4; cursor: not-allowed; }
-.btn-outline { background: transparent; color: var(--text2); border: 1px solid var(--border2); }
-.btn-red { background: var(--red-dim); color: var(--red); border: 1px solid var(--red); }
-.btn-green { background: var(--green-dim); color: var(--green); border: 1px solid var(--green); }
-
-/* ===== PORTFOLIO ===== */
-.port-summary { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
-.port-stat { background: var(--surface2); border-radius: var(--radius-sm); padding: 10px; text-align: center; }
-.port-stat-val { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--gold); }
-.port-stat-label { font-size: 10px; color: var(--text3); margin-top: 2px; }
-.port-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--surface2); border-radius: var(--radius); margin-bottom: 8px; border: 1px solid var(--border); cursor: pointer; }
-.port-item:active { transform: scale(0.98); }
-.port-emoji { font-size: 24px; width: 40px; text-align: center; }
-.port-info { flex: 1; min-width: 0; }
-.port-name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.port-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
-.port-pct-bar { height: 3px; background: var(--surface3); border-radius: 2px; margin-top: 5px; }
-.port-pct-fill { height: 100%; background: var(--gold); border-radius: 2px; }
-.port-right { text-align: right; flex-shrink: 0; }
-.port-rent { font-size: 13px; color: var(--green); font-weight: 500; }
-.port-val { font-size: 11px; color: var(--text3); margin-top: 2px; }
-.sell-btn { font-size: 11px; padding: 3px 8px; background: var(--red-dim); color: var(--red); border: 1px solid var(--red); border-radius: 5px; cursor: pointer; margin-top: 4px; }
-
-/* ===== OFFERS ===== */
-.offer-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; }
-.offer-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-.offer-prop-name { font-size: 14px; font-weight: 500; }
-.offer-amount { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--gold); }
-.offer-detail { font-size: 12px; color: var(--text3); margin-bottom: 10px; }
-.offer-actions { display: flex; gap: 8px; }
-.offer-actions .btn { margin: 0; flex: 1; padding: 10px; font-size: 13px; }
-
-/* ===== LEADERBOARD ===== */
-.lb-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--surface2); border-radius: var(--radius); margin-bottom: 8px; border: 1px solid var(--border); }
-.lb-rank { font-size: 20px; width: 30px; text-align: center; flex-shrink: 0; }
-.lb-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; flex-shrink: 0; }
-.lb-info { flex: 1; }
-.lb-name { font-size: 14px; font-weight: 500; }
-.lb-props { font-size: 11px; color: var(--text3); margin-top: 1px; }
-.lb-worth { font-family: 'DM Serif Display', serif; font-size: 15px; color: var(--gold); }
-
-/* ===== MARKET SCREEN ===== */
-.market-ticker { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 14px; padding-bottom: 4px; scrollbar-width: none; }
-.market-ticker::-webkit-scrollbar { display: none; }
-.ticker-chip { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; white-space: nowrap; font-size: 12px; flex-shrink: 0; }
-.ticker-chip span { font-weight: 600; margin-left: 4px; }
-.ticker-chip span.up { color: var(--green); }
-.ticker-chip span.dn { color: var(--red); }
-
-/* ===== ACTIVITY ===== */
-.activity-list { margin-top: 8px; }
-.act-item { display: flex; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); }
-.act-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
-.act-text { font-size: 12px; color: var(--text2); flex: 1; line-height: 1.4; }
-.act-time { font-size: 10px; color: var(--text3); flex-shrink: 0; }
-
-/* ===== EMPTY ===== */
-.empty { text-align: center; padding: 60px 20px; }
-.empty-icon { font-size: 40px; margin-bottom: 12px; }
-.empty-text { font-size: 14px; color: var(--text3); }
-
-/* ===== TOAST ===== */
-#toast { position: fixed; top: calc(80px + env(safe-area-inset-top,0px)); left: 50%; transform: translateX(-50%); background: var(--surface2); border: 1px solid var(--border2); border-radius: 20px; padding: 10px 20px; font-size: 13px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 500; white-space: nowrap; max-width: 90vw; text-overflow: ellipsis; overflow: hidden; }
-#toast.show { opacity: 1; }
-
-/* ===== BANNER ===== */
-#connect-banner { background: var(--gold-dim); border: 1px solid var(--gold); border-radius: 8px; padding: 8px 12px; margin: 0 16px 0; font-size: 12px; color: var(--gold); display: none; }
-
-/* ===== AUTH ===== */
-#auth-screen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: flex-end; justify-content: center; z-index: 300; }
-.auth-sheet { background: var(--surface); border-radius: 24px 24px 0 0; width: 100%; padding: 24px 24px calc(24px + env(safe-area-inset-bottom, 0px)); }
-.auth-logo { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--gold); text-align: center; margin-bottom: 4px; }
-.auth-sub { font-size: 13px; color: var(--text3); text-align: center; margin-bottom: 20px; }
-.auth-tabs { display: flex; gap: 0; margin-bottom: 16px; background: var(--surface2); border-radius: 10px; padding: 3px; }
-.auth-tab { flex: 1; padding: 8px; font-size: 14px; cursor: pointer; border-radius: 8px; color: var(--text3); text-align: center; transition: all 0.15s; font-weight: 500; }
-.auth-tab.active { background: var(--surface); color: var(--gold); }
-.auth-input { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 13px 16px; color: var(--text); font-size: 15px; font-family: 'DM Sans', sans-serif; margin-bottom: 10px; outline: none; }
-.auth-input:focus { border-color: var(--gold); }
-.auth-skip { font-size: 13px; color: var(--text3); text-align: center; margin-top: 14px; cursor: pointer; }
-
-/* ===== USER MENU ===== */
-#user-menu { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 150; display: none; align-items: flex-end; }
-#user-menu.open { display: flex; }
-.user-menu-sheet { background: var(--surface); border-radius: 20px 20px 0 0; width: 100%; padding: 20px 20px calc(20px + var(--safe-bottom)); }
-.user-menu-name { font-size: 18px; font-weight: 600; text-align: center; margin-bottom: 4px; }
-.user-menu-email { font-size: 12px; color: var(--text3); text-align: center; margin-bottom: 20px; }
-
-/* ===== SCROLLBAR ===== */
-::-webkit-scrollbar { width: 0; }
-
-/* ===== DESKTOP ENHANCEMENT ===== */
-@media (min-width: 600px) {
-  #app { max-width: 480px; margin: 0 auto; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
-  #bottom-nav { max-width: 480px; left: 50%; transform: translateX(-50%); }
-  #toast { max-width: 440px; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;overflow:hidden;}
+#app{display:flex;flex-direction:column;height:100dvh;height:100vh;}
+/* TOPBAR */
+#topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:8px;flex-shrink:0;z-index:10;}
+.logo{font-family:'DM Serif Display',serif;font-size:16px;color:var(--gold);flex-shrink:0;}
+.topbar-stats{display:flex;gap:5px;flex:1;overflow:hidden;}
+.tstat{display:flex;flex-direction:column;align-items:center;background:var(--surface2);border-radius:8px;padding:4px 6px;flex:1;min-width:0;cursor:default;}
+.tstat-val{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.tstat-val.g{color:var(--green);}.tstat-val.gold{color:var(--gold);}.tstat-val.purple{color:var(--purple);}
+.tstat-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;}
+#top-user-btn{font-size:20px;cursor:pointer;flex-shrink:0;}
+/* MAIN */
+#main-content{flex:1;overflow:hidden;position:relative;}
+.screen{position:absolute;inset:0;overflow-y:auto;display:none;-webkit-overflow-scrolling:touch;}
+.screen.active{display:block;}
+.screen-inner{padding:16px;padding-bottom:calc(var(--nav-h) + 20px + var(--safe-b));}
+/* BOTTOM NAV */
+#bottom-nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav-h) + var(--safe-b));background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:var(--safe-b);}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;position:relative;padding:8px 2px;}
+.bnav-icon{font-size:20px;transition:transform 0.15s;}
+.bnav-label{font-size:9px;color:var(--text3);font-weight:500;}
+.bnav-item.active .bnav-icon{transform:translateY(-2px);}
+.bnav-item.active .bnav-label{color:var(--gold);}
+.bnav-dot{position:absolute;top:6px;right:calc(50% - 14px);width:7px;height:7px;background:var(--red);border-radius:50%;display:none;border:2px solid var(--surface);}
+.bnav-dot.show{display:block;}
+/* CHIPS */
+.chip-scroll{display:flex;gap:7px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none;}
+.chip-scroll::-webkit-scrollbar{display:none;}
+.chip{padding:6px 13px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border2);color:var(--text3);background:var(--surface2);white-space:nowrap;cursor:pointer;flex-shrink:0;transition:all 0.15s;}
+.chip.active{border-color:var(--gold);color:var(--gold);background:var(--gold-dim);}
+/* PROP CARDS */
+.prop-list{display:flex;flex-direction:column;gap:9px;}
+.prop-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);display:flex;align-items:center;gap:11px;padding:11px;cursor:pointer;transition:border-color 0.15s;position:relative;overflow:hidden;}
+.prop-card:active{transform:scale(0.98);}
+.prop-card.owned{border-color:var(--green);}.prop-card.partial{border-color:var(--gold);}
+.prop-emoji-wrap{width:50px;height:50px;background:var(--surface3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.prop-info{flex:1;min-width:0;}
+.prop-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prop-loc{font-size:11px;color:var(--text3);margin:1px 0 4px;}
+.prop-meta{display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
+.prop-price{font-family:'DM Serif Display',serif;font-size:14px;color:var(--gold);}
+.prop-rent-badge{font-size:10px;color:var(--green);background:var(--green-dim);padding:2px 5px;border-radius:4px;}
+.prop-status-badge{font-size:10px;padding:2px 5px;border-radius:4px;font-weight:500;}
+.badge-available{background:var(--green-dim);color:var(--green);}
+.badge-mine{background:var(--gold-dim);color:var(--gold);}
+.badge-partial{background:var(--blue-dim);color:var(--blue);}
+.badge-taken{background:var(--red-dim);color:var(--red);}
+.prop-own-bar{position:absolute;bottom:0;left:0;height:2px;background:var(--gold);}
+/* SECTION */
+.section-hdr{margin-bottom:14px;}
+.section-hdr h2{font-family:'DM Serif Display',serif;font-size:20px;}
+.section-hdr p{font-size:12px;color:var(--text3);margin-top:2px;}
+/* MODAL */
+#modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.7);display:none;align-items:flex-end;backdrop-filter:blur(3px);}
+#modal-overlay.open{display:flex;}
+#modal{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-height:90dvh;max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(20px + var(--safe-b));animation:slideUp 0.25s ease;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 0;}
+.modal-header{padding:14px 20px 10px;display:flex;justify-content:space-between;align-items:center;}
+.modal-title{font-family:'DM Serif Display',serif;font-size:19px;}
+.modal-close{font-size:22px;color:var(--text3);cursor:pointer;padding:4px;}
+.modal-body{padding:0 20px 10px;}
+.modal-emoji{font-size:48px;display:block;text-align:center;margin:4px 0 10px;}
+.modal-loc{text-align:center;font-size:12px;color:var(--text3);margin-bottom:12px;}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;}
+.info-cell{background:var(--surface2);border-radius:var(--radius-sm);padding:10px 11px;}
+.info-cell-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;}
+.info-cell-val{font-size:15px;font-weight:600;}
+.info-cell-val.g{color:var(--green);}.info-cell-val.gold{color:var(--gold);}
+.own-bar-wrap{margin:10px 0 5px;}
+.own-bar-label{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px;}
+.own-bar{height:7px;background:var(--surface3);border-radius:4px;overflow:hidden;display:flex;}
+.own-bar-mine{background:var(--gold);transition:width 0.4s;}.own-bar-others{background:var(--blue);transition:width 0.4s;}
+.owner-list{margin:8px 0;}
+.owner-row{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.owner-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;}
+.owner-pct{margin-left:auto;color:var(--text2);font-weight:500;}
+.offer-btn{font-size:11px;padding:3px 9px;background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue);border-radius:5px;cursor:pointer;}
+.share-slider{margin:12px 0;}
+.share-slider label{font-size:13px;color:var(--text2);display:flex;justify-content:space-between;margin-bottom:7px;}
+.share-slider input[type=range]{width:100%;accent-color:var(--gold);}
+.divider{height:1px;background:var(--border);margin:10px 0;}
+/* BUTTONS */
+.btn{display:block;width:100%;padding:13px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s;text-align:center;margin-top:7px;font-family:'DM Sans',sans-serif;}
+.btn:active{transform:scale(0.97);}
+.btn-gold{background:var(--gold);color:#000;}.btn-gold:disabled{opacity:0.4;cursor:not-allowed;}
+.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border2);}
+.btn-red{background:var(--red-dim);color:var(--red);border:1px solid var(--red);}
+.btn-green{background:var(--green-dim);color:var(--green);border:1px solid var(--green);}
+.btn-purple{background:var(--purple-dim);color:var(--purple);border:1px solid var(--purple);}
+.btn-sm{padding:8px 14px;font-size:13px;width:auto;display:inline-block;margin-top:0;}
+/* PORTFOLIO */
+.port-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:14px;}
+.port-stat{background:var(--surface2);border-radius:var(--radius-sm);padding:10px;text-align:center;}
+.port-stat-val{font-family:'DM Serif Display',serif;font-size:15px;color:var(--gold);}
+.port-stat-label{font-size:9px;color:var(--text3);margin-top:2px;}
+.port-item{display:flex;align-items:center;gap:11px;padding:11px;background:var(--surface2);border-radius:var(--radius);margin-bottom:7px;border:1px solid var(--border);cursor:pointer;}
+.port-item:active{transform:scale(0.98);}
+.port-emoji{font-size:22px;width:36px;text-align:center;}
+.port-info{flex:1;min-width:0;}
+.port-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.port-sub{font-size:11px;color:var(--text3);margin-top:1px;}
+.port-pct-bar{height:3px;background:var(--surface3);border-radius:2px;margin-top:4px;}
+.port-pct-fill{height:100%;background:var(--gold);border-radius:2px;}
+.port-right{text-align:right;flex-shrink:0;}
+.port-rent{font-size:13px;color:var(--green);font-weight:500;}
+.port-val{font-size:11px;color:var(--text3);margin-top:1px;}
+.sell-btn{font-size:11px;padding:3px 7px;background:var(--red-dim);color:var(--red);border:1px solid var(--red);border-radius:5px;cursor:pointer;margin-top:3px;}
+/* OFFERS */
+.offer-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin-bottom:9px;}
+.offer-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.offer-prop-name{font-size:13px;font-weight:500;}
+.offer-amount{font-family:'DM Serif Display',serif;font-size:17px;color:var(--gold);}
+.offer-detail{font-size:12px;color:var(--text3);margin-bottom:9px;}
+.offer-actions{display:flex;gap:7px;}
+.offer-actions .btn{margin:0;flex:1;padding:9px;font-size:13px;}
+/* LEADERBOARD */
+.lb-item{display:flex;align-items:center;gap:11px;padding:11px;background:var(--surface2);border-radius:var(--radius);margin-bottom:7px;border:1px solid var(--border);}
+.lb-rank{font-size:18px;width:28px;text-align:center;flex-shrink:0;}
+.lb-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0;}
+.lb-info{flex:1;}
+.lb-name{font-size:13px;font-weight:500;}
+.lb-props{font-size:11px;color:var(--text3);margin-top:1px;}
+.lb-worth{font-family:'DM Serif Display',serif;font-size:14px;color:var(--gold);}
+/* STORE */
+.store-section{margin-bottom:20px;}
+.store-section-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;}
+.store-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.store-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 12px;text-align:center;cursor:pointer;transition:border-color 0.15s;}
+.store-card:active{transform:scale(0.97);}
+.store-card.best{border-color:var(--gold);}
+.store-card-icon{font-size:28px;margin-bottom:6px;}
+.store-card-title{font-size:13px;font-weight:600;margin-bottom:3px;}
+.store-card-coins{font-size:18px;font-weight:700;color:var(--gold);margin-bottom:3px;}
+.store-card-price{font-size:12px;color:var(--text3);}
+.store-card-badge{font-size:10px;background:var(--gold);color:#000;padding:2px 7px;border-radius:10px;font-weight:600;display:inline-block;margin-bottom:4px;}
+.powerup-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:8px;cursor:pointer;transition:border-color 0.15s;}
+.powerup-card:active{transform:scale(0.98);}
+.powerup-card.active-pu{border-color:var(--green);}
+.powerup-icon{font-size:28px;flex-shrink:0;}
+.powerup-info{flex:1;}
+.powerup-name{font-size:14px;font-weight:600;}
+.powerup-desc{font-size:12px;color:var(--text3);margin-top:2px;}
+.powerup-timer{font-size:11px;color:var(--green);margin-top:3px;}
+.powerup-cost{text-align:right;flex-shrink:0;}
+.powerup-coins{font-size:15px;font-weight:700;color:var(--gold);}
+.powerup-label{font-size:10px;color:var(--text3);}
+/* SKILLS */
+.skill-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:8px;}
+.skill-header{display:flex;align-items:center;gap:11px;margin-bottom:10px;}
+.skill-icon{font-size:26px;flex-shrink:0;}
+.skill-info{flex:1;}
+.skill-name{font-size:14px;font-weight:600;}
+.skill-desc{font-size:12px;color:var(--text3);margin-top:2px;}
+.skill-level-bar{display:flex;gap:4px;margin-bottom:10px;}
+.skill-dot{width:24px;height:6px;border-radius:3px;background:var(--surface3);flex:1;}
+.skill-dot.filled{background:var(--purple);}
+.skill-footer{display:flex;align-items:center;justify-content:space-between;}
+.skill-level-txt{font-size:12px;color:var(--text2);}
+.skill-cost{font-size:13px;color:var(--gold);font-weight:600;}
+.skill-max{font-size:12px;color:var(--green);}
+/* AD MODAL */
+#ad-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;display:none;align-items:center;justify-content:center;}
+#ad-overlay.open{display:flex;}
+.ad-box{background:var(--surface);border-radius:20px;padding:32px 24px;text-align:center;width:90%;max-width:360px;}
+.ad-emoji{font-size:48px;margin-bottom:12px;}
+.ad-title{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:6px;}
+.ad-sub{font-size:13px;color:var(--text3);margin-bottom:20px;}
+.ad-timer{font-size:48px;font-weight:700;color:var(--gold);margin:16px 0;}
+.ad-bar{height:6px;background:var(--surface3);border-radius:3px;overflow:hidden;margin-bottom:20px;}
+.ad-bar-fill{height:100%;background:var(--gold);border-radius:3px;transition:width 0.1s linear;}
+/* TOAST */
+#toast{position:fixed;top:calc(80px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--border2);border-radius:20px;padding:10px 18px;font-size:13px;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:600;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis;}
+#toast.show{opacity:1;}
+/* AUTH */
+#auth-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:flex-end;justify-content:center;z-index:300;}
+.auth-sheet{background:var(--surface);border-radius:24px 24px 0 0;width:100%;padding:24px 24px calc(24px + env(safe-area-inset-bottom,0px));}
+.auth-logo{font-family:'DM Serif Display',serif;font-size:26px;color:var(--gold);text-align:center;margin-bottom:4px;}
+.auth-sub{font-size:13px;color:var(--text3);text-align:center;margin-bottom:18px;}
+.auth-tabs{display:flex;margin-bottom:14px;background:var(--surface2);border-radius:10px;padding:3px;}
+.auth-tab{flex:1;padding:8px;font-size:14px;cursor:pointer;border-radius:8px;color:var(--text3);text-align:center;transition:all 0.15s;font-weight:500;}
+.auth-tab.active{background:var(--surface);color:var(--gold);}
+.auth-input{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:13px 16px;color:var(--text);font-size:15px;font-family:'DM Sans',sans-serif;margin-bottom:9px;outline:none;}
+.auth-input:focus{border-color:var(--gold);}
+/* USER MENU */
+#user-menu{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:150;display:none;align-items:flex-end;}
+#user-menu.open{display:flex;}
+.user-menu-sheet{background:var(--surface);border-radius:20px 20px 0 0;width:100%;padding:20px 20px calc(20px + var(--safe-b));}
+.user-menu-name{font-size:18px;font-weight:600;text-align:center;margin-bottom:3px;}
+.user-menu-email{font-size:12px;color:var(--text3);text-align:center;margin-bottom:18px;}
+/* MARKET TICKER */
+.market-ticker{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding-bottom:4px;scrollbar-width:none;}
+.market-ticker::-webkit-scrollbar{display:none;}
+.ticker-chip{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:5px 9px;white-space:nowrap;font-size:11px;flex-shrink:0;}
+.ticker-chip span{font-weight:600;margin-left:3px;}
+.ticker-chip span.up{color:var(--green);}.ticker-chip span.dn{color:var(--red);}
+/* ACTIVITY */
+.act-item{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);}
+.act-icon{font-size:13px;flex-shrink:0;margin-top:1px;}
+.act-text{font-size:12px;color:var(--text2);flex:1;line-height:1.4;}
+.act-time{font-size:10px;color:var(--text3);flex-shrink:0;}
+/* EMPTY */
+.empty{text-align:center;padding:50px 20px;}
+.empty-icon{font-size:36px;margin-bottom:10px;}
+.empty-text{font-size:14px;color:var(--text3);}
+/* DAILY */
+.daily-banner{background:linear-gradient(135deg,#2a1e08,#1a2a0a);border:1px solid var(--gold);border-radius:var(--radius);padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:14px;cursor:pointer;}
+.daily-banner:active{transform:scale(0.98);}
+.daily-info{flex:1;}
+.daily-title{font-size:14px;font-weight:600;color:var(--gold);}
+.daily-sub{font-size:12px;color:var(--text2);margin-top:2px;}
+/* BOOST BADGE */
+.boost-badge{display:inline-flex;align-items:center;gap:4px;background:var(--green-dim);color:var(--green);border:1px solid var(--green);border-radius:6px;font-size:11px;padding:3px 8px;margin-left:6px;font-weight:600;}
+::-webkit-scrollbar{width:0;}
+@media(min-width:600px){
+  #app,#bottom-nav,#toast{max-width:480px;margin:0 auto;}
+  #bottom-nav{left:50%;transform:translateX(-50%);}
 }
 </style>
 </head>
 <body>
 
-<!-- PWA INSTALL INLINE MANIFEST -->
 <script>
-const manifestData = {
-  name: "PropertyEmpire",
-  short_name: "PropertyEmpire",
-  description: "Buduj realitné impérium. Súpeř s celým svetom.",
-  start_url: "/",
-  display: "standalone",
-  background_color: "#0f0f0f",
-  theme_color: "#0f0f0f",
-  orientation: "portrait",
-  icons: [
-    { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%231a1a1a'/%3E%3Ctext x='96' y='130' font-size='100' text-anchor='middle'%3E🏙️%3C/text%3E%3C/svg%3E", sizes: "192x192", type: "image/svg+xml" },
-    { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%231a1a1a'/%3E%3Ctext x='256' y='350' font-size='280' text-anchor='middle'%3E🏙️%3C/text%3E%3C/svg%3E", sizes: "512x512", type: "image/svg+xml" }
-  ]
-};
-const blob = new Blob([JSON.stringify(manifestData)], {type:'application/json'});
-const manifestURL = URL.createObjectURL(blob);
-const link = document.createElement('link');
-link.rel = 'manifest'; link.href = manifestURL;
-document.head.appendChild(link);
+const manifestData={name:"PropertyEmpire",short_name:"PropertyEmpire",description:"Buduj realitné impérium.",start_url:"/",display:"standalone",background_color:"#0f0f0f",theme_color:"#0f0f0f",orientation:"portrait",icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%231a1a1a'/%3E%3Ctext x='96' y='130' font-size='100' text-anchor='middle'%3E🏙️%3C/text%3E%3C/svg%3E",sizes:"192x192",type:"image/svg+xml"}]};
+const blob=new Blob([JSON.stringify(manifestData)],{type:'application/json'});
+const link=document.createElement('link');link.rel='manifest';link.href=URL.createObjectURL(blob);document.head.appendChild(link);
 </script>
 
-<!-- AUTH SCREEN -->
+<!-- AUTH -->
 <div id="auth-screen">
   <div class="auth-sheet">
     <div class="auth-logo">🏙️ PropertyEmpire</div>
@@ -340,7 +261,6 @@ document.head.appendChild(link);
     <input class="auth-input" id="auth-pass" type="password" placeholder="Heslo" autocomplete="current-password">
     <input class="auth-input" id="auth-name" type="text" placeholder="Herné meno" style="display:none" autocomplete="nickname">
     <button class="btn btn-gold" id="auth-btn" onclick="handleAuth()">Prihlásiť sa</button>
-    <div class="auth-skip" onclick="skipAuth()">Hrať bez účtu (demo mód)</div>
   </div>
 </div>
 
@@ -349,13 +269,34 @@ document.head.appendChild(link);
   <div class="user-menu-sheet">
     <div class="user-menu-name" id="um-name">Hráč</div>
     <div class="user-menu-email" id="um-email"></div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <div style="flex:1;background:var(--surface2);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:20px;font-weight:700;color:var(--gold)" id="um-coins">0</div>
+        <div style="font-size:10px;color:var(--text3)">Gold Coins</div>
+      </div>
+      <div style="flex:1;background:var(--surface2);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:16px;font-weight:700;color:var(--text)" id="um-nw">€0</div>
+        <div style="font-size:10px;color:var(--text3)">Net Worth</div>
+      </div>
+    </div>
     <button class="btn btn-outline" onclick="logout()">🚪 Odhlásiť sa</button>
   </div>
 </div>
 
-<!-- MAIN APP -->
+<!-- AD OVERLAY -->
+<div id="ad-overlay">
+  <div class="ad-box">
+    <div class="ad-emoji">📺</div>
+    <div class="ad-title">Pozeráš reklamu</div>
+    <div class="ad-sub">Počkaj do konca a získaš odmenu</div>
+    <div class="ad-timer" id="ad-timer">30</div>
+    <div class="ad-bar"><div class="ad-bar-fill" id="ad-bar-fill" style="width:100%"></div></div>
+    <div style="font-size:13px;color:var(--text3)" id="ad-reward-txt">Odmena: 50 🪙</div>
+  </div>
+</div>
+
+<!-- APP -->
 <div id="app" style="display:none">
-  <!-- TOPBAR -->
   <div id="topbar">
     <div class="logo">🏙️</div>
     <div class="topbar-stats">
@@ -367,29 +308,21 @@ document.head.appendChild(link);
         <span class="tstat-val g" id="top-rent">+€0</span>
         <span class="tstat-label">Príjem/hod</span>
       </div>
-      <div class="tstat">
-        <span class="tstat-val gold" id="top-networth">€50K</span>
-        <span class="tstat-label">Net Worth</span>
+      <div class="tstat" onclick="setScreen('store',document.querySelector('[data-screen=store]'))">
+        <span class="tstat-val purple" id="top-coins">0 🪙</span>
+        <span class="tstat-label">Gold Coins</span>
       </div>
     </div>
     <div id="top-user-btn" onclick="openUserMenu()">👤</div>
   </div>
 
-  <div id="connect-banner"></div>
-
-  <!-- MAIN CONTENT AREA -->
   <div id="main-content">
-
-    <!-- SCREEN: MARKET -->
+    <!-- MARKET -->
     <div class="screen active" id="screen-market">
       <div class="screen-inner">
-        <div class="section-hdr">
-          <h2>Trh nehnuteľností</h2>
-          <p>Kúp celú nehnuteľnosť alebo len podiel</p>
-        </div>
-        <!-- Ticker -->
+        <div id="daily-banner-wrap"></div>
+        <div class="section-hdr"><h2>Trh nehnuteľností</h2><p id="boost-status"></p></div>
         <div class="market-ticker" id="ticker"></div>
-        <!-- Category chips -->
         <div class="chip-scroll" id="cat-chips">
           <div class="chip active" onclick="filterCat('all',this)">🌍 Všetko</div>
           <div class="chip" onclick="filterCat('byt',this)">🏠 Byty</div>
@@ -398,81 +331,188 @@ document.head.appendChild(link);
           <div class="chip" onclick="filterCat('priemysel',this)">🏭 Priemysel</div>
           <div class="chip" onclick="filterCat('mesto',this)">🌆 Mestá</div>
         </div>
-        <!-- Filter chips -->
-        <div class="chip-scroll" style="margin-bottom:14px">
-          <div class="chip active" onclick="setFilter('all',this)" id="fc-all">Všetko</div>
-          <div class="chip" onclick="setFilter('available',this)" id="fc-avail">Voľné</div>
-          <div class="chip" onclick="setFilter('partial',this)" id="fc-part">Čiastočné</div>
-          <div class="chip" onclick="setFilter('taken',this)" id="fc-taken">Obsadené</div>
+        <div class="chip-scroll">
+          <div class="chip active" id="fc-all" onclick="setFilter('all',this)">Všetko</div>
+          <div class="chip" id="fc-available" onclick="setFilter('available',this)">Voľné</div>
+          <div class="chip" id="fc-partial" onclick="setFilter('partial',this)">Čiastočné</div>
+          <div class="chip" id="fc-taken" onclick="setFilter('taken',this)">Obsadené</div>
         </div>
         <div class="prop-list" id="prop-grid"></div>
       </div>
     </div>
 
-    <!-- SCREEN: PORTFOLIO -->
+    <!-- PORTFOLIO -->
     <div class="screen" id="screen-portfolio">
       <div class="screen-inner">
-        <div class="section-hdr">
-          <h2>Môj portfólio</h2>
-          <p>Tvoje nehnuteľnosti a príjmy</p>
-        </div>
+        <div class="section-hdr"><h2>Môj portfólio</h2><p>Tvoje nehnuteľnosti a príjmy</p></div>
         <div class="port-summary" id="port-summary"></div>
         <div id="portfolio-list"></div>
       </div>
     </div>
 
-    <!-- SCREEN: OFFERS -->
+    <!-- STORE -->
+    <div class="screen" id="screen-store">
+      <div class="screen-inner">
+        <div class="section-hdr"><h2>💎 Store</h2><p>Gold Coins, Power-upy a špeciálne ponuky</p></div>
+
+        <!-- Watch Ad -->
+        <div class="store-section">
+          <div class="store-section-title">Zadarmo</div>
+          <div class="powerup-card" onclick="watchAd()">
+            <div class="powerup-icon">📺</div>
+            <div class="powerup-info">
+              <div class="powerup-name">Pozerať reklamu</div>
+              <div class="powerup-desc">30 sekúnd → 50 Gold Coins</div>
+            </div>
+            <div class="powerup-cost"><div class="powerup-coins">+50 🪙</div><div class="powerup-label">zadarmo</div></div>
+          </div>
+          <div class="powerup-card" onclick="claimDaily()">
+            <div class="powerup-icon">🎁</div>
+            <div class="powerup-info">
+              <div class="powerup-name">Denná odmena</div>
+              <div class="powerup-desc">Prihlás sa každý deň pre bonus</div>
+              <div class="powerup-timer" id="daily-timer-store"></div>
+            </div>
+            <div class="powerup-cost"><div class="powerup-coins" id="daily-coins-store">+100 🪙</div><div class="powerup-label">denne</div></div>
+          </div>
+        </div>
+
+        <!-- Power-ups -->
+        <div class="store-section">
+          <div class="store-section-title">Power-upy</div>
+          <div class="powerup-card" id="pu-2xrent" onclick="buyPowerup('2xrent')">
+            <div class="powerup-icon">⚡</div>
+            <div class="powerup-info">
+              <div class="powerup-name">2× Nájomné</div>
+              <div class="powerup-desc">Zdvojnásobi všetky príjmy na 7 dní</div>
+              <div class="powerup-timer" id="pu-2xrent-timer"></div>
+            </div>
+            <div class="powerup-cost"><div class="powerup-coins">500 🪙</div><div class="powerup-label">7 dní</div></div>
+          </div>
+          <div class="powerup-card" id="pu-discount" onclick="buyPowerup('discount')">
+            <div class="powerup-icon">🏷️</div>
+            <div class="powerup-info">
+              <div class="powerup-name">-20% Zľava</div>
+              <div class="powerup-desc">Všetky nákupy nehnuteľností lacnejšie o 20%</div>
+              <div class="powerup-timer" id="pu-discount-timer"></div>
+            </div>
+            <div class="powerup-cost"><div class="powerup-coins">400 🪙</div><div class="powerup-label">3 dni</div></div>
+          </div>
+          <div class="powerup-card" id="pu-insight" onclick="buyPowerup('insight')">
+            <div class="powerup-icon">🔮</div>
+            <div class="powerup-info">
+              <div class="powerup-name">Trhový výhľad</div>
+              <div class="powerup-desc">Uvidíš budúce trendy cien na 24h</div>
+              <div class="powerup-timer" id="pu-insight-timer"></div>
+            </div>
+            <div class="powerup-cost"><div class="powerup-coins">200 🪙</div><div class="powerup-label">24 hodín</div></div>
+          </div>
+        </div>
+
+        <!-- Coins packs -->
+        <div class="store-section">
+          <div class="store-section-title">Kúpiť Gold Coins</div>
+          <div class="store-cards">
+            <div class="store-card" onclick="buyCoins(100,'0.99')">
+              <div class="store-card-icon">🪙</div>
+              <div class="store-card-title">Štartér</div>
+              <div class="store-card-coins">100 🪙</div>
+              <div class="store-card-price">€0.99</div>
+            </div>
+            <div class="store-card" onclick="buyCoins(500,'3.99')">
+              <div class="store-card-icon">💰</div>
+              <div class="store-card-title">Populárny</div>
+              <div class="store-card-coins">500 🪙</div>
+              <div class="store-card-price">€3.99</div>
+            </div>
+            <div class="store-card best" onclick="buyCoins(1200,'7.99')">
+              <div class="store-card-badge">NAJLEPŠIA CENA</div>
+              <div class="store-card-icon">💎</div>
+              <div class="store-card-title">Investor</div>
+              <div class="store-card-coins">1 200 🪙</div>
+              <div class="store-card-price">€7.99</div>
+            </div>
+            <div class="store-card" onclick="buyCoins(3000,'14.99')">
+              <div class="store-card-icon">👑</div>
+              <div class="store-card-title">Tycoon</div>
+              <div class="store-card-coins">3 000 🪙</div>
+              <div class="store-card-price">€14.99</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coins to Cash -->
+        <div class="store-section">
+          <div class="store-section-title">Premeniť Gold Coins na hotovosť</div>
+          <div class="powerup-card" onclick="convertCoins()">
+            <div class="powerup-icon">💱</div>
+            <div class="powerup-info">
+              <div class="powerup-name">Konverzia: 100 🪙 → €5 000</div>
+              <div class="powerup-desc">Premeň Gold Coins na hernú hotovosť</div>
+            </div>
+            <div class="powerup-cost"><div class="powerup-coins">100 🪙</div><div class="powerup-label">za €5K</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SKILLS -->
+    <div class="screen" id="screen-skills">
+      <div class="screen-inner">
+        <div class="section-hdr"><h2>🧠 Zručnosti</h2><p>Vylepšuj svoje schopnosti za Gold Coins</p></div>
+        <div style="background:var(--purple-dim);border:1px solid var(--purple);border-radius:8px;padding:10px 13px;font-size:12px;color:var(--purple);margin-bottom:14px">
+          💡 Zručnosti zostávajú navždy — nie sú časovo obmedzené
+        </div>
+        <div id="skills-list"></div>
+      </div>
+    </div>
+
+    <!-- OFFERS -->
     <div class="screen" id="screen-offers">
       <div class="screen-inner">
-        <div class="section-hdr">
-          <h2>Ponuky</h2>
-          <p>Ponuky od iných hráčov na tvoje podiely</p>
-        </div>
+        <div class="section-hdr"><h2>Ponuky</h2><p>Ponuky od iných hráčov</p></div>
         <div id="offers-list"></div>
       </div>
     </div>
 
-    <!-- SCREEN: LEADERBOARD -->
+    <!-- LEADERBOARD -->
     <div class="screen" id="screen-leaderboard">
       <div class="screen-inner">
-        <div class="section-hdr">
-          <h2>Rebríček</h2>
-          <p>Najbohatší hráči sveta</p>
-        </div>
+        <div class="section-hdr"><h2>🏆 Rebríček</h2><p>Top hráči podľa Net Worth</p></div>
         <div id="lb-list"></div>
-        <!-- Activity -->
-        <div style="margin-top:20px">
-          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Aktivita hráčov</div>
-          <div class="activity-list" id="activity-feed"></div>
+        <div style="margin-top:18px">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Aktivita</div>
+          <div id="activity-feed"></div>
         </div>
       </div>
     </div>
-
   </div>
 
   <!-- BOTTOM NAV -->
   <div id="bottom-nav">
-    <div class="bnav-item active" onclick="setScreen('market',this)">
-      <span class="bnav-icon">🏪</span>
-      <span class="bnav-label">Trh</span>
+    <div class="bnav-item active" data-screen="market" onclick="setScreen('market',this)">
+      <span class="bnav-icon">🏪</span><span class="bnav-label">Trh</span>
     </div>
-    <div class="bnav-item" onclick="setScreen('portfolio',this)">
-      <span class="bnav-icon">📁</span>
-      <span class="bnav-label">Portfólio</span>
+    <div class="bnav-item" data-screen="portfolio" onclick="setScreen('portfolio',this)">
+      <span class="bnav-icon">📁</span><span class="bnav-label">Portfólio</span>
     </div>
-    <div class="bnav-item" onclick="setScreen('offers',this)">
-      <span class="bnav-icon">📩</span>
-      <span class="bnav-label">Ponuky</span>
+    <div class="bnav-item" data-screen="store" onclick="setScreen('store',this)">
+      <span class="bnav-icon">💎</span><span class="bnav-label">Store</span>
+    </div>
+    <div class="bnav-item" data-screen="skills" onclick="setScreen('skills',this)">
+      <span class="bnav-icon">🧠</span><span class="bnav-label">Zručnosti</span>
+    </div>
+    <div class="bnav-item" data-screen="offers" onclick="setScreen('offers',this)">
+      <span class="bnav-icon">📩</span><span class="bnav-label">Ponuky</span>
       <div class="bnav-dot" id="offers-dot"></div>
     </div>
-    <div class="bnav-item" onclick="setScreen('leaderboard',this)">
-      <span class="bnav-icon">🏆</span>
-      <span class="bnav-label">Rebríček</span>
+    <div class="bnav-item" data-screen="leaderboard" onclick="setScreen('leaderboard',this)">
+      <span class="bnav-icon">🏆</span><span class="bnav-label">Top</span>
     </div>
   </div>
 </div>
 
-<!-- PROPERTY MODAL (BOTTOM SHEET) -->
+<!-- PROPERTY MODAL -->
 <div id="modal-overlay" onclick="closeModal(event)">
   <div id="modal">
     <div class="modal-handle"></div>
@@ -484,247 +524,259 @@ document.head.appendChild(link);
   </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast"></div>
 
 <script>
-// ===================== DATA =====================
-const COLORS = ['#c9a84c','#5a9fe0','#4caf7d','#e05a5a','#9b59b6','#e67e22','#1abc9c','#e91e63'];
-const AVATARS = ['👑','💼','🤵','👔','🏦','💰','🎩','🌟'];
+// ======== CONSTANTS ========
+const SUPA_URL='https://gmzwcybkxhpyjppgdxlu.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtendjeWJreGhweWpwcGdkeGx1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NzgwOTgsImV4cCI6MjA5ODE1NDA5OH0.9e2Z_sGpOUun3Gg4V2GpE0pCf0vWKCfQI6bSeutUlBE';
+const COLORS=['#c9a84c','#5a9fe0','#4caf7d','#e05a5a','#9b59b6','#e67e22','#1abc9c','#e91e63'];
+const AVATARS=['👑','💼','🤵','👔','🏦','💰','🎩','🌟'];
 
+// ======== SKILLS DEFINITION ========
+const SKILLS_DEF = [
+  { id:'rent_boost', name:'Správca nehnuteľností', icon:'📈', desc:'Zvyšuje príjem z nájmu', maxLevel:5, effect:'+ {n}% rent príjem', costPerLevel:[100,200,350,550,800], bonus:(lvl)=>lvl*0.05 },
+  { id:'price_discount', name:'Realitný expert', icon:'🏷️', desc:'Znižuje náklady na kúpu nehnuteľností', maxLevel:5, effect:'- {n}% cena nehnuteľností', costPerLevel:[150,300,500,750,1000], bonus:(lvl)=>lvl*0.04 },
+  { id:'market_sense', name:'Trhový inštinkt', icon:'📊', desc:'Zlepšuje trhové podmienky pre tvoje nehnuteľnosti', maxLevel:3, effect:'+{n}% trhová hodnota', costPerLevel:[200,450,800], bonus:(lvl)=>lvl*0.06 },
+  { id:'negotiator', name:'Vyjednávač', icon:'🤝', desc:'Zvyšuje hodnotu ponúk ktoré dostávaš', maxLevel:3, effect:'+{n}% hodnota ponúk', costPerLevel:[180,400,700], bonus:(lvl)=>lvl*0.08 },
+  { id:'portfolio_exp', name:'Portfólio expander', icon:'🗂️', desc:'Zvyšuje príjem zo všetkých nehnuteľností globálne', maxLevel:5, effect:'+{n}% celkový príjem', costPerLevel:[250,500,900,1400,2000], bonus:(lvl)=>lvl*0.03 },
+  { id:'coin_master', name:'Gold master', icon:'🪙', desc:'Zvyšuje odmenu za reklamy a denné bonusy', maxLevel:3, effect:'+{n}% Gold Coins z odmien', costPerLevel:[100,250,500], bonus:(lvl)=>lvl*0.25 },
+];
+
+// ======== PROPERTIES ========
 const PROPERTIES = [
-  { id:1, name:'Garsónka Bratislava', emoji:'🏠', cat:'byt', loc:'Bratislava, SK', price:45000, rent:320, desc:'Malý ale lukratívny byt v centre Bratislavy.', tier:1 },
-  { id:2, name:'Rodinný dom Košice', emoji:'🏡', cat:'byt', loc:'Košice, SK', price:120000, rent:780, desc:'Priestranný rodinný dom s veľkým záhradom.', tier:2 },
-  { id:3, name:'Penthouse Praha', emoji:'🏙️', cat:'byt', loc:'Praha, CZ', price:380000, rent:2200, desc:'Exkluzívny penthouse s výhľadom na Vltavu.', tier:3 },
-  { id:4, name:'Chata Tatry', emoji:'🏔️', cat:'byt', loc:'Tatry, SK', price:95000, rent:650, desc:'Turistická chata vo Vysokých Tatrách.', tier:2 },
-  { id:5, name:'Bytový dom Žilina', emoji:'🏢', cat:'byt', loc:'Žilina, SK', price:280000, rent:1800, desc:'Bytový dom s 12 bytmi, stabilný príjem.', tier:3 },
-  { id:6, name:'Obchodný priestor Obchodná ul.', emoji:'🏪', cat:'komercny', loc:'Bratislava, SK', price:180000, rent:1400, desc:'Frekventovaný obchodný priestor na hlavnej ulici.', tier:2 },
-  { id:7, name:'Kancelársky komplex Aupark', emoji:'🏬', cat:'komercny', loc:'Bratislava, SK', price:650000, rent:4200, desc:'Moderný kancelársky komplex A-triedy.', tier:3 },
-  { id:8, name:'Reštaurácia centrum Wien', emoji:'🍽️', cat:'komercny', loc:'Viedeň, AT', price:420000, rent:3100, desc:'Etablovaná reštaurácia s vlastnou klientelou.', tier:3 },
-  { id:9, name:'Supermarket franšíza Tesco', emoji:'🛒', cat:'komercny', loc:'Nitra, SK', price:1200000, rent:8500, desc:'Dlhodobý nájomník, stabilný cashflow.', tier:4 },
-  { id:10, name:'Vidiecke sídlo Toskánsko', emoji:'🏰', cat:'luxus', loc:'Toskánsko, IT', price:2500000, rent:14000, desc:'Historická vila s vinicou a olivovým hájem.', tier:5 },
-  { id:11, name:'Prívat Malibu Beach', emoji:'🏖️', cat:'luxus', loc:'Malibu, CA, USA', price:8500000, rent:42000, desc:'Luxusné plážové sídlo, obľúbené miesto celebrít.', tier:5 },
-  { id:12, name:'Penthouse Monaco', emoji:'👑', cat:'luxus', loc:'Monte Carlo, MC', price:15000000, rent:85000, desc:'Legendárny penthouse s výhľadom na Stredozemné more.', tier:6 },
-  { id:13, name:'Súkromný ostrov Maledívy', emoji:'🏝️', cat:'luxus', loc:'Maledívy', price:45000000, rent:240000, desc:'Celý súkromný ostrov s rezortom.', tier:6 },
-  { id:14, name:'Sklad logistický Senec', emoji:'🏭', cat:'priemysel', loc:'Senec, SK', price:320000, rent:2100, desc:'Moderný logistický sklad pri D1 diaľnici.', tier:3 },
-  { id:15, name:'Výrobná hala Trnava', emoji:'⚙️', cat:'priemysel', loc:'Trnava, SK', price:850000, rent:5200, desc:'Výrobná hala prenajatá automobilovému priemyslu.', tier:4 },
-  { id:16, name:'Dátové centrum Frankfurt', emoji:'💻', cat:'priemysel', loc:'Frankfurt, DE', price:4200000, rent:28000, desc:'Tier-3 dátové centrum s kapacitou 500 rackov.', tier:5 },
-  { id:17, name:'Obchodná zóna Bratislava', emoji:'🌆', cat:'mesto', loc:'Bratislava, SK', price:12000000, rent:65000, desc:'Celá obchodná zóna v hlavnom meste.', tier:6 },
-  { id:18, name:'Centrum mesta Dubrovník', emoji:'🏯', cat:'mesto', loc:'Dubrovník, HR', price:35000000, rent:180000, desc:'Historické centrum UNESCO mesta.', tier:6 },
-  { id:19, name:'Ostrov Santorini', emoji:'🌋', cat:'mesto', loc:'Santorini, GR', price:120000000, rent:620000, desc:'Celý turistický ostrov s hotelmi a plážami.', tier:7 },
-  { id:20, name:'Štvrť Manhattan North', emoji:'🗽', cat:'mesto', loc:'New York, USA', price:500000000, rent:2500000, desc:'Celá rezidenčná štvrť na Manhattane.', tier:7 },
-  { id:21, name:'Štúdio Berlín Mitte', emoji:'🏠', cat:'byt', loc:'Berlín, DE', price:85000, rent:580, desc:'Moderné štúdio v centre Berlína.', tier:1 },
-  { id:22, name:'Vila Barcelona', emoji:'🏡', cat:'byt', loc:'Barcelona, ES', price:650000, rent:3800, desc:'Luxusná vila s výhľadom na more.', tier:3 },
-  { id:23, name:'Apartmán Paríž 7. obvod', emoji:'🗼', cat:'byt', loc:'Paríž, FR', price:1200000, rent:6500, desc:'Elegantný apartmán pri Eiffelovej veži.', tier:4 },
-  { id:24, name:'Byt Amsterdam kanálová zóna', emoji:'⛵', cat:'byt', loc:'Amsterdam, NL', price:480000, rent:2800, desc:'Historický byt pri slávnych kanáloch.', tier:3 },
-  { id:25, name:'Dom Dubaj Marina', emoji:'🌴', cat:'byt', loc:'Dubaj, UAE', price:920000, rent:5200, desc:'Moderný dom pri jachte prístave.', tier:4 },
-  { id:26, name:'Chalupa Provence', emoji:'🌻', cat:'byt', loc:'Provence, FR', price:340000, rent:1900, desc:'Kamenná chalupa medzi levanduľovými poľami.', tier:3 },
-  { id:27, name:'Byt Singapur Orchard Road', emoji:'🇸🇬', cat:'byt', loc:'Singapur', price:1800000, rent:9500, desc:'Prémiový byt na najluxusnejšej ulici Singapuru.', tier:5 },
-  { id:28, name:'Chata Švajčiarske Alpy', emoji:'⛷️', cat:'byt', loc:'Zermatt, CH', price:780000, rent:4200, desc:'Lyžiarska chata s výhľadom na Matterhorn.', tier:4 },
-  { id:29, name:'Hotel Budapešť 4*', emoji:'🏨', cat:'komercny', loc:'Budapešť, HU', price:3200000, rent:19000, desc:'Boutique hotel v historickom centre Budapešti.', tier:5 },
-  { id:30, name:'Nákupné centrum Bratislava', emoji:'🛍️', cat:'komercny', loc:'Bratislava, SK', price:8500000, rent:48000, desc:'Veľké nákupné centrum s 80 obchodmi.', tier:5 },
-  { id:31, name:'Kancelársky park Varšava', emoji:'🏢', cat:'komercny', loc:'Varšava, PL', price:4200000, rent:26000, desc:'Moderný kancelársky komplex pre 2000 zamestnancov.', tier:5 },
-  { id:32, name:'Reštaurácia Tokio Shibuya', emoji:'🍣', cat:'komercny', loc:'Tokio, JP', price:580000, rent:3600, desc:'Populárna reštaurácia v najrušnejšej štvrti Tokia.', tier:3 },
-  { id:33, name:'Čerpacia stanica diaľnica D1', emoji:'⛽', cat:'komercny', loc:'Senec, SK', price:420000, rent:2800, desc:'Frekventovaná čerpacia stanica pri diaľnici.', tier:3 },
-  { id:34, name:'Coworking centrum Viedeň', emoji:'💼', cat:'komercny', loc:'Viedeň, AT', price:1100000, rent:6800, desc:'Prémiový coworking s 300 miestami.', tier:4 },
-  { id:35, name:'Marina a jachtklub Chorvátsko', emoji:'⛵', cat:'komercny', loc:'Split, HR', price:2800000, rent:15000, desc:'Luxusná marina s 150 miestami pre jachty.', tier:5 },
-  { id:36, name:'Zámok Loire Valley', emoji:'🏰', cat:'luxus', loc:'Loire, FR', price:18000000, rent:92000, desc:'Historický zámok z 15. storočia s vinohradom.', tier:6 },
-  { id:37, name:'Penthouse Dubaj Burj Khalifa', emoji:'🌃', cat:'luxus', loc:'Dubaj, UAE', price:32000000, rent:165000, desc:'Najvyšší penthouse na svete.', tier:6 },
-  { id:38, name:'Rezort Bali Ubud', emoji:'🌺', cat:'luxus', loc:'Bali, ID', price:5500000, rent:32000, desc:'Exkluzívny wellness rezort v džungli.', tier:5 },
-  { id:39, name:"Villa Côte d'Azur Cannes", emoji:'🎬', cat:'luxus', loc:'Cannes, FR', price:22000000, rent:115000, desc:'Filmová vila kde sa stretávajú celebrity počas festivalu.', tier:6 },
-  { id:40, name:'Súkromná pláž Seychely', emoji:'🐠', cat:'luxus', loc:'Seychely', price:68000000, rent:340000, desc:'Celá súkromná pláž s vilou a personálom.', tier:7 },
-  { id:41, name:'Ski chalet Aspen Colorado', emoji:'🎿', cat:'luxus', loc:'Aspen, CO, USA', price:12000000, rent:62000, desc:'Legendárny chalet kde trávia zimu miliardári.', tier:6 },
-  { id:42, name:'Solárna farma Španielsko', emoji:'☀️', cat:'priemysel', loc:'Andalúzia, ES', price:6500000, rent:38000, desc:'Solárna elektráreň s výkonom 50 MW.', tier:5 },
-  { id:43, name:'Veterná farma Severné more', emoji:'💨', cat:'priemysel', loc:'Dánsko', price:18000000, rent:95000, desc:'Offshore veterná farma s 20 turbínami.', tier:6 },
-  { id:44, name:'Amazon logistický hub', emoji:'📦', cat:'priemysel', loc:'Lipsko, DE', price:12000000, rent:72000, desc:'Obrovský logistický sklad prenajatý Amazonu.', tier:6 },
-  { id:45, name:'Ropná platforma Severné more', emoji:'🛢️', cat:'priemysel', loc:'Nórsko', price:85000000, rent:450000, desc:'Aktívna ropná platforma s dlhodobým kontraktom.', tier:7 },
-  { id:46, name:'Bitcoinová ťažobňa Island', emoji:'₿', cat:'priemysel', loc:'Reykjavík, IS', price:4800000, rent:28000, desc:'Krypto mining farma napájaná geotermálnou energiou.', tier:5 },
-  { id:47, name:'Turistická zóna Benátky', emoji:'🚤', cat:'mesto', loc:'Benátky, IT', price:280000000, rent:1400000, desc:'Historické centrum Benátok s gondolami a palácmi.', tier:7 },
-  { id:48, name:'Celé mesto Las Vegas Strip', emoji:'🎰', cat:'mesto', loc:'Las Vegas, USA', price:850000000, rent:4200000, desc:'Legendárna kasínová zóna.', tier:8 },
-  { id:49, name:'Ostrov Ibiza', emoji:'🎉', cat:'mesto', loc:'Ibiza, ES', price:420000000, rent:2100000, desc:'Legendárny party ostrov s klubmi a rezortmi.', tier:8 },
-  { id:50, name:'Celé Monako', emoji:'🏎️', cat:'mesto', loc:'Monako', price:2000000000, rent:9000000, desc:'Celé kniežatstvo Monako. Ultimátny trofej.', tier:9 },
-  { id:51, name:'Downtown Dubaj', emoji:'🌇', cat:'mesto', loc:'Dubaj, UAE', price:1200000000, rent:5500000, desc:'Celý Downtown Dubaj vrátane Burj Khalifa.', tier:9 },
-  { id:52, name:'Centrum Singapuru', emoji:'🦁', cat:'mesto', loc:'Singapur', price:950000000, rent:4200000, desc:'Finančná štvrť svetového centra obchodu.', tier:8 },
-  { id:53, name:'Celá Maldívska republika', emoji:'🏝️', cat:'mesto', loc:'Maledívy', price:5000000000, rent:20000000, desc:'Celý ostrovný štát. Najdrahší majetok na svete.', tier:10 },
+  {id:1,name:'Garsónka Bratislava',emoji:'🏠',cat:'byt',loc:'Bratislava, SK',price:45000,rent:320,desc:'Malý ale lukratívny byt v centre Bratislavy.',tier:1},
+  {id:2,name:'Rodinný dom Košice',emoji:'🏡',cat:'byt',loc:'Košice, SK',price:120000,rent:780,desc:'Priestranný rodinný dom s veľkým záhradom.',tier:2},
+  {id:3,name:'Penthouse Praha',emoji:'🏙️',cat:'byt',loc:'Praha, CZ',price:380000,rent:2200,desc:'Exkluzívny penthouse s výhľadom na Vltavu.',tier:3},
+  {id:4,name:'Chata Tatry',emoji:'🏔️',cat:'byt',loc:'Tatry, SK',price:95000,rent:650,desc:'Turistická chata vo Vysokých Tatrách.',tier:2},
+  {id:5,name:'Bytový dom Žilina',emoji:'🏢',cat:'byt',loc:'Žilina, SK',price:280000,rent:1800,desc:'Bytový dom s 12 bytmi, stabilný príjem.',tier:3},
+  {id:6,name:'Obchodný priestor Obchodná ul.',emoji:'🏪',cat:'komercny',loc:'Bratislava, SK',price:180000,rent:1400,desc:'Frekventovaný obchodný priestor na hlavnej ulici.',tier:2},
+  {id:7,name:'Kancelársky komplex Aupark',emoji:'🏬',cat:'komercny',loc:'Bratislava, SK',price:650000,rent:4200,desc:'Moderný kancelársky komplex A-triedy.',tier:3},
+  {id:8,name:'Reštaurácia centrum Wien',emoji:'🍽️',cat:'komercny',loc:'Viedeň, AT',price:420000,rent:3100,desc:'Etablovaná reštaurácia s vlastnou klientelou.',tier:3},
+  {id:9,name:'Supermarket franšíza Tesco',emoji:'🛒',cat:'komercny',loc:'Nitra, SK',price:1200000,rent:8500,desc:'Dlhodobý nájomník, stabilný cashflow.',tier:4},
+  {id:10,name:'Vidiecke sídlo Toskánsko',emoji:'🏰',cat:'luxus',loc:'Toskánsko, IT',price:2500000,rent:14000,desc:'Historická vila s vinicou a olivovým hájem.',tier:5},
+  {id:11,name:'Prívat Malibu Beach',emoji:'🏖️',cat:'luxus',loc:'Malibu, CA, USA',price:8500000,rent:42000,desc:'Luxusné plážové sídlo.',tier:5},
+  {id:12,name:'Penthouse Monaco',emoji:'👑',cat:'luxus',loc:'Monte Carlo, MC',price:15000000,rent:85000,desc:'Legendárny penthouse s výhľadom na more.',tier:6},
+  {id:13,name:'Súkromný ostrov Maledívy',emoji:'🏝️',cat:'luxus',loc:'Maledívy',price:45000000,rent:240000,desc:'Celý súkromný ostrov s rezortom.',tier:6},
+  {id:14,name:'Sklad logistický Senec',emoji:'🏭',cat:'priemysel',loc:'Senec, SK',price:320000,rent:2100,desc:'Moderný logistický sklad pri D1 diaľnici.',tier:3},
+  {id:15,name:'Výrobná hala Trnava',emoji:'⚙️',cat:'priemysel',loc:'Trnava, SK',price:850000,rent:5200,desc:'Výrobná hala prenajatá automobilovému priemyslu.',tier:4},
+  {id:16,name:'Dátové centrum Frankfurt',emoji:'💻',cat:'priemysel',loc:'Frankfurt, DE',price:4200000,rent:28000,desc:'Tier-3 dátové centrum.',tier:5},
+  {id:17,name:'Obchodná zóna Bratislava',emoji:'🌆',cat:'mesto',loc:'Bratislava, SK',price:12000000,rent:65000,desc:'Celá obchodná zóna v hlavnom meste.',tier:6},
+  {id:18,name:'Centrum mesta Dubrovník',emoji:'🏯',cat:'mesto',loc:'Dubrovník, HR',price:35000000,rent:180000,desc:'Historické centrum UNESCO mesta.',tier:6},
+  {id:19,name:'Ostrov Santorini',emoji:'🌋',cat:'mesto',loc:'Santorini, GR',price:120000000,rent:620000,desc:'Celý turistický ostrov.',tier:7},
+  {id:20,name:'Štvrť Manhattan North',emoji:'🗽',cat:'mesto',loc:'New York, USA',price:500000000,rent:2500000,desc:'Celá rezidenčná štvrť na Manhattane.',tier:7},
+  {id:21,name:'Štúdio Berlín Mitte',emoji:'🏠',cat:'byt',loc:'Berlín, DE',price:85000,rent:580,desc:'Moderné štúdio v centre Berlína.',tier:1},
+  {id:22,name:'Vila Barcelona',emoji:'🏡',cat:'byt',loc:'Barcelona, ES',price:650000,rent:3800,desc:'Luxusná vila s výhľadom na more.',tier:3},
+  {id:23,name:'Apartmán Paríž 7. obvod',emoji:'🗼',cat:'byt',loc:'Paríž, FR',price:1200000,rent:6500,desc:'Elegantný apartmán pri Eiffelovej veži.',tier:4},
+  {id:24,name:'Byt Amsterdam kanálová zóna',emoji:'⛵',cat:'byt',loc:'Amsterdam, NL',price:480000,rent:2800,desc:'Historický byt pri slávnych kanáloch.',tier:3},
+  {id:25,name:'Dom Dubaj Marina',emoji:'🌴',cat:'byt',loc:'Dubaj, UAE',price:920000,rent:5200,desc:'Moderný dom pri jachte prístave.',tier:4},
+  {id:26,name:'Chalupa Provence',emoji:'🌻',cat:'byt',loc:'Provence, FR',price:340000,rent:1900,desc:'Kamenná chalupa medzi levanduľovými poľami.',tier:3},
+  {id:27,name:'Byt Singapur Orchard Road',emoji:'🇸🇬',cat:'byt',loc:'Singapur',price:1800000,rent:9500,desc:'Prémiový byt na najluxusnejšej ulici.',tier:5},
+  {id:28,name:'Chata Švajčiarske Alpy',emoji:'⛷️',cat:'byt',loc:'Zermatt, CH',price:780000,rent:4200,desc:'Lyžiarska chata s výhľadom na Matterhorn.',tier:4},
+  {id:29,name:'Hotel Budapešť 4*',emoji:'🏨',cat:'komercny',loc:'Budapešť, HU',price:3200000,rent:19000,desc:'Boutique hotel v historickom centre.',tier:5},
+  {id:30,name:'Nákupné centrum Bratislava',emoji:'🛍️',cat:'komercny',loc:'Bratislava, SK',price:8500000,rent:48000,desc:'Veľké nákupné centrum s 80 obchodmi.',tier:5},
+  {id:31,name:'Kancelársky park Varšava',emoji:'🏢',cat:'komercny',loc:'Varšava, PL',price:4200000,rent:26000,desc:'Moderný kancelársky komplex.',tier:5},
+  {id:32,name:'Reštaurácia Tokio Shibuya',emoji:'🍣',cat:'komercny',loc:'Tokio, JP',price:580000,rent:3600,desc:'Populárna reštaurácia v Tokiu.',tier:3},
+  {id:33,name:'Čerpacia stanica D1',emoji:'⛽',cat:'komercny',loc:'Senec, SK',price:420000,rent:2800,desc:'Frekventovaná čerpacia stanica pri diaľnici.',tier:3},
+  {id:34,name:'Coworking centrum Viedeň',emoji:'💼',cat:'komercny',loc:'Viedeň, AT',price:1100000,rent:6800,desc:'Prémiový coworking s 300 miestami.',tier:4},
+  {id:35,name:'Marina a jachtklub Chorvátsko',emoji:'⛵',cat:'komercny',loc:'Split, HR',price:2800000,rent:15000,desc:'Luxusná marina s 150 miestami.',tier:5},
+  {id:36,name:'Zámok Loire Valley',emoji:'🏰',cat:'luxus',loc:'Loire, FR',price:18000000,rent:92000,desc:'Historický zámok z 15. storočia.',tier:6},
+  {id:37,name:'Penthouse Dubaj Burj Khalifa',emoji:'🌃',cat:'luxus',loc:'Dubaj, UAE',price:32000000,rent:165000,desc:'Najvyšší penthouse na svete.',tier:6},
+  {id:38,name:'Rezort Bali Ubud',emoji:'🌺',cat:'luxus',loc:'Bali, ID',price:5500000,rent:32000,desc:'Exkluzívny wellness rezort v džungli.',tier:5},
+  {id:39,name:"Villa Côte d'Azur Cannes",emoji:'🎬',cat:'luxus',loc:'Cannes, FR',price:22000000,rent:115000,desc:'Filmová vila celebrít.',tier:6},
+  {id:40,name:'Súkromná pláž Seychely',emoji:'🐠',cat:'luxus',loc:'Seychely',price:68000000,rent:340000,desc:'Celá súkromná pláž s vilou.',tier:7},
+  {id:41,name:'Ski chalet Aspen',emoji:'🎿',cat:'luxus',loc:'Aspen, CO, USA',price:12000000,rent:62000,desc:'Legendárny chalet miliardárov.',tier:6},
+  {id:42,name:'Solárna farma Španielsko',emoji:'☀️',cat:'priemysel',loc:'Andalúzia, ES',price:6500000,rent:38000,desc:'Solárna elektráreň 50 MW.',tier:5},
+  {id:43,name:'Veterná farma Severné more',emoji:'💨',cat:'priemysel',loc:'Dánsko',price:18000000,rent:95000,desc:'Offshore veterná farma.',tier:6},
+  {id:44,name:'Amazon logistický hub',emoji:'📦',cat:'priemysel',loc:'Lipsko, DE',price:12000000,rent:72000,desc:'Obrovský sklad prenajatý Amazonu.',tier:6},
+  {id:45,name:'Ropná platforma Severné more',emoji:'🛢️',cat:'priemysel',loc:'Nórsko',price:85000000,rent:450000,desc:'Aktívna ropná platforma.',tier:7},
+  {id:46,name:'Bitcoinová ťažobňa Island',emoji:'₿',cat:'priemysel',loc:'Reykjavík, IS',price:4800000,rent:28000,desc:'Krypto mining farma.',tier:5},
+  {id:47,name:'Turistická zóna Benátky',emoji:'🚤',cat:'mesto',loc:'Benátky, IT',price:280000000,rent:1400000,desc:'Historické centrum Benátok.',tier:7},
+  {id:48,name:'Celé mesto Las Vegas Strip',emoji:'🎰',cat:'mesto',loc:'Las Vegas, USA',price:850000000,rent:4200000,desc:'Legendárna kasínová zóna.',tier:8},
+  {id:49,name:'Ostrov Ibiza',emoji:'🎉',cat:'mesto',loc:'Ibiza, ES',price:420000000,rent:2100000,desc:'Legendárny party ostrov.',tier:8},
+  {id:50,name:'Celé Monako',emoji:'🏎️',cat:'mesto',loc:'Monako',price:2000000000,rent:9000000,desc:'Celé kniežatstvo Monako.',tier:9},
+  {id:51,name:'Downtown Dubaj',emoji:'🌇',cat:'mesto',loc:'Dubaj, UAE',price:1200000000,rent:5500000,desc:'Celý Downtown Dubaj.',tier:9},
+  {id:52,name:'Centrum Singapuru',emoji:'🦁',cat:'mesto',loc:'Singapur',price:950000000,rent:4200000,desc:'Finančná štvrť Singapuru.',tier:8},
+  {id:53,name:'Celá Maldívska republika',emoji:'🏝️',cat:'mesto',loc:'Maledívy',price:5000000000,rent:20000000,desc:'Celý ostrovný štát. Ultimátny cieľ.',tier:10},
 ];
 
+// ======== STATE ========
 let STATE = {
-  cash: 50000, user: null, username: 'Demo hráč', demoMode: true,
-  ownership: {}, players: [], offers: [], watchlist: [],
-  activeScreen: 'market', activeFilter: 'all', activeCat: 'all',
-  market: {}, supabase: null, dbOwnerships: null, dbProfiles: null,
+  cash:50000, user:null, username:'Hráč', demoMode:false,
+  ownership:{}, offers:[], coins:0, skills:{},
+  powerups:{ '2xrent':null, 'discount':null, 'insight':null },
+  lastDaily:null, dailyStreak:0,
+  activeScreen:'market', activeFilter:'all', activeCat:'all',
+  market:{}, supabase:null, dbOwnerships:null, dbProfiles:null,
 };
 
-STATE.players = [
-  { id:'p1', name:'InvestorSK', avatar:'👑', color:COLORS[0], worth:320000, props:4 },
-  { id:'p2', name:'RealEstatePro', avatar:'💼', color:COLORS[1], worth:850000, props:8 },
-  { id:'p3', name:'LuxuryKing', avatar:'🎩', color:COLORS[2], worth:2400000, props:12 },
-  { id:'p4', name:'PropertyWolf', avatar:'🤵', color:COLORS[3], worth:180000, props:2 },
-];
+PROPERTIES.forEach(p=>{ STATE.market[p.id]={mult:1+(Math.random()-0.5)*0.1,trend:Math.random()>0.5?'up':'dn'}; });
 
-const MOCK_OWNERSHIP = {
-  3: [{pid:'p1',pct:30},{pid:'p2',pct:20}],
-  7: [{pid:'p2',pct:45}],
-  10: [{pid:'p3',pct:60}],
-  11: [{pid:'p1',pct:15},{pid:'p3',pct:25}],
-  17: [{pid:'p3',pct:70}],
-};
+// ======== SKILL HELPERS ========
+function getSkillLevel(id){ return STATE.skills[id]||0; }
+function getRentMultiplier(){
+  let m=1;
+  const rl=getSkillLevel('rent_boost');if(rl)m+=SKILLS_DEF.find(s=>s.id==='rent_boost').bonus(rl);
+  const pl=getSkillLevel('portfolio_exp');if(pl)m+=SKILLS_DEF.find(s=>s.id==='portfolio_exp').bonus(pl);
+  if(STATE.powerups['2xrent']&&new Date()<new Date(STATE.powerups['2xrent']))m*=2;
+  return m;
+}
+function getPriceMultiplier(){
+  let m=1;
+  const dl=getSkillLevel('price_discount');if(dl)m-=SKILLS_DEF.find(s=>s.id==='price_discount').bonus(dl);
+  if(STATE.powerups['discount']&&new Date()<new Date(STATE.powerups['discount']))m-=0.2;
+  return Math.max(0.3,m);
+}
+function getCoinBonus(){
+  const cl=getSkillLevel('coin_master');if(!cl)return 1;
+  return 1+SKILLS_DEF.find(s=>s.id==='coin_master').bonus(cl);
+}
 
-PROPERTIES.forEach(p => {
-  if (!STATE.market[p.id]) STATE.market[p.id] = { mult: 1+(Math.random()-0.5)*0.1, trend: Math.random()>0.5?'up':'dn' };
-});
-
-// ===================== HELPERS =====================
-function fmt(n) {
-  if (n >= 1000000000) return '€'+(n/1000000000).toFixed(1)+'B';
-  if (n >= 1000000) return '€'+(n/1000000).toFixed(1)+'M';
-  if (n >= 1000) return '€'+Math.round(n/1000)+'K';
+// ======== HELPERS ========
+function fmt(n){
+  if(n>=1000000000)return '€'+(n/1000000000).toFixed(1)+'B';
+  if(n>=1000000)return '€'+(n/1000000).toFixed(1)+'M';
+  if(n>=1000)return '€'+Math.round(n/1000)+'K';
   return '€'+Math.round(n).toLocaleString();
 }
-function fmtRent(n) {
-  if (n >= 1000000) return '+€'+(n/1000000).toFixed(1)+'M/hod';
-  if (n >= 1000) return '+€'+Math.round(n/1000)+'K/hod';
+function fmtRent(n){
+  if(n>=1000000)return '+€'+(n/1000000).toFixed(1)+'M/hod';
+  if(n>=1000)return '+€'+Math.round(n/1000)+'K/hod';
   return '+€'+n+'/hod';
 }
-function getPropPrice(p) { return Math.round(p.price * STATE.market[p.id].mult); }
-function getOtherOwnership(propId) {
-  if (STATE.dbOwnerships) return STATE.dbOwnerships.filter(o=>o.property_id==propId&&o.user_id!==(STATE.user?.id||'')).reduce((s,o)=>s+o.pct,0);
-  return (MOCK_OWNERSHIP[propId]||[]).reduce((s,o)=>s+o.pct,0);
+function fmtTime(ms){
+  const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000);
+  return h>0?`${h}h ${m}m`:`${m}m`;
 }
-function getMyOwnership(propId) {
-  return STATE.ownership[propId]||STATE.ownership[String(propId)]||STATE.ownership[Number(propId)]||0;
+function getPropPrice(p){ return Math.round(p.price*STATE.market[p.id].mult*getPriceMultiplier()); }
+function getOtherOwnership(propId){
+  if(STATE.dbOwnerships)return STATE.dbOwnerships.filter(o=>o.property_id==propId&&o.user_id!==(STATE.user?.id||'')).reduce((s,o)=>s+o.pct,0);
+  return 0;
 }
-function getAvailablePct(propId) { return Math.max(0,100-getOtherOwnership(propId)-getMyOwnership(propId)); }
-function getMyRentIncome() {
-  return PROPERTIES.reduce((s,p)=>{const m=getMyOwnership(p.id);return m?s+Math.round(p.rent*m/100):s;},0);
+function getMyOwnership(propId){ return STATE.ownership[propId]||STATE.ownership[String(propId)]||STATE.ownership[Number(propId)]||0; }
+function getAvailablePct(propId){ return Math.max(0,100-getOtherOwnership(propId)-getMyOwnership(propId)); }
+function getMyRentIncome(){
+  const base=PROPERTIES.reduce((s,p)=>{const m=getMyOwnership(p.id);return m?s+Math.round(p.rent*m/100):s;},0);
+  return Math.round(base*getRentMultiplier());
 }
-function getNetWorth() {
-  return STATE.cash+PROPERTIES.reduce((s,p)=>{const m=getMyOwnership(p.id);return m?s+Math.round(getPropPrice(p)*m/100):s;},0);
-}
-function getPropStatus(propId) {
+function getNetWorth(){ return STATE.cash+PROPERTIES.reduce((s,p)=>{const m=getMyOwnership(p.id);return m?s+Math.round(getPropPrice(p)*m/100):s;},0); }
+function getPropStatus(propId){
   const m=getMyOwnership(propId),o=getOtherOwnership(propId);
   if(m>=100)return'mine';if(m>0)return'partial';if(!m&&o>=100)return'taken';return'available';
 }
-function getCatLabel(cat) {
-  return {byt:'Byt/Dom',komercny:'Komerčné',luxus:'Luxus',priemysel:'Priemysel',mesto:'Mesto/Krajina'}[cat]||cat;
+function getCatLabel(cat){ return{byt:'Byt/Dom',komercny:'Komerčné',luxus:'Luxus',priemysel:'Priemysel',mesto:'Mesto/Krajina'}[cat]||cat; }
+function getOtherOwnersList(propId){
+  if(STATE.dbOwnerships)return STATE.dbOwnerships.filter(o=>o.property_id==propId&&o.user_id!==(STATE.user?.id||'')).map(o=>({userId:o.user_id,pct:o.pct,username:STATE.dbProfiles?.find(p=>p.id===o.user_id)?.username||'Hráč'}));
+  return [];
 }
-function getOtherOwnersList(propId) {
-  if (STATE.dbOwnerships) return STATE.dbOwnerships.filter(o=>o.property_id==propId&&o.user_id!==(STATE.user?.id||'')).map(o=>({userId:o.user_id,pct:o.pct,username:STATE.dbProfiles?.find(p=>p.id===o.user_id)?.username||'Hráč'}));
-  return (MOCK_OWNERSHIP[propId]||[]).map(o=>({pid:o.pid,pct:o.pct}));
-}
-
-function toast(msg,dur=2800) {
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
+function toast(msg,dur=2800){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),dur);
 }
-function addActivity(text) {
-  const feed=document.getElementById('activity-feed');
-  if (!feed) return;
-  const now=new Date();
-  const ts=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
-  const d=document.createElement('div');
-  d.className='act-item';
+function addActivity(text){
+  const feed=document.getElementById('activity-feed');if(!feed)return;
+  const now=new Date();const ts=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+  const d=document.createElement('div');d.className='act-item';
   d.innerHTML=`<span class="act-icon">📌</span><span class="act-text">${text}</span><span class="act-time">${ts}</span>`;
-  feed.insertBefore(d,feed.firstChild);
-  if(feed.children.length>10)feed.removeChild(feed.lastChild);
+  feed.insertBefore(d,feed.firstChild);if(feed.children.length>10)feed.removeChild(feed.lastChild);
 }
 
-// ===================== AUTH =====================
+// ======== AUTH ========
 let authMode='login';
-function switchAuthTab(mode) {
+function switchAuthTab(mode){
   authMode=mode;
   document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&mode==='login')||(i===1&&mode==='register')));
   document.getElementById('auth-name').style.display=mode==='register'?'block':'none';
   document.getElementById('auth-btn').textContent=mode==='login'?'Prihlásiť sa':'Registrovať sa';
 }
-async function handleAuth() {
+async function handleAuth(){
   const email=document.getElementById('auth-email').value.trim();
   const pass=document.getElementById('auth-pass').value;
   const name=document.getElementById('auth-name').value.trim();
   if(!email||!pass){toast('⚠️ Vyplň email a heslo');return;}
-  document.getElementById('auth-btn').textContent='Načítavam...';
-  document.getElementById('auth-btn').disabled=true;
-  let waited=0;
-  while(!STATE.supabase&&waited<5000){await new Promise(r=>setTimeout(r,100));waited+=100;}
-  if(!STATE.supabase){toast('⚠️ Supabase nedostupný — demo mód');STATE.username=name||email.split('@')[0];STATE.demoMode=true;startGame(null);return;}
+  const btn=document.getElementById('auth-btn');btn.textContent='Načítavam...';btn.disabled=true;
+  let waited=0;while(!STATE.supabase&&waited<6000){await new Promise(r=>setTimeout(r,100));waited+=100;}
+  if(!STATE.supabase){toast('❌ Supabase nedostupný');btn.textContent=authMode==='login'?'Prihlásiť sa':'Registrovať sa';btn.disabled=false;return;}
   if(authMode==='register'){
     const{data,error}=await STATE.supabase.auth.signUp({email,password:pass,options:{data:{username:name||email.split('@')[0]}}});
-    if(error){toast('❌ '+error.message);document.getElementById('auth-btn').textContent='Registrovať sa';document.getElementById('auth-btn').disabled=false;return;}
+    if(error){toast('❌ '+error.message);btn.textContent='Registrovať sa';btn.disabled=false;return;}
     if(data.user){STATE.username=name||email.split('@')[0];startGame(data.user);}
-    else{const{data:d2,error:e2}=await STATE.supabase.auth.signInWithPassword({email,password:pass});if(e2){toast('📧 Skontroluj email');document.getElementById('auth-btn').textContent='Registrovať sa';document.getElementById('auth-btn').disabled=false;}else{STATE.username=name||email.split('@')[0];startGame(d2.user);}}
+    else{const{data:d2,error:e2}=await STATE.supabase.auth.signInWithPassword({email,password:pass});if(e2){toast('📧 Skontroluj email');btn.textContent='Registrovať sa';btn.disabled=false;}else{STATE.username=name||email.split('@')[0];startGame(d2.user);}}
   }else{
     const{data,error}=await STATE.supabase.auth.signInWithPassword({email,password:pass});
-    if(error){toast('❌ '+error.message);document.getElementById('auth-btn').textContent='Prihlásiť sa';document.getElementById('auth-btn').disabled=false;return;}
+    if(error){toast('❌ '+error.message);btn.textContent='Prihlásiť sa';btn.disabled=false;return;}
     startGame(data.user);
   }
 }
-function skipAuth(){startGame(null);}
-function startGame(user) {
+function startGame(user){
   STATE.user=user;
   if(user){STATE.username=user.user_metadata?.username||user.email.split('@')[0];STATE.demoMode=false;}
   document.getElementById('auth-screen').style.display='none';
   document.getElementById('app').style.display='flex';
   document.getElementById('um-name').textContent=STATE.username;
-  document.getElementById('um-email').textContent=user?.email||'Demo mód';
-  const banner=document.getElementById('connect-banner');
-  banner.style.display='none';
-  if(STATE.demoMode||!user){STATE.demoMode=true;renderAll();startTicks();return;}
-  banner.style.display='block';
-  banner.style.cssText+='background:rgba(76,175,125,0.1);border-color:#4caf7d;color:#4caf7d;display:block';
-  banner.textContent='⏳ Načítavam účet...';
+  document.getElementById('um-email').textContent=user?.email||'';
   setupRealtime();
-  loadMultiplayerState().then(()=>{banner.style.display='none';toast('🌐 Multiplayer aktívny! Vitaj, '+STATE.username);renderAll();}).catch(()=>{banner.textContent='⚠️ Chyba načítania';renderAll();});
+  loadMultiplayerState().then(()=>{toast('🌐 Vitaj späť, '+STATE.username+'!');renderAll();checkDaily();}).catch(()=>{toast('⚠️ Chyba načítania');renderAll();});
   startTicks();
 }
-function logout(){if(STATE.supabase)STATE.supabase.auth.signOut();document.getElementById('app').style.display='none';document.getElementById('auth-screen').style.display='flex';closeUserMenu();}
-function openUserMenu(){document.getElementById('user-menu').classList.add('open');}
+function logout(){if(STATE.supabase)STATE.supabase.auth.signOut();location.reload();}
+function openUserMenu(){document.getElementById('um-coins').textContent=STATE.coins;document.getElementById('um-nw').textContent=fmt(getNetWorth());document.getElementById('user-menu').classList.add('open');}
 function closeUserMenu(e){if(!e||e.target===document.getElementById('user-menu'))document.getElementById('user-menu').classList.remove('open');}
 
-// ===================== SUPABASE =====================
-const SUPA_URL='https://gmzwcybkxhpyjppgdxlu.supabase.co';
-const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtendjeWJreGhweWpwcGdkeGx1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NzgwOTgsImV4cCI6MjA5ODE1NDA5OH0.9e2Z_sGpOUun3Gg4V2GpE0pCf0vWKCfQI6bSeutUlBE';
+// ======== SUPABASE ========
 (function(){const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';s.onload=()=>{STATE.supabase=window.supabase.createClient(SUPA_URL,SUPA_KEY);};document.head.appendChild(s);})();
 
-async function loadMultiplayerState() {
+async function loadMultiplayerState(){
   if(!STATE.supabase||!STATE.user)return;
   const{data:profile}=await STATE.supabase.from('profiles').select('*').eq('id',STATE.user.id).single();
-  if(profile){STATE.cash=profile.cash;if(profile.username){STATE.username=profile.username;document.getElementById('um-name').textContent=STATE.username;}}
-  else{await STATE.supabase.from('profiles').insert({id:STATE.user.id,username:STATE.username,cash:50000});STATE.cash=50000;}
+  if(profile){
+    STATE.cash=profile.cash;
+    STATE.coins=profile.coins||0;
+    STATE.skills=profile.skills||{};
+    STATE.powerups=profile.powerups||{};
+    STATE.lastDaily=profile.last_daily||null;
+    STATE.dailyStreak=profile.daily_streak||0;
+    if(profile.username)STATE.username=profile.username;
+  }else{
+    await STATE.supabase.from('profiles').insert({id:STATE.user.id,username:STATE.username,cash:50000,coins:100,skills:{},powerups:{},last_daily:null,daily_streak:0});
+    STATE.cash=50000;STATE.coins=100;
+    toast('🎉 Vitaj! Dostávaš 100 Gold Coins na štart!');
+  }
   const{data:allOwn}=await STATE.supabase.from('ownerships').select('*');
   STATE.dbOwnerships=allOwn||[];STATE.ownership={};
   (allOwn||[]).forEach(o=>{if(o.user_id===STATE.user.id)STATE.ownership[Number(o.property_id)]=o.pct;});
   const{data:myOffers}=await STATE.supabase.from('offers').select('*').eq('to_id',STATE.user.id).eq('status','pending');
   STATE.offers=myOffers||[];updateOffersBadge();
-  const{data:profiles}=await STATE.supabase.from('profiles').select('id,username,cash').order('cash',{ascending:false}).limit(20);
+  const{data:profiles}=await STATE.supabase.from('profiles').select('id,username,cash,coins').order('cash',{ascending:false}).limit(20);
   STATE.dbProfiles=profiles||[];
 }
-function setupRealtime() {
+function setupRealtime(){
   if(!STATE.supabase)return;
-  STATE.supabase.channel('ownerships-ch').on('postgres_changes',{event:'*',schema:'public',table:'ownerships'},async(payload)=>{
+  STATE.supabase.channel('own-ch').on('postgres_changes',{event:'*',schema:'public',table:'ownerships'},async()=>{
     const{data:allOwn}=await STATE.supabase.from('ownerships').select('*');
     STATE.dbOwnerships=allOwn||[];STATE.ownership={};
     (allOwn||[]).forEach(o=>{if(o.user_id===STATE.user?.id)STATE.ownership[Number(o.property_id)]=o.pct;});
-    const pn=PROPERTIES.find(p=>p.id==payload.new?.property_id)?.name||'nehnuteľnosť';
-    if(payload.new?.user_id!==STATE.user?.id)addActivity(`Hráč kúpil ${payload.new?.pct}% z ${pn}`);
     renderAll();
   }).subscribe();
-  if(STATE.user){STATE.supabase.channel('my-offers-ch').on('postgres_changes',{event:'INSERT',schema:'public',table:'offers',filter:`to_id=eq.${STATE.user.id}`},async(payload)=>{
-    const{data:myOffers}=await STATE.supabase.from('offers').select('*').eq('to_id',STATE.user.id).eq('status','pending');
-    STATE.offers=myOffers||[];updateOffersBadge();
-    const p=PROPERTIES.find(x=>x.id==payload.new.property_id);
-    toast(`📩 Nová ponuka na ${p?.name||'nehnuteľnosť'}!`);
+  if(STATE.user){STATE.supabase.channel('off-ch').on('postgres_changes',{event:'INSERT',schema:'public',table:'offers',filter:`to_id=eq.${STATE.user.id}`},async()=>{
+    const{data:mo}=await STATE.supabase.from('offers').select('*').eq('to_id',STATE.user.id).eq('status','pending');
+    STATE.offers=mo||[];updateOffersBadge();toast('📩 Nová ponuka!');
   }).subscribe();}
   STATE.supabase.channel('live-act').on('broadcast',{event:'action'},({payload})=>addActivity(payload.text)).subscribe();
 }
 function broadcastAction(text){if(!STATE.supabase)return;STATE.supabase.channel('live-act').send({type:'broadcast',event:'action',payload:{text}});}
-function broadcastBuy(name,pct){broadcastAction(`${STATE.username} kúpil ${pct}% z ${name}`);}
-function updateOffersBadge(){const dot=document.getElementById('offers-dot');const cnt=STATE.offers?.length||0;dot.classList.toggle('show',cnt>0);}
-async function saveCash(){if(!STATE.supabase||!STATE.user)return;await STATE.supabase.from('profiles').upsert({id:STATE.user.id,username:STATE.username,cash:STATE.cash,updated_at:new Date().toISOString()},{onConflict:'id'});}
-async function dbUpsertOwnership(uid,pid,pct){if(pct<=0)await STATE.supabase.from('ownerships').delete().eq('user_id',uid).eq('property_id',pid);else await STATE.supabase.from('ownerships').upsert({user_id:uid,property_id:pid,pct,updated_at:new Date().toISOString()},{onConflict:'user_id,property_id'});}
+function updateOffersBadge(){document.getElementById('offers-dot').classList.toggle('show',(STATE.offers?.length||0)>0);}
+async function saveProfile(){
+  if(!STATE.supabase||!STATE.user)return;
+  await STATE.supabase.from('profiles').upsert({id:STATE.user.id,username:STATE.username,cash:STATE.cash,coins:STATE.coins,skills:STATE.skills,powerups:STATE.powerups,last_daily:STATE.lastDaily,daily_streak:STATE.dailyStreak,updated_at:new Date().toISOString()},{onConflict:'id'});
+}
+async function dbUpsertOwnership(uid,pid,pct){
+  if(pct<=0)await STATE.supabase.from('ownerships').delete().eq('user_id',uid).eq('property_id',pid);
+  else await STATE.supabase.from('ownerships').upsert({user_id:uid,property_id:pid,pct,updated_at:new Date().toISOString()},{onConflict:'user_id,property_id'});
+}
 
-// ===================== NAVIGATION =====================
-function setScreen(name, el) {
+// ======== NAVIGATION ========
+function setScreen(name,el){
   STATE.activeScreen=name;
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
@@ -733,23 +785,23 @@ function setScreen(name, el) {
   if(name==='portfolio')renderPortfolio();
   if(name==='offers')renderOffers();
   if(name==='leaderboard')renderLeaderboard();
+  if(name==='skills')renderSkills();
+  if(name==='store')renderStore();
   if(name==='market')renderGrid();
 }
-function filterCat(cat,el) {
+function filterCat(cat,el){
   STATE.activeCat=cat;
   document.querySelectorAll('#cat-chips .chip').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
-  renderGrid();
+  el.classList.add('active');renderGrid();
 }
-function setFilter(f,el) {
+function setFilter(f,el){
   STATE.activeFilter=f;
-  document.querySelectorAll('.chip-scroll .chip').forEach(c=>{if(['all','available','partial','taken'].some(x=>c.id==='fc-'+x))c.classList.remove('active');});
-  el.classList.add('active');
-  renderGrid();
+  ['all','available','partial','taken'].forEach(x=>{const e=document.getElementById('fc-'+x);if(e)e.classList.remove('active');});
+  el.classList.add('active');renderGrid();
 }
 
-// ===================== RENDER GRID =====================
-function renderGrid() {
+// ======== RENDER GRID ========
+function renderGrid(){
   const grid=document.getElementById('prop-grid');
   let props=PROPERTIES;
   if(STATE.activeCat!=='all')props=props.filter(p=>p.cat===STATE.activeCat);
@@ -759,186 +811,102 @@ function renderGrid() {
   grid.innerHTML='';
   if(!props.length){grid.innerHTML='<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">Žiadne nehnuteľnosti</div></div>';return;}
   props.forEach(p=>{
-    const status=getPropStatus(p.id);
-    const myPct=getMyOwnership(p.id);
-    const otherPct=getOtherOwnership(p.id);
-    const price=getPropPrice(p);
-    const totalOwned=myPct+otherPct;
-    const badgeHtml=status==='mine'?'<span class="prop-status-badge badge-mine">✓ Moje</span>':status==='partial'&&myPct>0?'<span class="prop-status-badge badge-mine">Môj podiel</span>':status==='partial'?'<span class="prop-status-badge badge-partial">Čiastočné</span>':status==='taken'?'<span class="prop-status-badge badge-taken">Obsadené</span>':'<span class="prop-status-badge badge-available">Voľné</span>';
-    const d=document.createElement('div');
-    d.className='prop-card'+(myPct>0?(myPct>=100?' owned':' partial'):'');
-    d.innerHTML=`<div class="prop-emoji-wrap">${p.emoji}</div><div class="prop-info"><div class="prop-name">${p.name}</div><div class="prop-loc">📍 ${p.loc}</div><div class="prop-meta"><span class="prop-price">${fmt(price)}</span><span class="prop-rent-badge">${fmtRent(p.rent)}</span>${badgeHtml}</div></div>${totalOwned>0?`<div class="prop-own-bar" style="width:${totalOwned}%"></div>`:''}`;
-    d.onclick=()=>openModal(p.id);
-    grid.appendChild(d);
+    const status=getPropStatus(p.id);const myPct=getMyOwnership(p.id);const otherPct=getOtherOwnership(p.id);const price=getPropPrice(p);const totalOwned=myPct+otherPct;
+    const badge=status==='mine'?'<span class="prop-status-badge badge-mine">✓ Moje</span>':status==='partial'&&myPct>0?'<span class="prop-status-badge badge-mine">Môj podiel</span>':status==='partial'?'<span class="prop-status-badge badge-partial">Čiastočné</span>':status==='taken'?'<span class="prop-status-badge badge-taken">Obsadené</span>':'<span class="prop-status-badge badge-available">Voľné</span>';
+    const d=document.createElement('div');d.className='prop-card'+(myPct>0?(myPct>=100?' owned':' partial'):'');
+    d.innerHTML=`<div class="prop-emoji-wrap">${p.emoji}</div><div class="prop-info"><div class="prop-name">${p.name}</div><div class="prop-loc">📍 ${p.loc}</div><div class="prop-meta"><span class="prop-price">${fmt(price)}</span><span class="prop-rent-badge">${fmtRent(p.rent)}</span>${badge}</div></div>${totalOwned>0?`<div class="prop-own-bar" style="width:${totalOwned}%"></div>`:''}`;
+    d.onclick=()=>openModal(p.id);grid.appendChild(d);
   });
+  // boost status
+  const boost=document.getElementById('boost-status');if(boost){
+    const active2x=STATE.powerups['2xrent']&&new Date()<new Date(STATE.powerups['2xrent']);
+    const activeDisc=STATE.powerups['discount']&&new Date()<new Date(STATE.powerups['discount']);
+    boost.innerHTML=(active2x?'<span class="boost-badge">⚡ 2× Nájomné aktívne</span>':'')+(activeDisc?'<span class="boost-badge">🏷️ -20% Zľava aktívna</span>':'');
+  }
 }
 
-// ===================== MODAL =====================
+// ======== MODAL ========
 let currentPropId=null,buySharePct=10;
-function openModal(propId) {
+function openModal(propId){
   currentPropId=propId;
   const p=PROPERTIES.find(x=>x.id===propId);if(!p)return;
-  const myPct=getMyOwnership(propId);
-  const otherPct=getOtherOwnership(propId);
-  const avail=getAvailablePct(propId);
-  const price=getPropPrice(p);
-  const others=getOtherOwnersList(propId);
-  const trend=STATE.market[propId].trend;
+  const myPct=getMyOwnership(propId);const otherPct=getOtherOwnership(propId);const avail=getAvailablePct(propId);const price=getPropPrice(p);
+  const others=getOtherOwnersList(propId);const trend=STATE.market[propId].trend;
   const trendTxt=trend==='up'?`📈 +${(Math.random()*5+1).toFixed(1)}%`:`📉 -${(Math.random()*3+0.5).toFixed(1)}%`;
   document.getElementById('modal-title').textContent=p.name;
   let ownHtml='';
   if(myPct>0)ownHtml+=`<div class="owner-row"><div class="owner-avatar" style="background:${COLORS[0]}22;color:${COLORS[0]}">👤</div><span style="font-size:13px;font-weight:500">Ty (${STATE.username})</span><span class="owner-pct">${myPct}%</span></div>`;
-  others.forEach((o,i)=>{const nm=o.username||(STATE.players.find(x=>x.id===o.pid)?.name)||'Hráč';const clr=COLORS[(i+1)%COLORS.length];ownHtml+=`<div class="owner-row"><div class="owner-avatar" style="background:${clr}22;color:${clr}">👤</div><span style="font-size:13px">${nm}</span><span class="owner-pct">${o.pct}%</span><button class="offer-btn" onclick="makeOffer('${o.userId||o.pid}',${propId},${o.pct},'${nm}')">Ponúknuť</button></div>`;});
+  others.forEach((o,i)=>{const nm=o.username||'Hráč';const clr=COLORS[(i+1)%COLORS.length];ownHtml+=`<div class="owner-row"><div class="owner-avatar" style="background:${clr}22;color:${clr}">👤</div><span style="font-size:13px">${nm}</span><span class="owner-pct">${o.pct}%</span><button class="offer-btn" onclick="makeOffer('${o.userId}',${propId},${o.pct},'${nm}')">Ponúknuť</button></div>`;});
   const maxBuy=Math.min(avail,100);buySharePct=Math.min(10,maxBuy);
   const shareCost=Math.round(price*buySharePct/100);
   let buyHtml='';
-  if(avail>0){const canAfford=STATE.cash>=shareCost;buyHtml=`<div class="divider"></div><div class="share-slider"><label>Kúpiť podiel <span id="sl-pct">${buySharePct}%</span><span id="sl-cost" style="color:var(--gold)">${fmt(shareCost)}</span></label><input type="range" min="1" max="${maxBuy}" value="${buySharePct}" oninput="updateSlider(this.value,${propId})"></div><button class="btn btn-gold" id="buy-btn" onclick="buyShare(${propId})" ${!canAfford?'disabled':''}>${canAfford?`Kúpiť ${buySharePct}% za ${fmt(shareCost)}`:`Nedostatok (${fmt(shareCost)})`}</button>`;}
-  else if(myPct>0)buyHtml=`<div class="divider"></div><div style="font-size:12px;color:var(--text3);text-align:center;padding:8px">Všetky podiely obsadené — pošli ponuku inému hráčovi.</div>`;
+  if(avail>0){const ca=STATE.cash>=shareCost;buyHtml=`<div class="divider"></div><div class="share-slider"><label>Kúpiť podiel <span id="sl-pct">${buySharePct}%</span><span id="sl-cost" style="color:var(--gold)">${fmt(shareCost)}</span></label><input type="range" min="1" max="${maxBuy}" value="${buySharePct}" oninput="updateSlider(this.value,${propId})"></div><button class="btn btn-gold" id="buy-btn" onclick="buyShare(${propId})" ${!ca?'disabled':''}>${ca?`Kúpiť ${buySharePct}% za ${fmt(shareCost)}`:`Nedostatok (${fmt(shareCost)})`}</button>`;}
+  else if(myPct>0)buyHtml=`<div class="divider"></div><div style="font-size:12px;color:var(--text3);text-align:center;padding:8px">Všetky podiely obsadené.</div>`;
   const sellHtml=myPct>0?`<button class="btn btn-outline" onclick="sellShare(${propId})">Predať môj podiel (${myPct}%)</button>`:'';
-  const watchHtml=STATE.watchlist.includes(propId)?`<button class="btn btn-outline" onclick="removeWatch(${propId})">👁️ Odobrať zo sledovaných</button>`:`<button class="btn btn-outline" onclick="addWatch(${propId})">👁️ Sledovať</button>`;
-  document.getElementById('modal-body').innerHTML=`<span class="modal-emoji">${p.emoji}</span><div class="modal-loc">📍 ${p.loc} &nbsp;|&nbsp; ${getCatLabel(p.cat)} &nbsp;|&nbsp; ${trendTxt}</div><div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.5">${p.desc}</div><div class="info-grid"><div class="info-cell"><div class="info-cell-label">Trhová cena</div><div class="info-cell-val gold">${fmt(price)}</div></div><div class="info-cell"><div class="info-cell-label">Rent/hod</div><div class="info-cell-val g">${fmt(p.rent)}</div></div><div class="info-cell"><div class="info-cell-label">Môj podiel</div><div class="info-cell-val">${myPct}%</div></div><div class="info-cell"><div class="info-cell-label">Dostupné</div><div class="info-cell-val">${avail}%</div></div></div><div class="own-bar-wrap"><div class="own-bar-label"><span>Vlastníctvo</span><span>${100-avail}% vlastnené</span></div><div class="own-bar"><div class="own-bar-mine" style="width:${myPct}%"></div><div class="own-bar-others" style="width:${otherPct}%"></div></div></div>${ownHtml?'<div class="owner-list">'+ownHtml+'</div>':''}${buyHtml}${sellHtml}${watchHtml}`;
+  document.getElementById('modal-body').innerHTML=`<span class="modal-emoji">${p.emoji}</span><div class="modal-loc">📍 ${p.loc} | ${getCatLabel(p.cat)} | ${trendTxt}</div><div style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.5">${p.desc}</div><div class="info-grid"><div class="info-cell"><div class="info-cell-label">Trhová cena</div><div class="info-cell-val gold">${fmt(price)}</div></div><div class="info-cell"><div class="info-cell-label">Rent/hod</div><div class="info-cell-val g">${fmt(p.rent)}</div></div><div class="info-cell"><div class="info-cell-label">Môj podiel</div><div class="info-cell-val">${myPct}%</div></div><div class="info-cell"><div class="info-cell-label">Dostupné</div><div class="info-cell-val">${avail}%</div></div></div><div class="own-bar-wrap"><div class="own-bar-label"><span>Vlastníctvo</span><span>${100-avail}% vlastnené</span></div><div class="own-bar"><div class="own-bar-mine" style="width:${myPct}%"></div><div class="own-bar-others" style="width:${otherPct}%"></div></div></div>${ownHtml?'<div class="owner-list">'+ownHtml+'</div>':''}${buyHtml}${sellHtml}`;
   document.getElementById('modal-overlay').classList.add('open');
 }
-function updateSlider(val,propId) {
+function updateSlider(val,propId){
   buySharePct=parseInt(val);const p=PROPERTIES.find(x=>x.id===propId);const cost=Math.round(getPropPrice(p)*buySharePct/100);
   document.getElementById('sl-pct').textContent=buySharePct+'%';document.getElementById('sl-cost').textContent=fmt(cost);
   const btn=document.getElementById('buy-btn');if(!btn)return;
   btn.disabled=STATE.cash<cost;btn.textContent=STATE.cash>=cost?`Kúpiť ${buySharePct}% za ${fmt(cost)}`:`Nedostatok (${fmt(cost)})`;
 }
-async function buyShare(propId) {
+async function buyShare(propId){
   const p=PROPERTIES.find(x=>x.id===propId);const cost=Math.round(getPropPrice(p)*buySharePct/100);
   if(STATE.cash<cost){toast('❌ Nedostatok hotovosti');return;}
-  STATE.cash-=cost;const newPct=(getMyOwnership(propId))+buySharePct;STATE.ownership[Number(propId)]=newPct;
-  broadcastBuy(p.name,buySharePct);toast(`✅ Kúpil si ${buySharePct}% z ${p.name} za ${fmt(cost)}`);
-  addActivity(`Ty si kúpil ${buySharePct}% z ${p.name}`);closeModalDirect();renderAll();
-  if(STATE.supabase&&STATE.user){await dbUpsertOwnership(STATE.user.id,propId,newPct);await saveCash();}
+  STATE.cash-=cost;const newPct=getMyOwnership(propId)+buySharePct;STATE.ownership[Number(propId)]=newPct;
+  broadcastAction(`${STATE.username} kúpil ${buySharePct}% z ${p.name}`);
+  toast(`✅ Kúpil si ${buySharePct}% z ${p.name} za ${fmt(cost)}`);
+  closeModalDirect();renderAll();
+  if(STATE.supabase&&STATE.user){await dbUpsertOwnership(STATE.user.id,propId,newPct);await saveProfile();}
   openModal(propId);
 }
-async function sellShare(propId) {
+async function sellShare(propId){
   const p=PROPERTIES.find(x=>x.id===propId);const myPct=getMyOwnership(propId);const gain=Math.round(getPropPrice(p)*myPct/100);
   STATE.cash+=gain;delete STATE.ownership[propId];delete STATE.ownership[Number(propId)];
-  broadcastAction(`${STATE.username} predal ${myPct}% z ${p.name}`);toast(`💰 Predaný podiel za ${fmt(gain)}`);
+  broadcastAction(`${STATE.username} predal ${myPct}% z ${p.name}`);toast(`💰 Predaný za ${fmt(gain)}`);
   closeModalDirect();renderAll();
-  if(STATE.supabase&&STATE.user){await dbUpsertOwnership(STATE.user.id,propId,0);await saveCash();}
+  if(STATE.supabase&&STATE.user){await dbUpsertOwnership(STATE.user.id,propId,0);await saveProfile();}
 }
-async function makeOffer(targetId,propId,targetPct,targetName) {
-  const p=PROPERTIES.find(x=>x.id===propId);const amt=Math.round(getPropPrice(p)*targetPct/100*1.15);
+async function makeOffer(targetId,propId,targetPct,targetName){
+  const p=PROPERTIES.find(x=>x.id===propId);const negLvl=getSkillLevel('negotiator');const bonus=negLvl?SKILLS_DEF.find(s=>s.id==='negotiator').bonus(negLvl):0;
+  const amt=Math.round(getPropPrice(p)*targetPct/100*(1.15+bonus));
   if(STATE.cash<amt){toast('❌ Nedostatok hotovosti');return;}
-  if(!STATE.supabase||!STATE.user){toast(`📩 Demo: Ponuka za ${fmt(amt)}`);closeModalDirect();return;}
-  const{error}=await STATE.supabase.from('offers').insert({from_id:STATE.user.id,to_id:targetId,property_id:propId,pct:targetPct,amount:amt,status:'pending'}).select().single();
-  if(error){toast('❌ Chyba');return;}
-  toast(`📩 Ponuka ${fmt(amt)} odoslaná ${targetName}!`);broadcastAction(`${STATE.username} poslal ponuku ${targetName} na ${p.name}`);closeModalDirect();
+  if(!STATE.supabase||!STATE.user){toast('❌ Treba byť prihlásený');return;}
+  await STATE.supabase.from('offers').insert({from_id:STATE.user.id,to_id:targetId,property_id:propId,pct:targetPct,amount:amt,status:'pending'});
+  toast(`📩 Ponuka ${fmt(amt)} odoslaná ${targetName}!`);broadcastAction(`${STATE.username} poslal ponuku na ${p.name}`);closeModalDirect();
 }
-async function acceptOffer(offer) {
+async function acceptOffer(offer){
   const p=PROPERTIES.find(x=>x.id==offer.property_id);const myPct=getMyOwnership(offer.property_id);
   STATE.cash+=offer.amount;const newPct=Math.max(0,myPct-offer.pct);STATE.ownership[Number(offer.property_id)]=newPct;
   await STATE.supabase.from('offers').update({status:'accepted'}).eq('id',offer.id);
-  await dbUpsertOwnership(STATE.user.id,offer.property_id,newPct);await saveCash();
+  await dbUpsertOwnership(STATE.user.id,offer.property_id,newPct);await saveProfile();
   const{data:bOwn}=await STATE.supabase.from('ownerships').select('pct').eq('user_id',offer.from_id).eq('property_id',offer.property_id).single();
   await STATE.supabase.from('ownerships').upsert({user_id:offer.from_id,property_id:offer.property_id,pct:(bOwn?.pct||0)+offer.pct},{onConflict:'user_id,property_id'});
   const{data:bPro}=await STATE.supabase.from('profiles').select('cash').eq('id',offer.from_id).single();
   if(bPro)await STATE.supabase.from('profiles').update({cash:bPro.cash-offer.amount}).eq('id',offer.from_id);
-  STATE.offers=STATE.offers.filter(o=>o.id!==offer.id);updateOffersBadge();toast(`✅ Prijatá! Získal si ${fmt(offer.amount)}`);renderAll();renderOffers();
+  STATE.offers=STATE.offers.filter(o=>o.id!==offer.id);updateOffersBadge();
+  toast(`✅ Prijatá! Získal si ${fmt(offer.amount)}`);addActivity(`${STATE.username} predal podiel v ${p?.name}`);renderAll();renderOffers();
 }
-async function rejectOffer(offer) {
+async function rejectOffer(offer){
   await STATE.supabase.from('offers').update({status:'rejected'}).eq('id',offer.id);
   STATE.offers=STATE.offers.filter(o=>o.id!==offer.id);updateOffersBadge();toast('❌ Odmietnuté');renderOffers();
 }
-function addWatch(id){STATE.watchlist.push(id);toast('👁️ Pridané do sledovaných');openModal(id);}
-function removeWatch(id){STATE.watchlist=STATE.watchlist.filter(x=>x!==id);toast('Odobrané');openModal(id);}
 function closeModal(e){if(e.target===document.getElementById('modal-overlay'))closeModalDirect();}
 function closeModalDirect(){document.getElementById('modal-overlay').classList.remove('open');}
 
-// ===================== PORTFOLIO =====================
-function renderPortfolio() {
+// ======== PORTFOLIO ========
+function renderPortfolio(){
   const myProps=PROPERTIES.filter(p=>getMyOwnership(p.id)>0);
-  const totalRent=myProps.reduce((s,p)=>s+Math.round(p.rent*getMyOwnership(p.id)/100),0);
+  const totalRent=myProps.reduce((s,p)=>s+Math.round(p.rent*getMyOwnership(p.id)/100*getRentMultiplier()),0);
   const totalVal=myProps.reduce((s,p)=>s+Math.round(getPropPrice(p)*getMyOwnership(p.id)/100),0);
   document.getElementById('port-summary').innerHTML=`<div class="port-stat"><div class="port-stat-val">${fmt(totalVal)}</div><div class="port-stat-label">Hodnota</div></div><div class="port-stat"><div class="port-stat-val" style="color:var(--green)">${fmtRent(totalRent)}</div><div class="port-stat-label">Príjem/hod</div></div><div class="port-stat"><div class="port-stat-val">${myProps.length}</div><div class="port-stat-label">Nehnuteľnosti</div></div>`;
   const list=document.getElementById('portfolio-list');
   if(!myProps.length){list.innerHTML='<div class="empty"><div class="empty-icon">📁</div><div class="empty-text">Zatiaľ nevlastníš žiadnu nehnuteľnosť</div></div>';return;}
   list.innerHTML='';
   myProps.forEach(p=>{
-    const myPct=getMyOwnership(p.id);const rent=Math.round(p.rent*myPct/100);const val=Math.round(getPropPrice(p)*myPct/100);
+    const myPct=getMyOwnership(p.id);const rent=Math.round(p.rent*myPct/100*getRentMultiplier());const val=Math.round(getPropPrice(p)*myPct/100);
     const d=document.createElement('div');d.className='port-item';
     d.innerHTML=`<div class="port-emoji">${p.emoji}</div><div class="port-info"><div class="port-name">${p.name}</div><div class="port-sub">📍 ${p.loc} · ${myPct}% podiel</div><div class="port-pct-bar"><div class="port-pct-fill" style="width:${myPct}%"></div></div></div><div class="port-right"><div class="port-rent">${fmtRent(rent)}</div><div class="port-val">${fmt(val)}</div><button class="sell-btn" onclick="event.stopPropagation();sellShare(${p.id})">Predať</button></div>`;
-    d.onclick=()=>openModal(p.id);list.appendChild(d);
-  });
-}
-
-// ===================== OFFERS =====================
-function renderOffers() {
-  const list=document.getElementById('offers-list');
-  if(!STATE.offers||!STATE.offers.length){list.innerHTML='<div class="empty"><div class="empty-icon">📩</div><div class="empty-text">Žiadne ponuky od hráčov</div></div>';return;}
-  list.innerHTML='';
-  STATE.offers.forEach(offer=>{
-    const p=PROPERTIES.find(x=>x.id==offer.property_id);const fromName=STATE.dbProfiles?.find(pr=>pr.id===offer.from_id)?.username||'Hráč';
-    const d=document.createElement('div');d.className='offer-card';
-    d.innerHTML=`<div class="offer-top"><span class="offer-prop-name">${p?.emoji||'🏠'} ${p?.name||'Nehnuteľnosť'}</span><span class="offer-amount">${fmt(offer.amount)}</span></div><div class="offer-detail">Od: ${fromName} · Chce: ${offer.pct}% tvojho podielu</div><div class="offer-actions"><button class="btn btn-green" onclick="acceptOffer(${JSON.stringify(offer).replace(/"/g,"'")})">✅ Prijať</button><button class="btn btn-red" onclick="rejectOffer(${JSON.stringify(offer).replace(/"/g,"'")})">❌ Odmietnuť</button></div>`;
-    list.appendChild(d);
-  });
-}
-
-// ===================== LEADERBOARD =====================
-function renderLeaderboard() {
-  let players;
-  if(STATE.dbProfiles&&STATE.dbProfiles.length){
-    players=STATE.dbProfiles.map((pr,i)=>({name:pr.username||pr.id.slice(0,8),avatar:AVATARS[i%AVATARS.length],color:COLORS[i%COLORS.length],worth:pr.cash+(STATE.dbOwnerships||[]).filter(o=>o.user_id===pr.id).reduce((s,o)=>{const p=PROPERTIES.find(x=>x.id==o.property_id);return s+(p?Math.round(getPropPrice(p)*o.pct/100):0);},0),props:(STATE.dbOwnerships||[]).filter(o=>o.user_id===pr.id).length,isMe:pr.id===STATE.user?.id}));
-  }else{players=[{name:STATE.username,avatar:'🌟',color:COLORS[7],worth:getNetWorth(),props:Object.keys(STATE.ownership).length,isMe:true},...STATE.players.map(p=>({...p,isMe:false}))];}
-  players.sort((a,b)=>b.worth-a.worth);
-  const list=document.getElementById('lb-list');list.innerHTML='';
-  const medals=['🥇','🥈','🥉'];
-  players.forEach((pl,i)=>{
-    const isMe=pl.isMe||pl.name===STATE.username;
-    const d=document.createElement('div');d.className='lb-item';d.style.background=isMe?'var(--gold-dim)':'';
-    d.innerHTML=`<span class="lb-rank">${medals[i]||'#'+(i+1)}</span><div class="lb-avatar" style="background:${pl.color}22;color:${pl.color}">${pl.avatar}</div><div class="lb-info"><div class="lb-name">${pl.name}${isMe?' (Ty)':''}</div><div class="lb-props">${pl.props} nehnuteľností</div></div><div class="lb-worth">${fmt(pl.worth)}</div>`;
-    list.appendChild(d);
-  });
-}
-
-// ===================== TICKER =====================
-function renderTicker() {
-  const ticker=document.getElementById('ticker');if(!ticker)return;ticker.innerHTML='';
-  const cats=[{n:'Bratislava',id:1},{n:'Praha',id:3},{n:'Viedeň',id:8},{n:'Monaco',id:12},{n:'Manhattan',id:20},{n:'Dubaj',id:25},{n:'Santorini',id:19}];
-  cats.forEach(c=>{const t=STATE.market[c.id]?.trend||'up';const chg=(Math.random()*4+0.5).toFixed(1);const d=document.createElement('div');d.className='ticker-chip';d.innerHTML=`${c.n}<span class="${t==='up'?'up':'dn'}">${t==='up'?'+':'-'}${chg}%</span>`;ticker.appendChild(d);});
-}
-
-// ===================== TOPBAR =====================
-function updateTopbar() {
-  document.getElementById('top-cash').textContent=fmt(STATE.cash);
-  document.getElementById('top-rent').textContent=fmtRent(getMyRentIncome());
-  document.getElementById('top-networth').textContent=fmt(getNetWorth());
-}
-
-// ===================== TICKS =====================
-function startTicks() {
-  setInterval(async()=>{
-    if(!STATE.supabase||!STATE.user)return;
-    const{data}=await STATE.supabase.from('profiles').select('cash').eq('id',STATE.user.id).single();
-    if(data&&data.cash!==STATE.cash){const diff=data.cash-STATE.cash;STATE.cash=data.cash;if(diff>0)toast(`💰 Príjem z nájmu: +${fmt(diff)}`);renderAll();}
-  },300000);
-  setInterval(()=>{PROPERTIES.forEach(p=>{const d=(Math.random()-0.48)*0.04;STATE.market[p.id].mult=Math.max(0.7,Math.min(1.5,STATE.market[p.id].mult+d));STATE.market[p.id].trend=d>0?'up':'dn';});renderTicker();},45000);
-  const fakeActs=[
-    ()=>{const r=STATE.players[Math.floor(Math.random()*STATE.players.length)];const pr=PROPERTIES[Math.floor(Math.random()*PROPERTIES.length)];addActivity(`${r.name} kúpil podiel v ${pr.name}`);},
-    ()=>{const r=STATE.players[Math.floor(Math.random()*STATE.players.length)];addActivity(`${r.name} poslal ponuku inému hráčovi`);},
-    ()=>{const pr=PROPERTIES[Math.floor(Math.random()*PROPERTIES.length)];addActivity(`Cena ${pr.name} vzrástla o ${(Math.random()*3+0.5).toFixed(1)}%`);}
-  ];
-  setInterval(()=>fakeActs[Math.floor(Math.random()*fakeActs.length)](),8000);
-}
-
-function renderAll(){renderGrid();if(STATE.activeScreen==='portfolio')renderPortfolio();updateTopbar();renderTicker();}
-
-// Init
-function initActivity() {
-  ['LuxuryKing kúpil 30% z Penthouse Praha','Cena Santorini vzrástla o 2.3%','RealEstatePro kúpil 45% z Aupark komplex','Nová nehnuteľnosť dostupná na trhu'].forEach((text,i)=>{const d=document.createElement('div');d.className='act-item';d.innerHTML=`<span class="act-icon">📌</span><span class="act-text">${text}</span><span class="act-time">${(i+1)*7}m</span>`;document.getElementById('activity-feed').appendChild(d);});
-}
-initActivity();
-
-// PWA install prompt
-let deferredPrompt=null;
-window.addEventListener('beforeinstallprompt',(e)=>{e.preventDefault();deferredPrompt=e;toast('💾 Tap here to install PropertyEmpire!',5000);});
-
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModalDirect();});
-</script>
-</body>
-</html>
+    d.onclick=()=>openModal(p.
