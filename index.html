@@ -248,13 +248,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     <div class="auth-logo">🏙️ PropertyEmpire</div>
     <div class="auth-sub">Buduj realitné impérium. Súpeř s celým svetom.</div>
     <div class="auth-tabs">
-      <div class="auth-tab active" id="tab-login">Prihlásenie</div>
-      <div class="auth-tab" id="tab-register">Registrácia</div>
+      <div class="auth-tab active" onclick="switchAuthTab('login')">Prihlásenie</div>
+      <div class="auth-tab" onclick="switchAuthTab('register')">Registrácia</div>
     </div>
     <input class="auth-input" id="auth-email" type="email" placeholder="Email" autocomplete="email">
     <input class="auth-input" id="auth-pass" type="password" placeholder="Heslo" autocomplete="current-password">
     <input class="auth-input" id="auth-name" type="text" placeholder="Herné meno" style="display:none" autocomplete="nickname">
-    <button class="btn btn-gold" id="auth-btn">Prihlásiť sa</button>
+    <div id="auth-error" style="color:var(--red);font-size:13px;text-align:center;min-height:20px;margin-top:4px"></div>
+    <button class="btn btn-gold" onclick="handleAuth()">Prihlásiť sa</button>
   </div>
 </div>
 
@@ -684,24 +685,47 @@ function switchAuthTab(mode){
   document.getElementById('auth-btn').textContent=mode==='login'?'Prihlásiť sa':'Registrovať sa';
 }
 async function handleAuth(){
-  const email=document.getElementById('auth-email').value.trim();
-  const pass=document.getElementById('auth-pass').value;
-  const name=document.getElementById('auth-name').value.trim();
-  if(!email||!pass){toast('⚠️ Vyplň email a heslo');return;}
-  const btn=document.getElementById('auth-btn');btn.textContent='Načítavam...';btn.disabled=true;
-  let waited=0;while(!STATE.supabase&&waited<6000){await new Promise(r=>setTimeout(r,100));waited+=100;}
-  if(!STATE.supabase){toast('❌ Supabase nedostupný');btn.textContent=authMode==='login'?'Prihlásiť sa':'Registrovať sa';btn.disabled=false;return;}
-  if(authMode==='register'){
-    const{data,error}=await STATE.supabase.auth.signUp({email,password:pass,options:{data:{username:name||email.split('@')[0]}}});
-    if(error){toast('❌ '+error.message);btn.textContent='Registrovať sa';btn.disabled=false;return;}
-    if(data.user){STATE.username=name||email.split('@')[0];startGame(data.user);}
-    else{const{data:d2,error:e2}=await STATE.supabase.auth.signInWithPassword({email,password:pass});if(e2){toast('📧 Skontroluj email');btn.textContent='Registrovať sa';btn.disabled=false;}else{STATE.username=name||email.split('@')[0];startGame(d2.user);}}
-  }else{
-    const{data,error}=await STATE.supabase.auth.signInWithPassword({email,password:pass});
-    if(error){toast('❌ '+error.message);btn.textContent='Prihlásiť sa';btn.disabled=false;return;}
-    startGame(data.user);
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value;
+  const name = document.getElementById('auth-name').value.trim();
+  const errEl = document.getElementById('auth-error');
+  
+  if(!email || !pass){ errEl.textContent='⚠️ Vyplň email a heslo'; return; }
+  errEl.textContent = 'Načítavam...';
+
+  // Wait for Supabase max 8 seconds
+  let waited = 0;
+  while(!STATE.supabase && waited < 8000){
+    await new Promise(r => setTimeout(r, 200));
+    waited += 200;
+  }
+  if(!STATE.supabase){ errEl.textContent='❌ Chyba pripojenia. Skús znova.'; return; }
+
+  try {
+    if(authMode === 'register'){
+      const uname = name || email.split('@')[0];
+      const { data, error } = await STATE.supabase.auth.signUp({
+        email: email,
+        password: pass,
+        options: { data: { username: uname } }
+      });
+      if(error){ errEl.textContent = '❌ ' + error.message; return; }
+      // Try immediate login after register
+      const { data: d2, error: e2 } = await STATE.supabase.auth.signInWithPassword({ email, password: pass });
+      if(e2){ errEl.textContent = '📧 Registrácia OK! Skontroluj email a potom sa prihlás.'; return; }
+      STATE.username = uname;
+      startGame(d2.user);
+    } else {
+      const { data, error } = await STATE.supabase.auth.signInWithPassword({ email, password: pass });
+      if(error){ errEl.textContent = '❌ ' + error.message; return; }
+      startGame(data.user);
+    }
+  } catch(e) {
+    errEl.textContent = '❌ Chyba: ' + e.message;
   }
 }
+
+
 function startGame(user){
   STATE.user=user;
   if(user){STATE.username=user.user_metadata?.username||user.email.split('@')[0];STATE.demoMode=false;}
@@ -1054,10 +1078,6 @@ function renderAll(){
 
 // ======== INIT ========
 document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('tab-login').addEventListener('click',()=>switchAuthTab('login'));
-  document.getElementById('tab-register').addEventListener('click',()=>switchAuthTab('register'));
-  document.getElementById('auth-btn').addEventListener('click',handleAuth);
-  document.getElementById('user-menu').addEventListener('click',closeUserMenu);
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModalDirect();});
 
   // PWA manifest
