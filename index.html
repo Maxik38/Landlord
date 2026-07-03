@@ -239,288 +239,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
   #bottom-nav{left:50%;transform:translateX(-50%);}
 }
 </style>
-</head>
-<body>
-
-<!-- AUTH -->
-<div id="auth-screen">
-  <div class="auth-sheet">
-    <div class="auth-logo">🏙️ PropertyEmpire</div>
-    <div class="auth-sub">Buduj realitné impérium. Súpeř s celým svetom.</div>
-    <div class="auth-tabs">
-      <div class="auth-tab active" onclick="switchAuthTab('login')">Prihlásenie</div>
-      <div class="auth-tab" onclick="switchAuthTab('register')">Registrácia</div>
-    </div>
-    <input class="auth-input" id="auth-email" type="email" placeholder="Email" autocomplete="email">
-    <input class="auth-input" id="auth-pass" type="password" placeholder="Heslo" autocomplete="current-password">
-    <input class="auth-input" id="auth-name" type="text" placeholder="Herné meno" style="display:none" autocomplete="nickname">
-    <div id="auth-error" style="color:var(--red);font-size:13px;text-align:center;min-height:20px;margin-top:4px"></div>
-    <button class="btn btn-gold" onclick="handleAuth()">Prihlásiť sa</button>
-  </div>
-</div>
-
-<!-- USER MENU -->
-<div id="user-menu" onclick="closeUserMenu(event)">
-  <div class="user-menu-sheet">
-    <div class="user-menu-name" id="um-name">Hráč</div>
-    <div class="user-menu-email" id="um-email"></div>
-    <div style="display:flex;gap:8px;margin-bottom:8px">
-      <div style="flex:1;background:var(--surface2);border-radius:8px;padding:10px;text-align:center">
-        <div style="font-size:20px;font-weight:700;color:var(--gold)" id="um-coins">0</div>
-        <div style="font-size:10px;color:var(--text3)">Gold Coins</div>
-      </div>
-      <div style="flex:1;background:var(--surface2);border-radius:8px;padding:10px;text-align:center">
-        <div style="font-size:16px;font-weight:700;color:var(--text)" id="um-nw">€0</div>
-        <div style="font-size:10px;color:var(--text3)">Net Worth</div>
-      </div>
-    </div>
-    <button class="btn btn-outline" onclick="logout()">🚪 Odhlásiť sa</button>
-  </div>
-</div>
-
-<!-- AD OVERLAY -->
-<div id="ad-overlay">
-  <div class="ad-box">
-    <div class="ad-emoji">📺</div>
-    <div class="ad-title">Pozeráš reklamu</div>
-    <div class="ad-sub">Počkaj do konca a získaš odmenu</div>
-    <div class="ad-timer" id="ad-timer">30</div>
-    <div class="ad-bar"><div class="ad-bar-fill" id="ad-bar-fill" style="width:100%"></div></div>
-    <div style="font-size:13px;color:var(--text3)" id="ad-reward-txt">Odmena: 50 🪙</div>
-  </div>
-</div>
-
-<!-- APP -->
-<div id="app" style="display:none">
-  <div id="topbar">
-    <div class="logo">🏙️</div>
-    <div class="topbar-stats">
-      <div class="tstat">
-        <span class="tstat-val gold" id="top-cash">€50K</span>
-        <span class="tstat-label">Hotovosť</span>
-      </div>
-      <div class="tstat">
-        <span class="tstat-val g" id="top-rent">+€0</span>
-        <span class="tstat-label">Príjem/hod</span>
-      </div>
-      <div class="tstat" onclick="setScreen('store',document.querySelector('[data-screen=store]'))">
-        <span class="tstat-val purple" id="top-coins">0 🪙</span>
-        <span class="tstat-label">Gold Coins</span>
-      </div>
-    </div>
-    <div id="top-user-btn" onclick="openUserMenu()">👤</div>
-  </div>
-
-  <div id="main-content">
-    <!-- MARKET -->
-    <div class="screen active" id="screen-market">
-      <div class="screen-inner">
-        <div id="daily-banner-wrap"></div>
-        <div class="section-hdr"><h2>Trh nehnuteľností</h2><p id="boost-status"></p></div>
-        <div class="market-ticker" id="ticker"></div>
-        <div class="chip-scroll" id="cat-chips">
-          <div class="chip active" onclick="filterCat('all',this)">🌍 Všetko</div>
-          <div class="chip" onclick="filterCat('byt',this)">🏠 Byty</div>
-          <div class="chip" onclick="filterCat('komercny',this)">🏢 Komerčné</div>
-          <div class="chip" onclick="filterCat('luxus',this)">💎 Luxusné</div>
-          <div class="chip" onclick="filterCat('priemysel',this)">🏭 Priemysel</div>
-          <div class="chip" onclick="filterCat('mesto',this)">🌆 Mestá</div>
-        </div>
-        <div class="chip-scroll">
-          <div class="chip active" id="fc-all" onclick="setFilter('all',this)">Všetko</div>
-          <div class="chip" id="fc-available" onclick="setFilter('available',this)">Voľné</div>
-          <div class="chip" id="fc-partial" onclick="setFilter('partial',this)">Čiastočné</div>
-          <div class="chip" id="fc-taken" onclick="setFilter('taken',this)">Obsadené</div>
-        </div>
-        <div class="prop-list" id="prop-grid"></div>
-      </div>
-    </div>
-
-    <!-- PORTFOLIO -->
-    <div class="screen" id="screen-portfolio">
-      <div class="screen-inner">
-        <div class="section-hdr"><h2>Môj portfólio</h2><p>Tvoje nehnuteľnosti a príjmy</p></div>
-        <div class="port-summary" id="port-summary"></div>
-        <div id="portfolio-list"></div>
-      </div>
-    </div>
-
-    <!-- STORE -->
-    <div class="screen" id="screen-store">
-      <div class="screen-inner">
-        <div class="section-hdr"><h2>💎 Store</h2><p>Gold Coins, Power-upy a špeciálne ponuky</p></div>
-
-        <!-- Watch Ad -->
-        <div class="store-section">
-          <div class="store-section-title">Zadarmo</div>
-          <div class="powerup-card" onclick="watchAd()">
-            <div class="powerup-icon">📺</div>
-            <div class="powerup-info">
-              <div class="powerup-name">Pozerať reklamu</div>
-              <div class="powerup-desc">30 sekúnd → 50 Gold Coins</div>
-            </div>
-            <div class="powerup-cost"><div class="powerup-coins">+50 🪙</div><div class="powerup-label">zadarmo</div></div>
-          </div>
-          <div class="powerup-card" onclick="claimDaily()">
-            <div class="powerup-icon">🎁</div>
-            <div class="powerup-info">
-              <div class="powerup-name">Denná odmena</div>
-              <div class="powerup-desc">Prihlás sa každý deň pre bonus</div>
-              <div class="powerup-timer" id="daily-timer-store"></div>
-            </div>
-            <div class="powerup-cost"><div class="powerup-coins" id="daily-coins-store">+100 🪙</div><div class="powerup-label">denne</div></div>
-          </div>
-        </div>
-
-        <!-- Power-ups -->
-        <div class="store-section">
-          <div class="store-section-title">Power-upy</div>
-          <div class="powerup-card" id="pu-2xrent" onclick="buyPowerup('2xrent')">
-            <div class="powerup-icon">⚡</div>
-            <div class="powerup-info">
-              <div class="powerup-name">2× Nájomné</div>
-              <div class="powerup-desc">Zdvojnásobi všetky príjmy na 7 dní</div>
-              <div class="powerup-timer" id="pu-2xrent-timer"></div>
-            </div>
-            <div class="powerup-cost"><div class="powerup-coins">500 🪙</div><div class="powerup-label">7 dní</div></div>
-          </div>
-          <div class="powerup-card" id="pu-discount" onclick="buyPowerup('discount')">
-            <div class="powerup-icon">🏷️</div>
-            <div class="powerup-info">
-              <div class="powerup-name">-20% Zľava</div>
-              <div class="powerup-desc">Všetky nákupy nehnuteľností lacnejšie o 20%</div>
-              <div class="powerup-timer" id="pu-discount-timer"></div>
-            </div>
-            <div class="powerup-cost"><div class="powerup-coins">400 🪙</div><div class="powerup-label">3 dni</div></div>
-          </div>
-          <div class="powerup-card" id="pu-insight" onclick="buyPowerup('insight')">
-            <div class="powerup-icon">🔮</div>
-            <div class="powerup-info">
-              <div class="powerup-name">Trhový výhľad</div>
-              <div class="powerup-desc">Uvidíš budúce trendy cien na 24h</div>
-              <div class="powerup-timer" id="pu-insight-timer"></div>
-            </div>
-            <div class="powerup-cost"><div class="powerup-coins">200 🪙</div><div class="powerup-label">24 hodín</div></div>
-          </div>
-        </div>
-
-        <!-- Coins packs -->
-        <div class="store-section">
-          <div class="store-section-title">Kúpiť Gold Coins</div>
-          <div class="store-cards">
-            <div class="store-card" onclick="buyCoins(100,'0.99')">
-              <div class="store-card-icon">🪙</div>
-              <div class="store-card-title">Štartér</div>
-              <div class="store-card-coins">100 🪙</div>
-              <div class="store-card-price">€0.99</div>
-            </div>
-            <div class="store-card" onclick="buyCoins(500,'3.99')">
-              <div class="store-card-icon">💰</div>
-              <div class="store-card-title">Populárny</div>
-              <div class="store-card-coins">500 🪙</div>
-              <div class="store-card-price">€3.99</div>
-            </div>
-            <div class="store-card best" onclick="buyCoins(1200,'7.99')">
-              <div class="store-card-badge">NAJLEPŠIA CENA</div>
-              <div class="store-card-icon">💎</div>
-              <div class="store-card-title">Investor</div>
-              <div class="store-card-coins">1 200 🪙</div>
-              <div class="store-card-price">€7.99</div>
-            </div>
-            <div class="store-card" onclick="buyCoins(3000,'14.99')">
-              <div class="store-card-icon">👑</div>
-              <div class="store-card-title">Tycoon</div>
-              <div class="store-card-coins">3 000 🪙</div>
-              <div class="store-card-price">€14.99</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Coins to Cash -->
-        <div class="store-section">
-          <div class="store-section-title">Premeniť Gold Coins na hotovosť</div>
-          <div class="powerup-card" onclick="convertCoins()">
-            <div class="powerup-icon">💱</div>
-            <div class="powerup-info">
-              <div class="powerup-name">Konverzia: 100 🪙 → €5 000</div>
-              <div class="powerup-desc">Premeň Gold Coins na hernú hotovosť</div>
-            </div>
-            <div class="powerup-cost"><div class="powerup-coins">100 🪙</div><div class="powerup-label">za €5K</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SKILLS -->
-    <div class="screen" id="screen-skills">
-      <div class="screen-inner">
-        <div class="section-hdr"><h2>🧠 Zručnosti</h2><p>Vylepšuj svoje schopnosti za Gold Coins</p></div>
-        <div style="background:var(--purple-dim);border:1px solid var(--purple);border-radius:8px;padding:10px 13px;font-size:12px;color:var(--purple);margin-bottom:14px">
-          💡 Zručnosti zostávajú navždy — nie sú časovo obmedzené
-        </div>
-        <div id="skills-list"></div>
-      </div>
-    </div>
-
-    <!-- OFFERS -->
-    <div class="screen" id="screen-offers">
-      <div class="screen-inner">
-        <div class="section-hdr"><h2>Ponuky</h2><p>Ponuky od iných hráčov</p></div>
-        <div id="offers-list"></div>
-      </div>
-    </div>
-
-    <!-- LEADERBOARD -->
-    <div class="screen" id="screen-leaderboard">
-      <div class="screen-inner">
-        <div class="section-hdr"><h2>🏆 Rebríček</h2><p>Top hráči podľa Net Worth</p></div>
-        <div id="lb-list"></div>
-        <div style="margin-top:18px">
-          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Aktivita</div>
-          <div id="activity-feed"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- BOTTOM NAV -->
-  <div id="bottom-nav">
-    <div class="bnav-item active" data-screen="market" onclick="setScreen('market',this)">
-      <span class="bnav-icon">🏪</span><span class="bnav-label">Trh</span>
-    </div>
-    <div class="bnav-item" data-screen="portfolio" onclick="setScreen('portfolio',this)">
-      <span class="bnav-icon">📁</span><span class="bnav-label">Portfólio</span>
-    </div>
-    <div class="bnav-item" data-screen="store" onclick="setScreen('store',this)">
-      <span class="bnav-icon">💎</span><span class="bnav-label">Store</span>
-    </div>
-    <div class="bnav-item" data-screen="skills" onclick="setScreen('skills',this)">
-      <span class="bnav-icon">🧠</span><span class="bnav-label">Zručnosti</span>
-    </div>
-    <div class="bnav-item" data-screen="offers" onclick="setScreen('offers',this)">
-      <span class="bnav-icon">📩</span><span class="bnav-label">Ponuky</span>
-      <div class="bnav-dot" id="offers-dot"></div>
-    </div>
-    <div class="bnav-item" data-screen="leaderboard" onclick="setScreen('leaderboard',this)">
-      <span class="bnav-icon">🏆</span><span class="bnav-label">Top</span>
-    </div>
-  </div>
-</div>
-
-<!-- PROPERTY MODAL -->
-<div id="modal-overlay" onclick="closeModal(event)">
-  <div id="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-header">
-      <div class="modal-title" id="modal-title"></div>
-      <span class="modal-close" onclick="closeModalDirect()">✕</span>
-    </div>
-    <div class="modal-body" id="modal-body"></div>
-  </div>
-</div>
-
-<div id="toast"></div>
-
 <script>
 // ======== CONSTANTS ========
 const SUPA_URL='https://gmzwcybkxhpyjppgdxlu.supabase.co';
@@ -927,7 +645,7 @@ function renderPortfolio(){
     const myPct=getMyOwnership(p.id);const rent=Math.round(p.rent*myPct/100*getRentMultiplier());const val=Math.round(getPropPrice(p)*myPct/100);
     const d=document.createElement('div');d.className='port-item';
     d.innerHTML=`<div class="port-emoji">${p.emoji}</div><div class="port-info"><div class="port-name">${p.name}</div><div class="port-sub">📍 ${p.loc} · ${myPct}% podiel</div><div class="port-pct-bar"><div class="port-pct-fill" style="width:${myPct}%"></div></div></div><div class="port-right"><div class="port-rent">${fmtRent(rent)}</div><div class="port-val">${fmt(val)}</div><button class="sell-btn" onclick="event.stopPropagation();sellShare(${p.id})">Predať</button></div>`;
-    id);list.appendChild(d);
+    list.appendChild(d);
   });
 }
 
@@ -1092,5 +810,288 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.head.appendChild(s);
 });
 </script>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-sheet">
+    <div class="auth-logo">🏙️ PropertyEmpire</div>
+    <div class="auth-sub">Buduj realitné impérium. Súpeř s celým svetom.</div>
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="if(typeof switchAuthTab!=='undefined')switchAuthTab('login')">Prihlásenie</div>
+      <div class="auth-tab" onclick="if(typeof switchAuthTab!=='undefined')switchAuthTab('register')">Registrácia</div>
+    </div>
+    <input class="auth-input" id="auth-email" type="email" placeholder="Email" autocomplete="email">
+    <input class="auth-input" id="auth-pass" type="password" placeholder="Heslo" autocomplete="current-password">
+    <input class="auth-input" id="auth-name" type="text" placeholder="Herné meno" style="display:none" autocomplete="nickname">
+    <div id="auth-error" style="color:var(--red);font-size:13px;text-align:center;min-height:20px;margin-top:4px"></div>
+    <button class="btn btn-gold" onclick="if(typeof handleAuth!=='undefined')handleAuth();else setTimeout(handleAuth,100)">Prihlásiť sa</button>
+  </div>
+</div>
+
+<!-- USER MENU -->
+<div id="user-menu" onclick="closeUserMenu(event)">
+  <div class="user-menu-sheet">
+    <div class="user-menu-name" id="um-name">Hráč</div>
+    <div class="user-menu-email" id="um-email"></div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <div style="flex:1;background:var(--surface2);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:20px;font-weight:700;color:var(--gold)" id="um-coins">0</div>
+        <div style="font-size:10px;color:var(--text3)">Gold Coins</div>
+      </div>
+      <div style="flex:1;background:var(--surface2);border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:16px;font-weight:700;color:var(--text)" id="um-nw">€0</div>
+        <div style="font-size:10px;color:var(--text3)">Net Worth</div>
+      </div>
+    </div>
+    <button class="btn btn-outline" onclick="logout()">🚪 Odhlásiť sa</button>
+  </div>
+</div>
+
+<!-- AD OVERLAY -->
+<div id="ad-overlay">
+  <div class="ad-box">
+    <div class="ad-emoji">📺</div>
+    <div class="ad-title">Pozeráš reklamu</div>
+    <div class="ad-sub">Počkaj do konca a získaš odmenu</div>
+    <div class="ad-timer" id="ad-timer">30</div>
+    <div class="ad-bar"><div class="ad-bar-fill" id="ad-bar-fill" style="width:100%"></div></div>
+    <div style="font-size:13px;color:var(--text3)" id="ad-reward-txt">Odmena: 50 🪙</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+  <div id="topbar">
+    <div class="logo">🏙️</div>
+    <div class="topbar-stats">
+      <div class="tstat">
+        <span class="tstat-val gold" id="top-cash">€50K</span>
+        <span class="tstat-label">Hotovosť</span>
+      </div>
+      <div class="tstat">
+        <span class="tstat-val g" id="top-rent">+€0</span>
+        <span class="tstat-label">Príjem/hod</span>
+      </div>
+      <div class="tstat" onclick="setScreen('store',document.querySelector('[data-screen=store]'))">
+        <span class="tstat-val purple" id="top-coins">0 🪙</span>
+        <span class="tstat-label">Gold Coins</span>
+      </div>
+    </div>
+    <div id="top-user-btn" onclick="openUserMenu()">👤</div>
+  </div>
+
+  <div id="main-content">
+    <!-- MARKET -->
+    <div class="screen active" id="screen-market">
+      <div class="screen-inner">
+        <div id="daily-banner-wrap"></div>
+        <div class="section-hdr"><h2>Trh nehnuteľností</h2><p id="boost-status"></p></div>
+        <div class="market-ticker" id="ticker"></div>
+        <div class="chip-scroll" id="cat-chips">
+          <div class="chip active" onclick="filterCat('all',this)">🌍 Všetko</div>
+          <div class="chip" onclick="filterCat('byt',this)">🏠 Byty</div>
+          <div class="chip" onclick="filterCat('komercny',this)">🏢 Komerčné</div>
+          <div class="chip" onclick="filterCat('luxus',this)">💎 Luxusné</div>
+          <div class="chip" onclick="filterCat('priemysel',this)">🏭 Priemysel</div>
+          <div class="chip" onclick="filterCat('mesto',this)">🌆 Mestá</div>
+        </div>
+        <div class="chip-scroll">
+          <div class="chip active" id="fc-all" onclick="setFilter('all',this)">Všetko</div>
+          <div class="chip" id="fc-available" onclick="setFilter('available',this)">Voľné</div>
+          <div class="chip" id="fc-partial" onclick="setFilter('partial',this)">Čiastočné</div>
+          <div class="chip" id="fc-taken" onclick="setFilter('taken',this)">Obsadené</div>
+        </div>
+        <div class="prop-list" id="prop-grid"></div>
+      </div>
+    </div>
+
+    <!-- PORTFOLIO -->
+    <div class="screen" id="screen-portfolio">
+      <div class="screen-inner">
+        <div class="section-hdr"><h2>Môj portfólio</h2><p>Tvoje nehnuteľnosti a príjmy</p></div>
+        <div class="port-summary" id="port-summary"></div>
+        <div id="portfolio-list"></div>
+      </div>
+    </div>
+
+    <!-- STORE -->
+    <div class="screen" id="screen-store">
+      <div class="screen-inner">
+        <div class="section-hdr"><h2>💎 Store</h2><p>Gold Coins, Power-upy a špeciálne ponuky</p></div>
+
+        <!-- Watch Ad -->
+        <div class="store-section">
+          <div class="store-section-title">Zadarmo</div>
+          <div class="powerup-card" onclick="watchAd()">
+            <div class="powerup-icon">📺</div>
+            <div class="powerup-info">
+              <div class="powerup-name">Pozerať reklamu</div>
+              <div class="powerup-desc">30 sekúnd → 50 Gold Coins</div>
+            </div>
+            <div class="powerup-cost"><div class="powerup-coins">+50 🪙</div><div class="powerup-label">zadarmo</div></div>
+          </div>
+          <div class="powerup-card" onclick="claimDaily()">
+            <div class="powerup-icon">🎁</div>
+            <div class="powerup-info">
+              <div class="powerup-name">Denná odmena</div>
+              <div class="powerup-desc">Prihlás sa každý deň pre bonus</div>
+              <div class="powerup-timer" id="daily-timer-store"></div>
+            </div>
+            <div class="powerup-cost"><div class="powerup-coins" id="daily-coins-store">+100 🪙</div><div class="powerup-label">denne</div></div>
+          </div>
+        </div>
+
+        <!-- Power-ups -->
+        <div class="store-section">
+          <div class="store-section-title">Power-upy</div>
+          <div class="powerup-card" id="pu-2xrent" onclick="buyPowerup('2xrent')">
+            <div class="powerup-icon">⚡</div>
+            <div class="powerup-info">
+              <div class="powerup-name">2× Nájomné</div>
+              <div class="powerup-desc">Zdvojnásobi všetky príjmy na 7 dní</div>
+              <div class="powerup-timer" id="pu-2xrent-timer"></div>
+            </div>
+            <div class="powerup-cost"><div class="powerup-coins">500 🪙</div><div class="powerup-label">7 dní</div></div>
+          </div>
+          <div class="powerup-card" id="pu-discount" onclick="buyPowerup('discount')">
+            <div class="powerup-icon">🏷️</div>
+            <div class="powerup-info">
+              <div class="powerup-name">-20% Zľava</div>
+              <div class="powerup-desc">Všetky nákupy nehnuteľností lacnejšie o 20%</div>
+              <div class="powerup-timer" id="pu-discount-timer"></div>
+            </div>
+            <div class="powerup-cost"><div class="powerup-coins">400 🪙</div><div class="powerup-label">3 dni</div></div>
+          </div>
+          <div class="powerup-card" id="pu-insight" onclick="buyPowerup('insight')">
+            <div class="powerup-icon">🔮</div>
+            <div class="powerup-info">
+              <div class="powerup-name">Trhový výhľad</div>
+              <div class="powerup-desc">Uvidíš budúce trendy cien na 24h</div>
+              <div class="powerup-timer" id="pu-insight-timer"></div>
+            </div>
+            <div class="powerup-cost"><div class="powerup-coins">200 🪙</div><div class="powerup-label">24 hodín</div></div>
+          </div>
+        </div>
+
+        <!-- Coins packs -->
+        <div class="store-section">
+          <div class="store-section-title">Kúpiť Gold Coins</div>
+          <div class="store-cards">
+            <div class="store-card" onclick="buyCoins(100,'0.99')">
+              <div class="store-card-icon">🪙</div>
+              <div class="store-card-title">Štartér</div>
+              <div class="store-card-coins">100 🪙</div>
+              <div class="store-card-price">€0.99</div>
+            </div>
+            <div class="store-card" onclick="buyCoins(500,'3.99')">
+              <div class="store-card-icon">💰</div>
+              <div class="store-card-title">Populárny</div>
+              <div class="store-card-coins">500 🪙</div>
+              <div class="store-card-price">€3.99</div>
+            </div>
+            <div class="store-card best" onclick="buyCoins(1200,'7.99')">
+              <div class="store-card-badge">NAJLEPŠIA CENA</div>
+              <div class="store-card-icon">💎</div>
+              <div class="store-card-title">Investor</div>
+              <div class="store-card-coins">1 200 🪙</div>
+              <div class="store-card-price">€7.99</div>
+            </div>
+            <div class="store-card" onclick="buyCoins(3000,'14.99')">
+              <div class="store-card-icon">👑</div>
+              <div class="store-card-title">Tycoon</div>
+              <div class="store-card-coins">3 000 🪙</div>
+              <div class="store-card-price">€14.99</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coins to Cash -->
+        <div class="store-section">
+          <div class="store-section-title">Premeniť Gold Coins na hotovosť</div>
+          <div class="powerup-card" onclick="convertCoins()">
+            <div class="powerup-icon">💱</div>
+            <div class="powerup-info">
+              <div class="powerup-name">Konverzia: 100 🪙 → €5 000</div>
+              <div class="powerup-desc">Premeň Gold Coins na hernú hotovosť</div>
+            </div>
+            <div class="powerup-cost"><div class="powerup-coins">100 🪙</div><div class="powerup-label">za €5K</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SKILLS -->
+    <div class="screen" id="screen-skills">
+      <div class="screen-inner">
+        <div class="section-hdr"><h2>🧠 Zručnosti</h2><p>Vylepšuj svoje schopnosti za Gold Coins</p></div>
+        <div style="background:var(--purple-dim);border:1px solid var(--purple);border-radius:8px;padding:10px 13px;font-size:12px;color:var(--purple);margin-bottom:14px">
+          💡 Zručnosti zostávajú navždy — nie sú časovo obmedzené
+        </div>
+        <div id="skills-list"></div>
+      </div>
+    </div>
+
+    <!-- OFFERS -->
+    <div class="screen" id="screen-offers">
+      <div class="screen-inner">
+        <div class="section-hdr"><h2>Ponuky</h2><p>Ponuky od iných hráčov</p></div>
+        <div id="offers-list"></div>
+      </div>
+    </div>
+
+    <!-- LEADERBOARD -->
+    <div class="screen" id="screen-leaderboard">
+      <div class="screen-inner">
+        <div class="section-hdr"><h2>🏆 Rebríček</h2><p>Top hráči podľa Net Worth</p></div>
+        <div id="lb-list"></div>
+        <div style="margin-top:18px">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Aktivita</div>
+          <div id="activity-feed"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div id="bottom-nav">
+    <div class="bnav-item active" data-screen="market" onclick="setScreen('market',this)">
+      <span class="bnav-icon">🏪</span><span class="bnav-label">Trh</span>
+    </div>
+    <div class="bnav-item" data-screen="portfolio" onclick="setScreen('portfolio',this)">
+      <span class="bnav-icon">📁</span><span class="bnav-label">Portfólio</span>
+    </div>
+    <div class="bnav-item" data-screen="store" onclick="setScreen('store',this)">
+      <span class="bnav-icon">💎</span><span class="bnav-label">Store</span>
+    </div>
+    <div class="bnav-item" data-screen="skills" onclick="setScreen('skills',this)">
+      <span class="bnav-icon">🧠</span><span class="bnav-label">Zručnosti</span>
+    </div>
+    <div class="bnav-item" data-screen="offers" onclick="setScreen('offers',this)">
+      <span class="bnav-icon">📩</span><span class="bnav-label">Ponuky</span>
+      <div class="bnav-dot" id="offers-dot"></div>
+    </div>
+    <div class="bnav-item" data-screen="leaderboard" onclick="setScreen('leaderboard',this)">
+      <span class="bnav-icon">🏆</span><span class="bnav-label">Top</span>
+    </div>
+  </div>
+</div>
+
+<!-- PROPERTY MODAL -->
+<div id="modal-overlay" onclick="closeModal(event)">
+  <div id="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title"></div>
+      <span class="modal-close" onclick="closeModalDirect()">✕</span>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+
 </body>
 </html>
