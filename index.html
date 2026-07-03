@@ -242,25 +242,19 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 </head>
 <body>
 
-<script>
-const manifestData={name:"PropertyEmpire",short_name:"PropertyEmpire",description:"Buduj realitné impérium.",start_url:"/",display:"standalone",background_color:"#0f0f0f",theme_color:"#0f0f0f",orientation:"portrait",icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%231a1a1a'/%3E%3Ctext x='96' y='130' font-size='100' text-anchor='middle'%3E🏙️%3C/text%3E%3C/svg%3E",sizes:"192x192",type:"image/svg+xml"}]};
-const blob=new Blob([JSON.stringify(manifestData)],{type:'application/json'});
-const link=document.createElement('link');link.rel='manifest';link.href=URL.createObjectURL(blob);document.head.appendChild(link);
-</script>
-
 <!-- AUTH -->
 <div id="auth-screen">
   <div class="auth-sheet">
     <div class="auth-logo">🏙️ PropertyEmpire</div>
     <div class="auth-sub">Buduj realitné impérium. Súpeř s celým svetom.</div>
     <div class="auth-tabs">
-      <div class="auth-tab active" onclick="switchAuthTab('login')">Prihlásenie</div>
-      <div class="auth-tab" onclick="switchAuthTab('register')">Registrácia</div>
+      <div class="auth-tab active" id="tab-login">Prihlásenie</div>
+      <div class="auth-tab" id="tab-register">Registrácia</div>
     </div>
     <input class="auth-input" id="auth-email" type="email" placeholder="Email" autocomplete="email">
     <input class="auth-input" id="auth-pass" type="password" placeholder="Heslo" autocomplete="current-password">
     <input class="auth-input" id="auth-name" type="text" placeholder="Herné meno" style="display:none" autocomplete="nickname">
-    <button class="btn btn-gold" id="auth-btn" onclick="handleAuth()">Prihlásiť sa</button>
+    <button class="btn btn-gold" id="auth-btn">Prihlásiť sa</button>
   </div>
 </div>
 
@@ -724,7 +718,7 @@ function openUserMenu(){document.getElementById('um-coins').textContent=STATE.co
 function closeUserMenu(e){if(!e||e.target===document.getElementById('user-menu'))document.getElementById('user-menu').classList.remove('open');}
 
 // ======== SUPABASE ========
-(function(){const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';s.onload=()=>{STATE.supabase=window.supabase.createClient(SUPA_URL,SUPA_KEY);};document.head.appendChild(s);})();
+// Supabase loaded in DOMContentLoaded below
 
 async function loadMultiplayerState(){
   if(!STATE.supabase||!STATE.user)return;
@@ -909,4 +903,174 @@ function renderPortfolio(){
     const myPct=getMyOwnership(p.id);const rent=Math.round(p.rent*myPct/100*getRentMultiplier());const val=Math.round(getPropPrice(p)*myPct/100);
     const d=document.createElement('div');d.className='port-item';
     d.innerHTML=`<div class="port-emoji">${p.emoji}</div><div class="port-info"><div class="port-name">${p.name}</div><div class="port-sub">📍 ${p.loc} · ${myPct}% podiel</div><div class="port-pct-bar"><div class="port-pct-fill" style="width:${myPct}%"></div></div></div><div class="port-right"><div class="port-rent">${fmtRent(rent)}</div><div class="port-val">${fmt(val)}</div><button class="sell-btn" onclick="event.stopPropagation();sellShare(${p.id})">Predať</button></div>`;
-    d.onclick=()=>openModal(p.
+    id);list.appendChild(d);
+  });
+}
+
+// ======== OFFERS ========
+function renderOffers(){
+  const list=document.getElementById('offers-list');
+  if(!STATE.offers||!STATE.offers.length){list.innerHTML='<div class="empty"><div class="empty-icon">📩</div><div class="empty-text">Žiadne ponuky</div></div>';return;}
+  list.innerHTML='';
+  STATE.offers.forEach(offer=>{
+    const p=PROPERTIES.find(x=>x.id==offer.property_id);const fromName=STATE.dbProfiles?.find(pr=>pr.id===offer.from_id)?.username||'Hráč';
+    const d=document.createElement('div');d.className='offer-card';
+    const offerJson=JSON.stringify(offer).replace(/'/g,"\'");
+    d.innerHTML=`<div class="offer-top"><span class="offer-prop-name">${p?.emoji||'🏠'} ${p?.name||'Nehnuteľnosť'}</span><span class="offer-amount">${fmt(offer.amount)}</span></div><div class="offer-detail">Od: ${fromName} · Chce: ${offer.pct}% tvojho podielu</div><div class="offer-actions"><button class="btn btn-green" onclick='acceptOffer(${JSON.stringify(offer)})'>✅ Prijať</button><button class="btn btn-red" onclick='rejectOffer(${JSON.stringify(offer)})'>❌ Odmietnuť</button></div>`;
+    list.appendChild(d);
+  });
+}
+
+// ======== LEADERBOARD ========
+function renderLeaderboard(){
+  let players=[];
+  if(STATE.dbProfiles&&STATE.dbProfiles.length){
+    players=STATE.dbProfiles.map((pr,i)=>({name:pr.username||'Hráč',avatar:AVATARS[i%AVATARS.length],color:COLORS[i%COLORS.length],worth:pr.cash+(STATE.dbOwnerships||[]).filter(o=>o.user_id===pr.id).reduce((s,o)=>{const p=PROPERTIES.find(x=>x.id==o.property_id);return s+(p?Math.round(getPropPrice(p)*o.pct/100):0);},0),props:(STATE.dbOwnerships||[]).filter(o=>o.user_id===pr.id).length,isMe:pr.id===STATE.user?.id}));
+  }else{players=[{name:STATE.username,avatar:'🌟',color:COLORS[0],worth:getNetWorth(),props:Object.keys(STATE.ownership).length,isMe:true}];}
+  players.sort((a,b)=>b.worth-a.worth);
+  const list=document.getElementById('lb-list');list.innerHTML='';
+  const medals=['🥇','🥈','🥉'];
+  players.forEach((pl,i)=>{
+    const d=document.createElement('div');d.className='lb-item';d.style.background=pl.isMe?'var(--gold-dim)':'';
+    d.innerHTML=`<span class="lb-rank">${medals[i]||'#'+(i+1)}</span><div class="lb-avatar" style="background:${pl.color}22;color:${pl.color}">${pl.avatar}</div><div class="lb-info"><div class="lb-name">${pl.name}${pl.isMe?' (Ty)':''}</div><div class="lb-props">${pl.props} nehnuteľností</div></div><div class="lb-worth">${fmt(pl.worth)}</div>`;
+    list.appendChild(d);
+  });
+}
+
+// ======== SKILLS ========
+function renderSkills(){
+  const list=document.getElementById('skills-list');list.innerHTML='';
+  SKILLS_DEF.forEach(skill=>{
+    const lvl=getSkillLevel(skill.id);const maxed=lvl>=skill.maxLevel;const cost=!maxed?skill.costPerLevel[lvl]:0;const canAfford=!maxed&&STATE.coins>=cost;
+    const effectTxt=skill.effect.replace('{n}',maxed?Math.round(skill.bonus(skill.maxLevel)*100):Math.round(skill.bonus(lvl+1)*100));
+    const d=document.createElement('div');d.className='skill-card';
+    let dotsHtml='';for(let i=0;i<skill.maxLevel;i++)dotsHtml+=`<div class="skill-dot ${i<lvl?'filled':''}"></div>`;
+    d.innerHTML=`<div class="skill-header"><div class="skill-icon">${skill.icon}</div><div class="skill-info"><div class="skill-name">${skill.name}</div><div class="skill-desc">${skill.desc}</div></div></div><div class="skill-level-bar">${dotsHtml}</div><div class="skill-footer"><span class="skill-level-txt">Úroveň ${lvl}/${skill.maxLevel} · ${effectTxt}</span>${maxed?'<span class="skill-max">✅ Max</span>':`<span class="skill-cost">${cost} 🪙</span>`}</div>`;
+    if(!maxed){d.style.cursor='pointer';d.onclick=()=>upgradeSkill(skill.id);}
+    list.appendChild(d);
+  });
+}
+async function upgradeSkill(skillId){
+  const skill=SKILLS_DEF.find(s=>s.id===skillId);const lvl=getSkillLevel(skillId);
+  if(lvl>=skill.maxLevel){toast('✅ Zručnosť je už na maxime');return;}
+  const cost=skill.costPerLevel[lvl];
+  if(STATE.coins<cost){toast('❌ Potrebuješ '+cost+' 🪙 (máš '+STATE.coins+')');return;}
+  STATE.coins-=cost;STATE.skills[skillId]=(lvl+1);
+  toast('✅ '+skill.name+' → Úroveň '+(lvl+1)+'!');renderSkills();updateTopbar();await saveProfile();
+}
+
+// ======== STORE ========
+function renderStore(){
+  const now=new Date();
+  ['2xrent','discount','insight'].forEach(id=>{
+    const card=document.getElementById('pu-'+id);if(!card)return;
+    const exp=STATE.powerups[id]?new Date(STATE.powerups[id]):null;
+    const active=exp&&now<exp;card.classList.toggle('active-pu',active);
+    const timerEl=document.getElementById('pu-'+id+'-timer');if(timerEl)timerEl.textContent=active?'⏳ Zostatok: '+fmtTime(exp-now):'';
+  });
+}
+async function buyPowerup(id){
+  const costs={'2xrent':500,'discount':400,'insight':200};const cost=costs[id];
+  if(STATE.coins<cost){toast('❌ Potrebuješ '+cost+' 🪙');return;}
+  const durations={'2xrent':7*24*3600000,'discount':3*24*3600000,'insight':24*3600000};
+  STATE.coins-=cost;const exp=new Date(Date.now()+durations[id]);STATE.powerups[id]=exp.toISOString();
+  const names={'2xrent':'2× Nájomné','discount':'-20% Zľava','insight':'Trhový výhľad'};
+  toast('✅ '+names[id]+' aktivovaný!');renderStore();updateTopbar();await saveProfile();
+}
+function buyCoins(amount,price){toast('💳 Platba '+price+' — pripravujeme platobný systém!',4000);}
+async function convertCoins(){
+  if(STATE.coins<100){toast('❌ Potrebuješ aspoň 100 🪙');return;}
+  const batches=Math.floor(STATE.coins/100);const gain=batches*5000;
+  STATE.coins-=batches*100;STATE.cash+=gain;
+  toast('💱 '+(batches*100)+' 🪙 → '+fmt(gain));updateTopbar();await saveProfile();
+}
+
+// ======== AD SYSTEM ========
+let adInterval=null;
+function watchAd(){
+  const bonus=Math.round(50*getCoinBonus());
+  document.getElementById('ad-reward-txt').textContent='Odmena: '+bonus+' 🪙';
+  document.getElementById('ad-overlay').classList.add('open');
+  let secs=30;document.getElementById('ad-timer').textContent=secs;document.getElementById('ad-bar-fill').style.width='100%';
+  adInterval=setInterval(async()=>{
+    secs--;document.getElementById('ad-timer').textContent=secs;document.getElementById('ad-bar-fill').style.width=(secs/30*100)+'%';
+    if(secs<=0){clearInterval(adInterval);document.getElementById('ad-overlay').classList.remove('open');STATE.coins+=bonus;toast('🎉 Odmena: +'+bonus+' 🪙');updateTopbar();await saveProfile();}
+  },1000);
+}
+
+// ======== DAILY REWARD ========
+function checkDaily(){
+  const now=new Date();const banner=document.getElementById('daily-banner-wrap');if(!banner)return;
+  if(!STATE.lastDaily||now-new Date(STATE.lastDaily)>=24*3600000){
+    banner.innerHTML='<div class="daily-banner" onclick="claimDaily()"><div style="font-size:28px">🎁</div><div class="daily-info"><div class="daily-title">Denná odmena dostupná!</div><div class="daily-sub">Streak: '+STATE.dailyStreak+' dní · Klikni pre odmenu</div></div><div style="font-size:20px;color:var(--gold)">›</div></div>';
+  }else{banner.innerHTML='';}
+}
+async function claimDaily(){
+  const now=new Date();
+  if(STATE.lastDaily&&now-new Date(STATE.lastDaily)<24*3600000){toast('⏳ Denná odmena bola už vyzdvihnutá');return;}
+  const streak=STATE.dailyStreak+1;const total=Math.round((100+Math.min(streak*20,500))*getCoinBonus());
+  STATE.coins+=total;STATE.lastDaily=now.toISOString();STATE.dailyStreak=streak;
+  toast('🎁 Denná odmena: +'+total+' 🪙 (Streak: '+streak+' dní!)');
+  document.getElementById('daily-banner-wrap').innerHTML='';updateTopbar();await saveProfile();
+}
+
+// ======== TOPBAR ========
+function updateTopbar(){
+  document.getElementById('top-cash').textContent=fmt(STATE.cash);
+  document.getElementById('top-rent').textContent=fmtRent(getMyRentIncome());
+  document.getElementById('top-coins').textContent=STATE.coins+' 🪙';
+}
+
+// ======== TICKER ========
+function renderTicker(){
+  const ticker=document.getElementById('ticker');if(!ticker)return;ticker.innerHTML='';
+  [{n:'Bratislava',id:1},{n:'Praha',id:3},{n:'Viedeň',id:8},{n:'Monaco',id:12},{n:'Manhattan',id:20},{n:'Dubaj',id:25},{n:'Santorini',id:19}].forEach(c=>{
+    const t=STATE.market[c.id]?.trend||'up';const chg=(Math.random()*4+0.5).toFixed(1);
+    const d=document.createElement('div');d.className='ticker-chip';d.innerHTML=c.n+'<span class="'+(t==='up'?'up':'dn')+'">'+(t==='up'?'+':'-')+chg+'%</span>';ticker.appendChild(d);
+  });
+}
+
+// ======== TICKS ========
+function startTicks(){
+  setInterval(async()=>{
+    if(!STATE.supabase||!STATE.user)return;
+    const{data}=await STATE.supabase.from('profiles').select('cash,coins').eq('id',STATE.user.id).single();
+    if(data&&data.cash!==STATE.cash){const diff=data.cash-STATE.cash;STATE.cash=data.cash;if(diff>0)toast('💰 Príjem z nájmu: +'+fmt(diff));renderAll();}
+    if(data&&data.coins!==undefined)STATE.coins=data.coins;updateTopbar();
+  },300000);
+  setInterval(()=>{
+    PROPERTIES.forEach(p=>{const d=(Math.random()-0.48)*0.04;STATE.market[p.id].mult=Math.max(0.7,Math.min(1.5,STATE.market[p.id].mult+d));STATE.market[p.id].trend=d>0?'up':'dn';});
+    renderTicker();
+  },45000);
+}
+
+function renderAll(){
+  renderGrid();
+  if(STATE.activeScreen==='portfolio')renderPortfolio();
+  if(STATE.activeScreen==='store')renderStore();
+  if(STATE.activeScreen==='skills')renderSkills();
+  updateTopbar();renderTicker();
+}
+
+// ======== INIT ========
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('tab-login').addEventListener('click',()=>switchAuthTab('login'));
+  document.getElementById('tab-register').addEventListener('click',()=>switchAuthTab('register'));
+  document.getElementById('auth-btn').addEventListener('click',handleAuth);
+  document.getElementById('user-menu').addEventListener('click',closeUserMenu);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModalDirect();});
+
+  // PWA manifest
+  const md={name:"PropertyEmpire",short_name:"PropertyEmpire",start_url:"/",display:"standalone",background_color:"#0f0f0f",theme_color:"#0f0f0f",icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%231a1a1a'/%3E%3Ctext x='96' y='130' font-size='100' text-anchor='middle'%3E%F0%9F%8F%99%EF%B8%8F%3C/text%3E%3C/svg%3E",sizes:"192x192",type:"image/svg+xml"}]};
+  const bl=new Blob([JSON.stringify(md)],{type:'application/json'});
+  const lk=document.createElement('link');lk.rel='manifest';lk.href=URL.createObjectURL(bl);document.head.appendChild(lk);
+
+  // Load Supabase SDK
+  const s=document.createElement('script');
+  s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+  s.onload=()=>{STATE.supabase=window.supabase.createClient(SUPA_URL,SUPA_KEY);console.log('Supabase ready');};
+  document.head.appendChild(s);
+});
+</script>
+</body>
+</html>
