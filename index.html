@@ -801,12 +801,13 @@ function fmtTime(ms){const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60
 function getOwn(id){return S.own[id]||S.own[String(id)]||S.own[Number(id)]||0;}
 function getOtherOwn(id){if(S.dbOwn)return S.dbOwn.filter(o=>o.property_id==id&&o.user_id!==S.user?.id).reduce((s,o)=>s+o.pct,0);return 0;}
 function getAvail(id){return Math.max(0,100-getOwn(id)-getOtherOwn(id));}
-function getPrice(p){return Math.round(p.price*S.market[p.id].mult*priceMult());}
+function marketValue(p){return Math.round(p.price*S.market[p.id].mult);}
+function getPrice(p){return Math.round(marketValue(p)*priceMult());}
 function rentMult(){let m=1;const rl=S.skills.rent_boost||0;if(rl)m+=SKILLS_DEF[0].bonus(rl);const pl=S.skills.portfolio||0;if(pl)m+=SKILLS_DEF[4].bonus(pl);if(S.powerups['2xrent']&&new Date()<new Date(S.powerups['2xrent']))m*=2;return m;}
 function priceMult(){let m=1;const dl=S.skills.price_disc||0;if(dl)m-=SKILLS_DEF[1].bonus(dl);if(S.powerups.discount&&new Date()<new Date(S.powerups.discount))m-=0.2;return Math.max(0.3,m);}
 function coinBonus(){const cl=S.skills.coin_master||0;return cl?SKILLS_DEF[5].bonus(cl):0;}
 function totalRentIncome(){return Math.round(PROPS.reduce((s,p)=>{const m=getOwn(p.id);return m?s+Math.round(p.rent*m/100):s;},0)*rentMult());}
-function netWorth(){return S.cash+PROPS.reduce((s,p)=>{const m=getOwn(p.id);return m?s+Math.round(getPrice(p)*m/100):s;},0);}
+function netWorth(){return S.cash+PROPS.reduce((s,p)=>{const m=getOwn(p.id);return m?s+Math.round(marketValue(p)*m/100):s;},0);}
 function getPropStatus(id){const m=getOwn(id),o=getOtherOwn(id);if(m>=100)return'mine';if(m>0)return'partial';if(!m&&o>=100)return'taken';return'available';}
 function toast(msg,dur=2800){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
 function addActivity(txt){const f=document.getElementById('activity-feed');if(!f)return;const now=new Date();const d=document.createElement('div');d.className='act-item';d.innerHTML=`<span class="act-icon">📌</span><span class="act-text">${txt}</span><span class="act-time">${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}</span>`;f.insertBefore(d,f.firstChild);if(f.children.length>10)f.removeChild(f.lastChild);}
@@ -881,7 +882,7 @@ async function buyShare(id){
   await saveOwn(id,np);await saveProfile();openModal(id);
 }
 async function sellShare(id){
-  const p=PROPS.find(x=>x.id===id);const m=getOwn(id);const gain=Math.round(getPrice(p)*m/100);
+  const p=PROPS.find(x=>x.id===id);const m=getOwn(id);const gain=Math.round(marketValue(p)*m/100);
   S.cash+=gain;delete S.own[id];delete S.own[Number(id)];
   toast(T('sold',fmt(gain)));closeModal();renderAll();
   await saveOwn(id,0);await saveProfile();
@@ -913,13 +914,13 @@ function closeModal(){document.getElementById('modal-overlay').classList.remove(
 function renderPortfolio(){
   const myP=PROPS.filter(p=>getOwn(p.id)>0);
   const tRent=myP.reduce((s,p)=>s+Math.round(p.rent*getOwn(p.id)/100*rentMult()),0);
-  const tVal=myP.reduce((s,p)=>s+Math.round(getPrice(p)*getOwn(p.id)/100),0);
+  const tVal=myP.reduce((s,p)=>s+Math.round(marketValue(p)*getOwn(p.id)/100),0);
   document.getElementById('port-summary').innerHTML=`<div class="port-stat"><div class="port-stat-val">${fmt(tVal)}</div><div class="port-stat-label">${T('propValue')}</div></div><div class="port-stat"><div class="port-stat-val" style="color:var(--green)">${fmtRent(tRent)}</div><div class="port-stat-label">${T('propIncome')}</div></div><div class="port-stat"><div class="port-stat-val">${myP.length}</div><div class="port-stat-label">${T('propCount')}</div></div>`;
   const list=document.getElementById('portfolio-list');
   if(!myP.length){list.innerHTML=`<div class="empty"><div class="empty-icon">📁</div><div class="empty-text">${T('emptyPortfolio')}</div></div>`;return;}
   list.innerHTML='';
   myP.forEach(p=>{
-    const m=getOwn(p.id),rent=Math.round(p.rent*m/100*rentMult()),val=Math.round(getPrice(p)*m/100);
+    const m=getOwn(p.id),rent=Math.round(p.rent*m/100*rentMult()),val=Math.round(marketValue(p)*m/100);
     const d=document.createElement('div');d.className='port-item';
     d.innerHTML=`<div class="port-emoji">${p.emoji}</div><div class="port-info"><div class="port-name">${p.name}</div><div class="port-sub">📍 ${p.loc} · ${m}%</div><div class="port-pct-bar"><div class="port-pct-fill" style="width:${m}%"></div></div></div><div class="port-right"><div class="port-rent">${fmtRent(rent)}</div><div class="port-val">${fmt(val)}</div><button class="sell-btn" onclick="event.stopPropagation();sellShare(${p.id})">${T('available')}</button></div>`;
     d.onclick=()=>openModal(p.id);list.appendChild(d);
@@ -943,7 +944,7 @@ function renderOffers(){
 function renderLeaderboard(){
   let players=[];
   if(S.dbProfiles&&S.dbProfiles.length){
-    players=S.dbProfiles.map((pr,i)=>({name:pr.username||'Player',avatar:pr.avatar||AVATARS[0],color:COLORS[i%COLORS.length],worth:pr.cash+(S.dbOwn||[]).filter(o=>o.user_id===pr.id).reduce((s,o)=>{const p=PROPS.find(x=>x.id==o.property_id);return s+(p?Math.round(getPrice(p)*o.pct/100):0);},0),props:(S.dbOwn||[]).filter(o=>o.user_id===pr.id).length,isMe:pr.id===S.user?.id}));
+    players=S.dbProfiles.map((pr,i)=>({name:pr.username||'Player',avatar:pr.avatar||AVATARS[0],color:COLORS[i%COLORS.length],worth:pr.cash+(S.dbOwn||[]).filter(o=>o.user_id===pr.id).reduce((s,o)=>{const p=PROPS.find(x=>x.id==o.property_id);return s+(p?Math.round(marketValue(p)*o.pct/100):0);},0),props:(S.dbOwn||[]).filter(o=>o.user_id===pr.id).length,isMe:pr.id===S.user?.id}));
   }else{players=[{name:S.username,avatar:S.avatar,color:COLORS[0],worth:netWorth(),props:Object.keys(S.own).length,isMe:true}];}
   players.sort((a,b)=>b.worth-a.worth);
   const list=document.getElementById('lb-list');list.innerHTML='';
