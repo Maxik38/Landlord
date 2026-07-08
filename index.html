@@ -434,7 +434,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     <div class="screen" id="screen-offers">
       <div class="screen-inner">
         <div class="section-hdr"><h2 id="lbl-offers-title">Offers</h2><p id="lbl-offers-sub">Offers from other players</p></div>
+        <div class="store-section-title" id="lbl-received" style="margin-top:0">Received</div>
         <div id="offers-list"></div>
+        <div class="store-section-title" id="lbl-sent" style="margin-top:18px">Sent</div>
+        <div id="offers-sent-list"></div>
       </div>
     </div>
 
@@ -482,8 +485,8 @@ document.head.appendChild(supaScript);
 
 // ===== TRANSLATIONS =====
 const LANGS = {
-  en:{flag:'🇬🇧',name:'English',login:'Login',register:'Register',loginBtn:'Sign In',registerBtn:'Sign Up',email:'Email',password:'Password',username:'Username',market:'Market',portfolio:'Portfolio',store:'Store',skills:'Skills',offers:'Offers',leaderboard:'Top',cash:'Cash',income:'Income/hr',networth:'Net Worth',free:'free',daily:'daily',powerups:'Power-ups',buyCoins:'Buy Gold Coins',convert:'Convert to Cash',convertDesc:'Convert Gold Coins to game cash',best:'BEST VALUE',skillsNote:'💡 Skills are permanent — not time limited',available:'Available',partial:'Partial',taken:'Taken',all:'All',apartments:'Apartments',commercial:'Commercial',luxury:'Luxury',industrial:'Industrial',cities:'Cities',activity:'Activity',logout:'Sign Out',noOffers:'No offers from players',emptyPortfolio:"You don't own any properties yet",watchAd:'Watch Ad',dailyReward:'Daily Reward',dailyDesc:'Sign in every day for bonus',sub:'Build your real estate empire.',fillFields:'⚠️ Fill in email and password',connError:'❌ Connection error. Try again.',welcome:(n)=>`🌐 Welcome back, ${n}!`,buyOk:(pct,name,price)=>`✅ Bought ${pct}% of ${name} for ${price}`,sold:(p)=>`💰 Sold for ${p}`,offerSent:(p,n)=>`📩 Offer ${p} sent to ${n}!`,accepted:(p)=>`✅ Accepted! You received ${p}`,rejected:'❌ Rejected',skillUp:(n,l)=>`✅ ${n} → Level ${l}!`,skillMax:'✅ Already maxed',noCoins:(n)=>`❌ Need ${n} 🪙`,puActive:(n)=>`✅ ${n} activated!`,converted:(c,v)=>`💱 ${c} 🪙 → ${v}`,need100:'❌ Need at least 100 🪙',adReward:(n)=>`🎉 Reward: +${n} 🪙`,dailyGot:(n)=>`🎁 Daily reward: +${n} 🪙`,dailyClaimed:'⏳ Daily reward already claimed',rentIncome:(v)=>`💰 Rent income: +${v}`,stayBtn:'Stay in game',exitBtn:'Close game',exitTitle:'Exit game?',exitSub:'Your progress is saved.',checkEmail:'📧 Registration OK! Check your email then sign in.',buyBtn:(pct,price)=>`Buy ${pct}% for ${price}`,noFunds:(p)=>`Insufficient funds (${p})`,lbProps:(n)=>`${n} properties`,remainingTime:(t)=>`⏳ Remaining: ${t}`,myShare:(n)=>`My share (${n}%)`,ownership:'Ownership',makeOffer:'Make offer',offerFrom:(n)=>`From: ${n}`,offerWants:(pct)=>`Wants: ${pct}% of your share`,accept:'✅ Accept',reject:'❌ Reject',marketValue:'Market Value',rentHr:'Rent/hr',myShareLbl:'My Share',available2:'Available',propValue:'Value',propIncome:'Income/hr',propCount:'Properties',chooseAvatar:'Choose your avatar',permaBoost:'2× All Profits Forever',permaBoostDesc:'Permanently doubles all your income — one-time purchase',permaBoostTag:'forever',level:'LEVEL',nextLevelAt:(nw)=>`Next level at ${nw} net worth`,levelReward:(c,cash)=>`Reward: +${c} 🪙 +${cash}`,maxLevelReached:'Maximum level reached! 🏆',levelUp:(l,c,cash)=>`🎉 Level ${l}! +${c} 🪙 +${cash}`,yourOfferPrice:'Your offer price (€)',weeklyReward:(c,cash,d)=>`🎁 +${c} 🪙 +${cash} in ${d}`,personal:'Personal',global:'Global',tierHouses:'Houses',tierCities:'Cities',tierCountries:'Countries',tierContinents:'Continents',luckyCharm:'Lucky Charm',luckyCharmDesc:'20% chance to double every ad reward for 24h',owned:'Owned',diamonds:'Diamonds',convertDiamond:'Convert to Diamond',convertDiamondDesc:'Convert game cash to premium Diamonds',needDiamonds:(n)=>`❌ Need ${n} 💎`,convertedDiamond:(c,d)=>`💎 ${c} → ${d} Diamond${d===1?'':'s'}`,buyBtnDiamond:(pct,price)=>`Buy ${pct}% for ${price} 💎`,noFundsDiamond:(p)=>`Insufficient Diamonds (${p})`},
-  sk:{flag:'🇸🇰',name:'Slovenčina',login:'Prihlásenie',register:'Registrácia',loginBtn:'Prihlásiť sa',registerBtn:'Registrovať sa',email:'Email',password:'Heslo',username:'Herné meno',market:'Trh',portfolio:'Portfólio',store:'Store',skills:'Zručnosti',offers:'Ponuky',leaderboard:'Top',cash:'Hotovosť',income:'Príjem/hod',networth:'Net Worth',free:'zadarmo',daily:'denne',powerups:'Power-upy',buyCoins:'Kúpiť Gold Coins',convert:'Premeniť Coins',convertDesc:'Premeň Gold Coins na hernú hotovosť',best:'NAJLEPŠIA CENA',skillsNote:'💡 Zručnosti zostávajú navždy — nie sú časovo obmedzené',available:'Voľné',partial:'Čiastočné',taken:'Obsadené',all:'Všetko',apartments:'Byty',commercial:'Komerčné',luxury:'Luxusné',industrial:'Priemysel',cities:'Mestá',activity:'Aktivita',logout:'Odhlásiť sa',noOffers:'Žiadne ponuky od hráčov',emptyPortfolio:'Zatiaľ nevlastníš žiadnu nehnuteľnosť',watchAd:'Pozerať reklamu',dailyReward:'Denná odmena',dailyDesc:'Prihlás sa každý deň pre bonus',sub:'Buduj realitné impérium. Súpeř s celým svetom.',fillFields:'⚠️ Vyplň email a heslo',connError:'❌ Chyba pripojenia. Skús znova.',welcome:(n)=>`🌐 Vitaj späť, ${n}!`,buyOk:(pct,name,price)=>`✅ Kúpil si ${pct}% z ${name} za ${price}`,sold:(p)=>`💰 Predaný za ${p}`,offerSent:(p,n)=>`📩 Ponuka ${p} odoslaná ${n}!`,accepted:(p)=>`✅ Prijatá! Získal si ${p}`,rejected:'❌ Odmietnuté',skillUp:(n,l)=>`✅ ${n} → Úroveň ${l}!`,skillMax:'✅ Zručnosť je na maxime',noCoins:(n)=>`❌ Potrebuješ ${n} 🪙`,puActive:(n)=>`✅ ${n} aktivovaný!`,converted:(c,v)=>`💱 ${c} 🪙 → ${v}`,need100:'❌ Potrebuješ aspoň 100 🪙',adReward:(n)=>`🎉 Odmena: +${n} 🪙`,dailyGot:(n)=>`🎁 Denná odmena: +${n} 🪙`,dailyClaimed:'⏳ Denná odmena bola už vyzdvihnutá',rentIncome:(v)=>`💰 Príjem z nájmu: +${v}`,stayBtn:'Zostať v hre',exitBtn:'Zatvoriť hru',exitTitle:'Ukončiť hru?',exitSub:'Tvoj postup je uložený.',checkEmail:'📧 Registrácia OK! Skontroluj email a potom sa prihlás.',buyBtn:(pct,price)=>`Kúpiť ${pct}% za ${price}`,noFunds:(p)=>`Nedostatok (${p})`,lbProps:(n)=>`${n} nehnuteľností`,remainingTime:(t)=>`⏳ Zostatok: ${t}`,myShare:(n)=>`Môj podiel (${n}%)`,ownership:'Vlastníctvo',makeOffer:'Ponúknuť',offerFrom:(n)=>`Od: ${n}`,offerWants:(pct)=>`Chce: ${pct}% tvojho podielu`,accept:'✅ Prijať',reject:'❌ Odmietnuť',marketValue:'Trhová cena',rentHr:'Rent/hod',myShareLbl:'Môj podiel',available2:'Dostupné',propValue:'Hodnota',propIncome:'Príjem/hod',propCount:'Nehnuteľnosti',chooseAvatar:'Vyber si profilovku',permaBoost:'2× Všetky zisky navždy',permaBoostDesc:'Natrvalo zdvojnásobí všetok tvoj príjem — jednorazový nákup',permaBoostTag:'navždy',level:'LEVEL',nextLevelAt:(nw)=>`Ďalší level pri majetku ${nw}`,levelReward:(c,cash)=>`Odmena: +${c} 🪙 +${cash}`,maxLevelReached:'Maximálny level dosiahnutý! 🏆',levelUp:(l,c,cash)=>`🎉 Level ${l}! +${c} 🪙 +${cash}`,yourOfferPrice:'Tvoja ponúkaná cena (€)',weeklyReward:(c,cash,d)=>`🎁 +${c} 🪙 +${cash} o ${d}`,personal:'Personal',global:'Global',tierHouses:'Domy',tierCities:'Mestá',tierCountries:'Krajiny',tierContinents:'Kontinenty',luckyCharm:'Šťastný Trojlístok',luckyCharmDesc:'20% šanca na dvojnásobnú odmenu z reklamy, 24h',owned:'Vlastníš',diamonds:'Brilianty',convertDiamond:'Zameniť na Briliant',convertDiamondDesc:'Premeň hernú hotovosť na prémiové Brilianty',needDiamonds:(n)=>`❌ Potrebuješ ${n} 💎`,convertedDiamond:(c,d)=>`💎 ${c} → ${d} briliant${d===1?'':d<5?'y':'ov'}`,buyBtnDiamond:(pct,price)=>`Kúpiť ${pct}% za ${price} 💎`,noFundsDiamond:(p)=>`Nedostatok briliantov (${p})`},
+  en:{flag:'🇬🇧',name:'English',login:'Login',register:'Register',loginBtn:'Sign In',registerBtn:'Sign Up',email:'Email',password:'Password',username:'Username',market:'Market',portfolio:'Portfolio',store:'Store',skills:'Skills',offers:'Offers',leaderboard:'Top',cash:'Cash',income:'Income/hr',networth:'Net Worth',free:'free',daily:'daily',powerups:'Power-ups',buyCoins:'Buy Gold Coins',convert:'Convert to Cash',convertDesc:'Convert Gold Coins to game cash',best:'BEST VALUE',skillsNote:'💡 Skills are permanent — not time limited',available:'Available',partial:'Partial',taken:'Taken',all:'All',apartments:'Apartments',commercial:'Commercial',luxury:'Luxury',industrial:'Industrial',cities:'Cities',activity:'Activity',logout:'Sign Out',noOffers:'No offers from players',emptyPortfolio:"You don't own any properties yet",watchAd:'Watch Ad',dailyReward:'Daily Reward',dailyDesc:'Sign in every day for bonus',sub:'Build your real estate empire.',fillFields:'⚠️ Fill in email and password',connError:'❌ Connection error. Try again.',welcome:(n)=>`🌐 Welcome back, ${n}!`,buyOk:(pct,name,price)=>`✅ Bought ${pct}% of ${name} for ${price}`,sold:(p)=>`💰 Sold for ${p}`,offerSent:(p,n)=>`📩 Offer ${p} sent to ${n}!`,accepted:(p)=>`✅ Accepted! You received ${p}`,rejected:'❌ Rejected',skillUp:(n,l)=>`✅ ${n} → Level ${l}!`,skillMax:'✅ Already maxed',noCoins:(n)=>`❌ Need ${n} 🪙`,puActive:(n)=>`✅ ${n} activated!`,converted:(c,v)=>`💱 ${c} 🪙 → ${v}`,need100:'❌ Need at least 100 🪙',adReward:(n)=>`🎉 Reward: +${n} 🪙`,dailyGot:(n)=>`🎁 Daily reward: +${n} 🪙`,dailyClaimed:'⏳ Daily reward already claimed',rentIncome:(v)=>`💰 Rent income: +${v}`,stayBtn:'Stay in game',exitBtn:'Close game',exitTitle:'Exit game?',exitSub:'Your progress is saved.',checkEmail:'📧 Registration OK! Check your email then sign in.',buyBtn:(pct,price)=>`Buy ${pct}% for ${price}`,noFunds:(p)=>`Insufficient funds (${p})`,lbProps:(n)=>`${n} properties`,remainingTime:(t)=>`⏳ Remaining: ${t}`,myShare:(n)=>`My share (${n}%)`,ownership:'Ownership',makeOffer:'Make offer',offerFrom:(n)=>`From: ${n}`,offerWants:(pct)=>`Wants: ${pct}% of your share`,accept:'✅ Accept',reject:'❌ Reject',marketValue:'Market Value',rentHr:'Rent/hr',myShareLbl:'My Share',available2:'Available',propValue:'Value',propIncome:'Income/hr',propCount:'Properties',chooseAvatar:'Choose your avatar',permaBoost:'2× All Profits Forever',permaBoostDesc:'Permanently doubles all your income — one-time purchase',permaBoostTag:'forever',level:'LEVEL',nextLevelAt:(nw)=>`Next level at ${nw} net worth`,levelReward:(c,cash)=>`Reward: +${c} 🪙 +${cash}`,maxLevelReached:'Maximum level reached! 🏆',levelUp:(l,c,cash)=>`🎉 Level ${l}! +${c} 🪙 +${cash}`,yourOfferPrice:'Your offer price (€)',weeklyReward:(c,cash,dia,d)=>`🎁 +${c} 🪙 +${cash} +${dia} 💎 in ${d}`,personal:'Personal',global:'Global',tierHouses:'Houses',tierCities:'Cities',tierCountries:'Countries',tierContinents:'Continents',luckyCharm:'Lucky Charm',luckyCharmDesc:'20% chance to double every ad reward for 24h',owned:'Owned',diamonds:'Diamonds',convertDiamond:'Convert to Diamond',convertDiamondDesc:'Convert game cash to premium Diamonds',needDiamonds:(n)=>`❌ Need ${n} 💎`,convertedDiamond:(c,d)=>`💎 ${c} → ${d} Diamond${d===1?'':'s'}`,buyBtnDiamond:(pct,price)=>`Buy ${pct}% for ${price} 💎`,noFundsDiamond:(p)=>`Insufficient Diamonds (${p})`,received:'Received',sent:'Sent',offerTo:(n)=>`To: ${n}`,edit:'Edit',cancelOffer:'Cancel',noSentOffers:'No offers sent yet',editOfferTitle:'Edit offer',updateOffer:'Update Offer',offerUpdated:'✅ Offer updated',offerCancelled:'🗑️ Offer cancelled'},
+  sk:{flag:'🇸🇰',name:'Slovenčina',login:'Prihlásenie',register:'Registrácia',loginBtn:'Prihlásiť sa',registerBtn:'Registrovať sa',email:'Email',password:'Heslo',username:'Herné meno',market:'Trh',portfolio:'Portfólio',store:'Store',skills:'Zručnosti',offers:'Ponuky',leaderboard:'Top',cash:'Hotovosť',income:'Príjem/hod',networth:'Net Worth',free:'zadarmo',daily:'denne',powerups:'Power-upy',buyCoins:'Kúpiť Gold Coins',convert:'Premeniť Coins',convertDesc:'Premeň Gold Coins na hernú hotovosť',best:'NAJLEPŠIA CENA',skillsNote:'💡 Zručnosti zostávajú navždy — nie sú časovo obmedzené',available:'Voľné',partial:'Čiastočné',taken:'Obsadené',all:'Všetko',apartments:'Byty',commercial:'Komerčné',luxury:'Luxusné',industrial:'Priemysel',cities:'Mestá',activity:'Aktivita',logout:'Odhlásiť sa',noOffers:'Žiadne ponuky od hráčov',emptyPortfolio:'Zatiaľ nevlastníš žiadnu nehnuteľnosť',watchAd:'Pozerať reklamu',dailyReward:'Denná odmena',dailyDesc:'Prihlás sa každý deň pre bonus',sub:'Buduj realitné impérium. Súpeř s celým svetom.',fillFields:'⚠️ Vyplň email a heslo',connError:'❌ Chyba pripojenia. Skús znova.',welcome:(n)=>`🌐 Vitaj späť, ${n}!`,buyOk:(pct,name,price)=>`✅ Kúpil si ${pct}% z ${name} za ${price}`,sold:(p)=>`💰 Predaný za ${p}`,offerSent:(p,n)=>`📩 Ponuka ${p} odoslaná ${n}!`,accepted:(p)=>`✅ Prijatá! Získal si ${p}`,rejected:'❌ Odmietnuté',skillUp:(n,l)=>`✅ ${n} → Úroveň ${l}!`,skillMax:'✅ Zručnosť je na maxime',noCoins:(n)=>`❌ Potrebuješ ${n} 🪙`,puActive:(n)=>`✅ ${n} aktivovaný!`,converted:(c,v)=>`💱 ${c} 🪙 → ${v}`,need100:'❌ Potrebuješ aspoň 100 🪙',adReward:(n)=>`🎉 Odmena: +${n} 🪙`,dailyGot:(n)=>`🎁 Denná odmena: +${n} 🪙`,dailyClaimed:'⏳ Denná odmena bola už vyzdvihnutá',rentIncome:(v)=>`💰 Príjem z nájmu: +${v}`,stayBtn:'Zostať v hre',exitBtn:'Zatvoriť hru',exitTitle:'Ukončiť hru?',exitSub:'Tvoj postup je uložený.',checkEmail:'📧 Registrácia OK! Skontroluj email a potom sa prihlás.',buyBtn:(pct,price)=>`Kúpiť ${pct}% za ${price}`,noFunds:(p)=>`Nedostatok (${p})`,lbProps:(n)=>`${n} nehnuteľností`,remainingTime:(t)=>`⏳ Zostatok: ${t}`,myShare:(n)=>`Môj podiel (${n}%)`,ownership:'Vlastníctvo',makeOffer:'Ponúknuť',offerFrom:(n)=>`Od: ${n}`,offerWants:(pct)=>`Chce: ${pct}% tvojho podielu`,accept:'✅ Prijať',reject:'❌ Odmietnuť',marketValue:'Trhová cena',rentHr:'Rent/hod',myShareLbl:'Môj podiel',available2:'Dostupné',propValue:'Hodnota',propIncome:'Príjem/hod',propCount:'Nehnuteľnosti',chooseAvatar:'Vyber si profilovku',permaBoost:'2× Všetky zisky navždy',permaBoostDesc:'Natrvalo zdvojnásobí všetok tvoj príjem — jednorazový nákup',permaBoostTag:'navždy',level:'LEVEL',nextLevelAt:(nw)=>`Ďalší level pri majetku ${nw}`,levelReward:(c,cash)=>`Odmena: +${c} 🪙 +${cash}`,maxLevelReached:'Maximálny level dosiahnutý! 🏆',levelUp:(l,c,cash)=>`🎉 Level ${l}! +${c} 🪙 +${cash}`,yourOfferPrice:'Tvoja ponúkaná cena (€)',weeklyReward:(c,cash,dia,d)=>`🎁 +${c} 🪙 +${cash} +${dia} 💎 o ${d}`,personal:'Personal',global:'Global',tierHouses:'Domy',tierCities:'Mestá',tierCountries:'Krajiny',tierContinents:'Kontinenty',luckyCharm:'Šťastný Trojlístok',luckyCharmDesc:'20% šanca na dvojnásobnú odmenu z reklamy, 24h',owned:'Vlastníš',diamonds:'Brilianty',convertDiamond:'Zameniť na Briliant',convertDiamondDesc:'Premeň hernú hotovosť na prémiové Brilianty',needDiamonds:(n)=>`❌ Potrebuješ ${n} 💎`,convertedDiamond:(c,d)=>`💎 ${c} → ${d} briliant${d===1?'':d<5?'y':'ov'}`,buyBtnDiamond:(pct,price)=>`Kúpiť ${pct}% za ${price} 💎`,noFundsDiamond:(p)=>`Nedostatok briliantov (${p})`,received:'Prijaté',sent:'Odoslané',offerTo:(n)=>`Pre: ${n}`,edit:'Upraviť',cancelOffer:'Zrušiť',noSentOffers:'Zatiaľ si neodoslal žiadnu ponuku',editOfferTitle:'Upraviť ponuku',updateOffer:'Aktualizovať ponuku',offerUpdated:'✅ Ponuka aktualizovaná',offerCancelled:'🗑️ Ponuka zrušená'},
   cs:{flag:'🇨🇿',name:'Čeština',login:'Přihlášení',register:'Registrace',loginBtn:'Přihlásit se',registerBtn:'Registrovat se',email:'Email',password:'Heslo',username:'Herní jméno',market:'Trh',portfolio:'Portfólio',store:'Obchod',skills:'Dovednosti',offers:'Nabídky',leaderboard:'Top',cash:'Hotovost',income:'Příjem/hod',networth:'Net Worth',free:'zdarma',daily:'denně',powerups:'Power-upy',buyCoins:'Koupit Gold Coins',convert:'Převést Coins',convertDesc:'Převeď Gold Coins na herní hotovost',best:'NEJLEPŠÍ CENA',skillsNote:'💡 Dovednosti jsou trvalé',available:'Volné',partial:'Částečné',taken:'Obsazené',all:'Vše',apartments:'Byty',commercial:'Komerční',luxury:'Luxusní',industrial:'Průmysl',cities:'Města',activity:'Aktivita',logout:'Odhlásit se',noOffers:'Žádné nabídky',emptyPortfolio:'Zatím nevlastníš žádnou nemovitost',watchAd:'Sledovat reklamu',dailyReward:'Denní odměna',dailyDesc:'Přihlašuj se každý den',sub:'Buduj realitní impérium.',fillFields:'⚠️ Vyplň email a heslo',connError:'❌ Chyba připojení.',welcome:(n)=>`🌐 Vítej zpět, ${n}!`,buyOk:(pct,name,price)=>`✅ Koupil jsi ${pct}% z ${name} za ${price}`,sold:(p)=>`💰 Prodáno za ${p}`,offerSent:(p,n)=>`📩 Nabídka ${p} odeslána ${n}!`,accepted:(p)=>`✅ Přijato! Získal jsi ${p}`,rejected:'❌ Odmítnuto',skillUp:(n,l)=>`✅ ${n} → Úroveň ${l}!`,skillMax:'✅ Na maximu',noCoins:(n)=>`❌ Potřebuješ ${n} 🪙`,puActive:(n)=>`✅ ${n} aktivován!`,converted:(c,v)=>`💱 ${c} 🪙 → ${v}`,need100:'❌ Potřebuješ alespoň 100 🪙',adReward:(n)=>`🎉 Odměna: +${n} 🪙`,dailyGot:(n)=>`🎁 Denní odměna: +${n} 🪙`,dailyClaimed:'⏳ Denní odměna již vyzvednuta',rentIncome:(v)=>`💰 Příjem z nájmu: +${v}`,stayBtn:'Zůstat',exitBtn:'Zavřít',exitTitle:'Ukončit hru?',exitSub:'Tvůj postup je uložen.',checkEmail:'📧 Registrace OK! Zkontroluj email.',buyBtn:(pct,price)=>`Koupit ${pct}% za ${price}`,noFunds:(p)=>`Nedostatek (${p})`,lbProps:(n)=>`${n} nemovitostí`,remainingTime:(t)=>`⏳ Zbývá: ${t}`,myShare:(n)=>`Můj podíl (${n}%)`,ownership:'Vlastnictví',makeOffer:'Nabídnout',offerFrom:(n)=>`Od: ${n}`,offerWants:(pct)=>`Chce: ${pct}% tvého podílu`,accept:'✅ Přijmout',reject:'❌ Odmítnout',marketValue:'Tržní cena',rentHr:'Nájem/hod',myShareLbl:'Můj podíl',available2:'Dostupné',propValue:'Hodnota',propIncome:'Příjem/hod',propCount:'Nemovitosti'},
   de:{flag:'🇩🇪',name:'Deutsch',login:'Anmeldung',register:'Registrierung',loginBtn:'Anmelden',registerBtn:'Registrieren',email:'E-Mail',password:'Passwort',username:'Spielername',market:'Markt',portfolio:'Portfolio',store:'Shop',skills:'Fähigkeiten',offers:'Angebote',leaderboard:'Top',cash:'Bargeld',income:'Einnahmen/Std',networth:'Nettowert',free:'kostenlos',daily:'täglich',powerups:'Power-ups',buyCoins:'Gold Coins kaufen',convert:'Coins umwandeln',convertDesc:'Gold Coins in Spielgeld umwandeln',best:'BESTES ANGEBOT',skillsNote:'💡 Fähigkeiten sind dauerhaft',available:'Verfügbar',partial:'Teilweise',taken:'Belegt',all:'Alle',apartments:'Wohnungen',commercial:'Gewerbe',luxury:'Luxus',industrial:'Industrie',cities:'Städte',activity:'Aktivität',logout:'Abmelden',noOffers:'Keine Angebote',emptyPortfolio:'Du besitzt noch keine Immobilien',watchAd:'Werbung ansehen',dailyReward:'Tagesbonus',dailyDesc:'Täglich anmelden für Bonus',sub:'Bau dein Immobilienimperium.',fillFields:'⚠️ E-Mail und Passwort eingeben',connError:'❌ Verbindungsfehler.',welcome:(n)=>`🌐 Willkommen zurück, ${n}!`,buyOk:(pct,name,price)=>`✅ ${pct}% von ${name} für ${price} gekauft`,sold:(p)=>`💰 Verkauft für ${p}`,offerSent:(p,n)=>`📩 Angebot ${p} an ${n} gesendet!`,accepted:(p)=>`✅ Angenommen! Du erhältst ${p}`,rejected:'❌ Abgelehnt',skillUp:(n,l)=>`✅ ${n} → Stufe ${l}!`,skillMax:'✅ Bereits maximal',noCoins:(n)=>`❌ Benötige ${n} 🪙`,puActive:(n)=>`✅ ${n} aktiviert!`,converted:(c,v)=>`💱 ${c} 🪙 → ${v}`,need100:'❌ Mindestens 100 🪙',adReward:(n)=>`🎉 Belohnung: +${n} 🪙`,dailyGot:(n)=>`🎁 Tagesbonus: +${n} 🪙`,dailyClaimed:'⏳ Tagesbonus bereits abgeholt',rentIncome:(v)=>`💰 Mieteinnahmen: +${v}`,stayBtn:'Bleiben',exitBtn:'Beenden',exitTitle:'Spiel beenden?',exitSub:'Dein Fortschritt ist gespeichert.',checkEmail:'📧 Registrierung OK! E-Mail prüfen.',buyBtn:(pct,price)=>`${pct}% kaufen für ${price}`,noFunds:(p)=>`Nicht genug (${p})`,lbProps:(n)=>`${n} Immobilien`,remainingTime:(t)=>`⏳ Verbleibend: ${t}`,myShare:(n)=>`Mein Anteil (${n}%)`,ownership:'Eigentum',makeOffer:'Anbieten',offerFrom:(n)=>`Von: ${n}`,offerWants:(pct)=>`Möchte: ${pct}% deines Anteils`,accept:'✅ Annehmen',reject:'❌ Ablehnen',marketValue:'Marktwert',rentHr:'Miete/Std',myShareLbl:'Mein Anteil',available2:'Verfügbar',propValue:'Wert',propIncome:'Einnahmen/Std',propCount:'Immobilien'},
   es:{flag:'🇪🇸',name:'Español',login:'Iniciar sesión',register:'Registrarse',loginBtn:'Entrar',registerBtn:'Registrarse',email:'Correo',password:'Contraseña',username:'Nombre',market:'Mercado',portfolio:'Portafolio',store:'Tienda',skills:'Habilidades',offers:'Ofertas',leaderboard:'Top',cash:'Efectivo',income:'Ingreso/hr',networth:'Valor neto',free:'gratis',daily:'diario',powerups:'Potenciadores',buyCoins:'Comprar Coins',convert:'Convertir Coins',convertDesc:'Convierte Coins en efectivo',best:'MEJOR PRECIO',skillsNote:'💡 Las habilidades son permanentes',available:'Disponible',partial:'Parcial',taken:'Ocupado',all:'Todo',apartments:'Apartamentos',commercial:'Comercial',luxury:'Lujo',industrial:'Industrial',cities:'Ciudades',activity:'Actividad',logout:'Cerrar sesión',noOffers:'Sin ofertas',emptyPortfolio:'Aún no posees propiedades',watchAd:'Ver anuncio',dailyReward:'Recompensa diaria',dailyDesc:'Inicia sesión cada día',sub:'Construye tu imperio inmobiliario.',fillFields:'⚠️ Completa email y contraseña',connError:'❌ Error de conexión.',welcome:(n)=>`🌐 Bienvenido de vuelta, ${n}!`,buyOk:(pct,name,price)=>`✅ Compraste ${pct}% de ${name} por ${price}`,sold:(p)=>`💰 Vendido por ${p}`,offerSent:(p,n)=>`📩 Oferta ${p} enviada a ${n}!`,accepted:(p)=>`✅ Aceptado! Recibiste ${p}`,rejected:'❌ Rechazado',skillUp:(n,l)=>`✅ ${n} → Nivel ${l}!`,skillMax:'✅ Al máximo',noCoins:(n)=>`❌ Necesitas ${n} 🪙`,puActive:(n)=>`✅ ${n} activado!`,converted:(c,v)=>`💱 ${c} 🪙 → ${v}`,need100:'❌ Necesitas 100 🪙',adReward:(n)=>`🎉 Recompensa: +${n} 🪙`,dailyGot:(n)=>`🎁 Recompensa diaria: +${n} 🪙`,dailyClaimed:'⏳ Ya reclamada',rentIncome:(v)=>`💰 Renta: +${v}`,stayBtn:'Quedarme',exitBtn:'Salir',exitTitle:'¿Salir?',exitSub:'Tu progreso está guardado.',checkEmail:'📧 Registro OK! Revisa tu email.',buyBtn:(pct,price)=>`Comprar ${pct}% por ${price}`,noFunds:(p)=>`Sin fondos (${p})`,lbProps:(n)=>`${n} propiedades`,remainingTime:(t)=>`⏳ Restante: ${t}`,myShare:(n)=>`Mi parte (${n}%)`,ownership:'Propiedad',makeOffer:'Ofrecer',offerFrom:(n)=>`De: ${n}`,offerWants:(pct)=>`Quiere: ${pct}%`,accept:'✅ Aceptar',reject:'❌ Rechazar',marketValue:'Valor de mercado',rentHr:'Renta/hr',myShareLbl:'Mi parte',available2:'Disponible',propValue:'Valor',propIncome:'Ingreso/hr',propCount:'Propiedades'},
@@ -567,12 +570,16 @@ function applyLang() {
   setText('lbl-personal', T('personal'));
   setText('lbl-global', T('global'));
   if(document.getElementById('prop-accordion'))renderGrid();
+  if(S.screen==='portfolio')renderPortfolio();
+  if(S.screen==='offers')renderOffers();
   // Logout
   setText('logout-btn', T('logout'));
   setText('um-nw-label', T('networth'));
   setText('lbl-diamonds', T('diamonds').toUpperCase());
   // Offers/lb titles
   setText('lbl-offers-title', T('offers'));
+  setText('lbl-received', T('received'));
+  setText('lbl-sent', T('sent'));
   setText('lbl-lb-title', '🏆 ' + T('leaderboard'));
   setText('lbl-activity', T('activity'));
 }
@@ -671,6 +678,29 @@ const PROPS = [
   {id:209,name:'Mesto Brno',emoji:'🏙️',cat:'mesto',loc:'Brno, CZ',price:1100000,rent:6800,scope:'personal',tier:'city'},
 ];
 
+// Property name translations. Only 'en' is populated for now — other languages keep the
+// original Slovak name (unchanged from before). Add more language keys here anytime.
+const PROP_NAMES = {
+  en: {
+    1:'Bratislava Studio',2:'Košice Family House',3:'Prague Penthouse',4:'Tatras Cabin',5:'Žilina Apartment Building',
+    6:'Bratislava Retail Space',7:'Aupark Office Complex',8:'Vienna Restaurant',9:'Tesco Supermarket',10:'Tuscany Estate',
+    11:'Malibu Beach House',12:'Monaco Penthouse',13:'Private Island Maldives',14:'Senec Warehouse',15:'Trnava Factory',
+    16:'Frankfurt Data Center',17:'Bratislava Trade Zone',18:'Dubrovnik City Center',19:'Santorini Island',20:'Manhattan North',
+    21:'Berlin Studio',22:'Barcelona Villa',23:'Paris Apartment',24:'Amsterdam Apartment',25:'Dubai Marina House',
+    26:'Provence Cottage',27:'Singapore Apartment',28:'Swiss Alps Chalet',29:'Budapest 4* Hotel',30:'Bratislava Shopping Mall',
+    31:'Warsaw Office Park',32:'Tokyo Restaurant',33:'D1 Gas Station',34:'Vienna Coworking Space',35:'Croatia Marina',
+    36:'Loire Castle',37:'Burj Khalifa Penthouse',38:'Bali Resort',39:'Cannes Villa',40:'Seychelles Beach',
+    41:'Aspen Ski Chalet',42:'Spain Solar Farm',43:'Denmark Wind Farm',44:'Amazon Logistics Hub',45:'Norway Oil Platform',
+    46:'Iceland Bitcoin Mine',47:'Venice Tourist Zone',48:'Las Vegas Strip',49:'Ibiza Island',50:'All of Monaco',
+    51:'Downtown Dubai',52:'Downtown Singapore',53:'The Entire Maldives',54:'All of Switzerland',55:'All of Japan',
+    56:'All of New Zealand',57:'All of Iceland',58:'All of Portugal',59:'All of Finland',60:'Europe',
+    61:'Asia',62:'Africa',63:'North America',64:'South America',65:'Australia & Oceania',66:'Antarctica',
+    200:'Prešov Family House',201:'Ružomberok Apartment',202:'Liptov Cabin',203:'Krakow Apartment',204:'Split Villa',
+    205:'City of Trnava',206:'City of Plzeň',207:'City of Katowice',208:'City of Graz',209:'City of Brno',
+  },
+};
+function propName(p){ return (PROP_NAMES[currentLang] && PROP_NAMES[currentLang][p.id]) || p.name; }
+
 const COLORS=['#c9a84c','#5a9fe0','#4caf7d','#e05a5a','#9b59b6','#e67e22','#1abc9c','#e91e63'];
 const AVATARS=['👑','💼','🤵','👔','🏦','💰','🎩','🌟'];
 const DIAMOND_IMG='data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjggMTI4Ij4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0idG9wIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNlYWY2ZmYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjYTlkOGY1Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJib2R5TCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjN2ZjNGVlIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzNkOGZkNiIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYm9keVIiIHgxPSIxIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2JmZTZmYiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM1YWE4ZTAiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJvZHlDIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNkOWYxZmQiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjNmJiNGU4Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8IS0tIGdpcmRsZSAvIGNyb3duIGZhY2V0cyAtLT4KICA8cG9seWdvbiBwb2ludHM9IjIwLDM0IDEwOCwzNCAxMjgsNDIgMCw0MiIgZmlsbD0iIzllZDRmMiIvPgogIDxwb2x5Z29uIHBvaW50cz0iMjAsMzQgNDQsMTAgODQsMTAgMTA4LDM0IiBmaWxsPSJ1cmwoI3RvcCkiLz4KICA8cG9seWdvbiBwb2ludHM9IjIwLDM0IDQ0LDEwIDIwLDM0IiBmaWxsPSIjY2RlYWZiIi8+CiAgPHBvbHlnb24gcG9pbnRzPSI0NCwxMCA2NCwzNCAyMCwzNCIgZmlsbD0iI2JmZTRmYSIvPgogIDxwb2x5Z29uIHBvaW50cz0iNDQsMTAgODQsMTAgNjQsMzQiIGZpbGw9IiNlYWY3ZmYiLz4KICA8cG9seWdvbiBwb2ludHM9Ijg0LDEwIDEwOCwzNCA2NCwzNCIgZmlsbD0iI2JmZTRmYSIvPgogIDwhLS0gcGF2aWxpb24gZmFjZXRzIChsb3dlciBib2R5LCBwb2ludGluZyBkb3duKSAtLT4KICA8cG9seWdvbiBwb2ludHM9IjAsNDIgNDYsNDIgNjQsMTE4IiBmaWxsPSJ1cmwoI2JvZHlMKSIvPgogIDxwb2x5Z29uIHBvaW50cz0iMTI4LDQyIDgyLDQyIDY0LDExOCIgZmlsbD0idXJsKCNib2R5UikiLz4KICA8cG9seWdvbiBwb2ludHM9IjQ2LDQyIDgyLDQyIDY0LDExOCIgZmlsbD0idXJsKCNib2R5QykiLz4KICA8IS0tIHNwYXJrbGUgaGlnaGxpZ2h0cyAtLT4KICA8cG9seWdvbiBwb2ludHM9IjMwLDQwIDQ2LDQyIDM2LDUwIiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjU1Ii8+CiAgPHBvbHlnb24gcG9pbnRzPSI2NCwzNCA3MCw0MiA1OCw0MiIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC41Ii8+CiAgPGNpcmNsZSBjeD0iOTYiIGN5PSIyNCIgcj0iNCIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC44NSIvPgogIDxjaXJjbGUgY3g9IjMwIiBjeT0iMjAiIHI9IjIuNCIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC43Ii8+Cjwvc3ZnPgo=';
@@ -679,7 +709,7 @@ const DIAMOND_IMG='data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGl
 // in the code needs to change.
 // Weekly leaderboard rewards: top 3 by net worth get paid every Sunday at 00:00 (server-side, see
 // pay_weekly_rewards.sql). This array is only used client-side to preview the upcoming reward.
-const WEEKLY_REWARDS=[{rank:1,coins:1000,cash:1000000},{rank:2,coins:500,cash:500000},{rank:3,coins:250,cash:250000}];
+const WEEKLY_REWARDS=[{rank:1,coins:1000,cash:1000000,diamonds:20},{rank:2,coins:500,cash:500000,diamonds:10},{rank:3,coins:250,cash:250000,diamonds:5}];
 function nextRewardDate(){
   const now=new Date();
   const d=new Date(now.getFullYear(),now.getMonth(),now.getDate(),0,0,0,0);
@@ -709,7 +739,7 @@ const COIN_IMG='data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz
 // ===== STATE =====
 let S = {
   cash:50000, user:null, username:'Player', avatar:'🌟', levelClaimed:1,
-  own:{}, offers:[], coins:0, diamonds:0, skills:{},
+  own:{}, offers:[], sentOffers:[], coins:0, diamonds:0, skills:{},
   powerups:{}, lastDaily:null, dailyStreak:0,
   screen:'market', marketScope:'personal', openSection:null,
   dbOwn:null, dbProfiles:null,
@@ -835,6 +865,8 @@ async function loadState() {
   (own||[]).forEach(o=>{ if(o.user_id===S.user.id) S.own[Number(o.property_id)]=o.pct; });
   const {data:off} = await supa.from('offers').select('*').eq('to_id',S.user.id).eq('status','pending');
   S.offers=off||[]; updateDot();
+  const {data:sent} = await supa.from('offers').select('*').eq('from_id',S.user.id).eq('status','pending');
+  S.sentOffers=sent||[];
   const {data:prof} = await supa.from('profiles').select('id,username,cash,coins,avatar').order('cash',{ascending:false}).limit(20);
   S.dbProfiles=prof||[];
 }
@@ -918,9 +950,10 @@ function renderGrid(){
     const body=document.createElement('div');body.className='accordion-body';
     ps.forEach(p=>{
       const st=getPropStatus(p.id),m=getOwn(p.id),o=getOtherOwn(p.id),tot=m+o,price=getPrice(p);
+      const priceTxt=isDiamondTier(p)?(diamondCost(100)+' 💎'):fmt(price);
       const badge=st==='mine'?`<span class="prop-status-badge badge-mine">✓ ${T('owned')}</span>`:st==='partial'&&m>0?`<span class="prop-status-badge badge-mine">${T('partial')}</span>`:st==='partial'?`<span class="prop-status-badge badge-partial">${T('partial')}</span>`:st==='taken'?`<span class="prop-status-badge badge-taken">${T('taken')}</span>`:`<span class="prop-status-badge badge-available">${T('available')}</span>`;
       const d=document.createElement('div');d.className='prop-card'+(m>0?(m>=100?' owned':' partial'):'');
-      d.innerHTML=`<div class="prop-emoji-wrap">${p.emoji}</div><div class="prop-info"><div class="prop-name">${p.name}</div><div class="prop-loc">📍 ${p.loc}</div><div class="prop-meta"><span class="prop-price">${fmt(price)}</span><span class="prop-rent-badge">${fmtRent(p.rent)}</span>${badge}</div></div>${tot>0?`<div class="prop-own-bar" style="width:${tot}%"></div>`:''}`;
+      d.innerHTML=`<div class="prop-emoji-wrap">${p.emoji}</div><div class="prop-info"><div class="prop-name">${propName(p)}</div><div class="prop-loc">📍 ${p.loc}</div><div class="prop-meta"><span class="prop-price">${priceTxt}</span><span class="prop-rent-badge">${fmtRent(p.rent)}</span>${badge}</div></div>${tot>0?`<div class="prop-own-bar" style="width:${tot}%"></div>`:''}`;
       d.onclick=()=>openModal(p.id);body.appendChild(d);
     });
     sec.appendChild(header);sec.appendChild(body);wrap.appendChild(sec);
@@ -936,7 +969,7 @@ function isDiamondTier(p){return p.tier==='continent';}
 function openModal(id){
   curProp=id;const p=PROPS.find(x=>x.id===id);if(!p)return;
   const m=getOwn(id),o=getOtherOwn(id),av=getAvail(id),price=getPrice(p),diamond=isDiamondTier(p);
-  document.getElementById('modal-title').textContent=p.name;
+  document.getElementById('modal-title').textContent=propName(p);
   const maxBuy=Math.min(av,100);buyPct=Math.min(10,maxBuy);
   const cost=diamond?diamondCost(buyPct):Math.round(price*buyPct/100);
   let ownHtml='';
@@ -970,8 +1003,8 @@ async function buyShare(id){
   if(funds<cost){toast(diamond?T('noFundsDiamond',cost):T('noFunds',fmt(cost)));return;}
   if(diamond)S.diamonds-=cost;else S.cash-=cost;
   const np=getOwn(id)+buyPct;S.own[Number(id)]=np;
-  broadcastAction(`${S.username} bought ${buyPct}% of ${p.name}`);
-  toast(T('buyOk',buyPct,p.name,diamond?(cost+' 💎'):fmt(cost)));closeModal();renderAll();
+  broadcastAction(`${S.username} bought ${buyPct}% of ${propName(p)}`);
+  toast(T('buyOk',buyPct,propName(p),diamond?(cost+' 💎'):fmt(cost)));closeModal();renderAll();
   await saveOwn(id,np);await saveProfile();openModal(id);
 }
 async function sellShare(id){
@@ -981,18 +1014,18 @@ async function sellShare(id){
   await saveOwn(id,0);await saveProfile();
 }
 let offerTarget=null;
-function openOfferModal(tid,id,maxPct,tname){
+function openOfferModal(tid,id,maxPct,tname,editId,editPct,editPrice){
   const p=PROPS.find(x=>x.id===id);if(!p)return;
-  offerTarget={tid,id,tname,maxPct,pname:p.name};
-  document.getElementById('om-title').textContent=T('makeOffer');
-  document.getElementById('om-sub').textContent=`${tname} · ${p.emoji} ${p.name}`;
+  offerTarget={tid,id,tname,maxPct,pname:propName(p),editId:editId||null};
+  document.getElementById('om-title').textContent=editId?T('editOfferTitle'):T('makeOffer');
+  document.getElementById('om-sub').textContent=`${tname} · ${p.emoji} ${propName(p)}`;
   document.getElementById('om-pct-label').textContent=T('myShareLbl');
   document.getElementById('om-price-label').textContent=T('yourOfferPrice');
-  document.getElementById('om-send-btn').textContent=T('makeOffer');
+  document.getElementById('om-send-btn').textContent=editId?T('updateOffer'):T('makeOffer');
   const slider=document.getElementById('om-pct-slider');
-  slider.max=maxPct;slider.min=1;const startPct=Math.min(10,maxPct);slider.value=startPct;
+  slider.max=maxPct;slider.min=1;const startPct=editPct||Math.min(10,maxPct);slider.value=startPct;
   document.getElementById('om-pct').textContent=startPct+'%';
-  const suggested=Math.round(marketValue(p)*startPct/100*1.15);
+  const suggested=editPrice||Math.round(marketValue(p)*startPct/100*1.15);
   document.getElementById('om-price-input').value=suggested;
   document.getElementById('om-suggested').textContent=T('marketValue')+': '+fmt(Math.round(marketValue(p)*startPct/100));
   document.getElementById('offer-modal').classList.add('open');
@@ -1010,9 +1043,30 @@ async function sendOffer(){
   const price=Math.round(parseFloat(document.getElementById('om-price-input').value));
   if(!price||price<=0){toast('⚠️');return;}
   if(!supa||!S.user){toast('❌ Login required');return;}
-  const {tid,tname,id}=offerTarget;
-  await supa.from('offers').insert({from_id:S.user.id,to_id:tid,property_id:id,pct,amount:price,status:'pending'});
-  toast(T('offerSent',fmt(price),tname));closeOfferModal();closeModal();
+  const {tid,tname,id,editId}=offerTarget;
+  if(editId){
+    await supa.from('offers').update({pct,amount:price}).eq('id',editId);
+    const idx=(S.sentOffers||[]).findIndex(o=>o.id===editId);
+    if(idx>-1){S.sentOffers[idx].pct=pct;S.sentOffers[idx].amount=price;}
+    toast(T('offerUpdated'));
+  }else{
+    const {data}=await supa.from('offers').insert({from_id:S.user.id,to_id:tid,property_id:id,pct,amount:price,status:'pending'}).select().single();
+    if(data){S.sentOffers=S.sentOffers||[];S.sentOffers.push(data);}
+    toast(T('offerSent',fmt(price),tname));
+  }
+  closeOfferModal();closeModal();renderOffers();
+}
+function editOffer(o){
+  const p=PROPS.find(x=>x.id==o.property_id);if(!p)return;
+  const toName=S.dbProfiles?.find(pr=>pr.id===o.to_id)?.username||'Player';
+  const ownerRow=(S.dbOwn||[]).find(x=>x.property_id==o.property_id&&x.user_id===o.to_id);
+  const maxPct=Math.max(ownerRow?ownerRow.pct:0,o.pct);
+  openOfferModal(o.to_id,o.property_id,maxPct,toName,o.id,o.pct,o.amount);
+}
+async function cancelOffer(o){
+  await supa.from('offers').delete().eq('id',o.id);
+  S.sentOffers=(S.sentOffers||[]).filter(x=>x.id!==o.id);
+  toast(T('offerCancelled'));renderOffers();
 }
 async function acceptOffer(o){
   const p=PROPS.find(x=>x.id==o.property_id);const m=getOwn(o.property_id);
@@ -1044,7 +1098,7 @@ function renderPortfolio(){
   myP.forEach(p=>{
     const m=getOwn(p.id),rent=Math.round(p.rent*m/100*rentMult()),val=Math.round(marketValue(p)*m/100);
     const d=document.createElement('div');d.className='port-item';
-    d.innerHTML=`<div class="port-emoji">${p.emoji}</div><div class="port-info"><div class="port-name">${p.name}</div><div class="port-sub">📍 ${p.loc} · ${m}%</div><div class="port-pct-bar"><div class="port-pct-fill" style="width:${m}%"></div></div></div><div class="port-right"><div class="port-rent">${fmtRent(rent)}</div><div class="port-val">${fmt(val)}</div><button class="sell-btn" onclick="event.stopPropagation();sellShare(${p.id})">${T('available')}</button></div>`;
+    d.innerHTML=`<div class="port-emoji">${p.emoji}</div><div class="port-info"><div class="port-name">${propName(p)}</div><div class="port-sub">📍 ${p.loc} · ${m}%</div><div class="port-pct-bar"><div class="port-pct-fill" style="width:${m}%"></div></div></div><div class="port-right"><div class="port-rent">${fmtRent(rent)}</div><div class="port-val">${fmt(val)}</div><button class="sell-btn" onclick="event.stopPropagation();sellShare(${p.id})">${T('available')}</button></div>`;
     d.onclick=()=>openModal(p.id);list.appendChild(d);
   });
 }
@@ -1052,13 +1106,24 @@ function renderPortfolio(){
 // ===== OFFERS =====
 function renderOffers(){
   const list=document.getElementById('offers-list');
-  if(!S.offers||!S.offers.length){list.innerHTML=`<div class="empty"><div class="empty-icon">📩</div><div class="empty-text">${T('noOffers')}</div></div>`;return;}
-  list.innerHTML='';
-  S.offers.forEach(o=>{
-    const p=PROPS.find(x=>x.id==o.property_id);const fromName=S.dbProfiles?.find(pr=>pr.id===o.from_id)?.username||'Player';
+  if(!S.offers||!S.offers.length){list.innerHTML=`<div class="empty"><div class="empty-icon">📩</div><div class="empty-text">${T('noOffers')}</div></div>`;}
+  else{
+    list.innerHTML='';
+    S.offers.forEach(o=>{
+      const p=PROPS.find(x=>x.id==o.property_id);const fromName=S.dbProfiles?.find(pr=>pr.id===o.from_id)?.username||'Player';
+      const d=document.createElement('div');d.className='offer-card';
+      d.innerHTML=`<div class="offer-top"><span class="offer-prop-name">${p?.emoji||'🏠'} ${p?propName(p):'Property'}</span><span class="offer-amount">${fmt(o.amount)}</span></div><div class="offer-detail">${T('offerFrom',fromName)} · ${T('offerWants',o.pct)}</div><div class="offer-actions"><button class="btn btn-green" onclick='acceptOffer(${JSON.stringify(o)})'>${T('accept')}</button><button class="btn btn-red" onclick='rejectOffer(${JSON.stringify(o)})'>${T('reject')}</button></div>`;
+      list.appendChild(d);
+    });
+  }
+  const sentList=document.getElementById('offers-sent-list');if(!sentList)return;
+  if(!S.sentOffers||!S.sentOffers.length){sentList.innerHTML=`<div class="empty"><div class="empty-icon">📤</div><div class="empty-text">${T('noSentOffers')}</div></div>`;return;}
+  sentList.innerHTML='';
+  S.sentOffers.forEach(o=>{
+    const p=PROPS.find(x=>x.id==o.property_id);const toName=S.dbProfiles?.find(pr=>pr.id===o.to_id)?.username||'Player';
     const d=document.createElement('div');d.className='offer-card';
-    d.innerHTML=`<div class="offer-top"><span class="offer-prop-name">${p?.emoji||'🏠'} ${p?.name||'Property'}</span><span class="offer-amount">${fmt(o.amount)}</span></div><div class="offer-detail">${T('offerFrom',fromName)} · ${T('offerWants',o.pct)}</div><div class="offer-actions"><button class="btn btn-green" onclick='acceptOffer(${JSON.stringify(o)})'>${T('accept')}</button><button class="btn btn-red" onclick='rejectOffer(${JSON.stringify(o)})'>${T('reject')}</button></div>`;
-    list.appendChild(d);
+    d.innerHTML=`<div class="offer-top"><span class="offer-prop-name">${p?.emoji||'🏠'} ${p?propName(p):'Property'}</span><span class="offer-amount">${fmt(o.amount)}</span></div><div class="offer-detail">${T('offerTo',toName)} · ${T('offerWants',o.pct)}</div><div class="offer-actions"><button class="btn btn-outline" onclick='editOffer(${JSON.stringify(o)})'>${T('edit')}</button><button class="btn btn-red" onclick='cancelOffer(${JSON.stringify(o)})'>${T('cancelOffer')}</button></div>`;
+    sentList.appendChild(d);
   });
 }
 
@@ -1077,7 +1142,7 @@ function renderLeaderboard(){
   players.forEach((pl,i)=>{
     const d=document.createElement('div');d.className='lb-item';d.style.background=pl.isMe?'var(--gold-dim)':'';
     const reward=WEEKLY_REWARDS[i];
-    const rewardHtml=reward?`<div class="lb-reward">${T('weeklyReward',reward.coins,fmt(reward.cash),dLabel)}</div>`:'';
+    const rewardHtml=reward?`<div class="lb-reward">${T('weeklyReward',reward.coins,fmt(reward.cash),reward.diamonds,dLabel)}</div>`:'';
     d.innerHTML=`<span class="lb-rank">${medals[i]||'#'+(i+1)}</span><div class="lb-avatar" style="background:${pl.color}22;color:${pl.color}">${pl.avatar}</div><div class="lb-info"><div class="lb-name">${pl.name}${pl.isMe?' (You)':''}</div><div class="lb-props">${T('lbProps',pl.props)}</div></div><div class="lb-worth">${fmt(pl.worth)}</div>${rewardHtml}`;
     list.appendChild(d);
   });
