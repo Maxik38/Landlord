@@ -1252,23 +1252,20 @@ function buyCoins(amt,price){toast(`💳 Payment ${price} — payment system com
 function buyPermaBoost(){toast(`💳 Payment €0.99 — payment system coming soon!`,4000);}
 async function convertCoins(){
   if(S.coins<100){toast(T('need100'));return;}
-  const b=Math.floor(S.coins/100);const gain=b*50000;
-  S.coins-=b*100;S.cash+=gain;
-  toast(T('converted',b*100,fmt(gain)));updateTopbar();await saveProfile();
+  S.coins-=100;S.cash+=50000;
+  toast(T('converted',100,fmt(50000)));updateTopbar();await saveProfile();
 }
 async function convertDiamond(){
   const rate=1000000000;
   if(S.cash<rate){toast(T('noFunds',fmt(rate)));return;}
-  const d=Math.floor(S.cash/rate);const spent=d*rate;
-  S.cash-=spent;S.diamonds=(S.diamonds||0)+d;
-  toast(T('convertedDiamond',fmt(spent),d));updateTopbar();await saveProfile();
+  S.cash-=rate;S.diamonds=(S.diamonds||0)+1;
+  toast(T('convertedDiamond',fmt(rate),1));updateTopbar();await saveProfile();
 }
 async function convertAlien(){
   const rate=100;
   if((S.diamonds||0)<rate){toast(T('noFundsSpecial',rate,'💎'));return;}
-  const a=Math.floor(S.diamonds/rate);const spent=a*rate;
-  S.diamonds-=spent;S.aliens=(S.aliens||0)+a;
-  toast(T('convertedAlien',spent,a));updateTopbar();await saveProfile();
+  S.diamonds-=rate;S.aliens=(S.aliens||0)+1;
+  toast(T('convertedAlien',rate,1));updateTopbar();await saveProfile();
 }
 
 // ===== AD =====
