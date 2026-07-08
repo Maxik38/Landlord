@@ -35,6 +35,17 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .chip{padding:6px 13px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border2);color:var(--text3);background:var(--surface2);white-space:nowrap;cursor:pointer;flex-shrink:0;transition:all 0.15s;}
 .chip.active{border-color:var(--gold);color:var(--gold);background:var(--gold-dim);}
 .prop-list{display:flex;flex-direction:column;gap:9px;}
+.market-scope-tabs{display:flex;gap:8px;margin-bottom:14px;}
+.scope-tab{flex:1;text-align:center;padding:12px;border-radius:var(--radius-sm);background:var(--surface2);border:1px solid var(--border2);font-size:14px;font-weight:600;color:var(--text2);cursor:pointer;transition:all 0.15s;}
+.scope-tab.active{background:var(--gold-dim);border-color:var(--gold);color:var(--gold);}
+.accordion-section{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:9px;overflow:hidden;}
+.accordion-header{display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--surface2);cursor:pointer;}
+.accordion-header-left{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;}
+.accordion-count{font-size:11px;color:var(--text3);font-weight:400;}
+.accordion-chevron{font-size:11px;color:var(--text3);transition:transform 0.2s;}
+.accordion-section.open .accordion-chevron{transform:rotate(180deg);}
+.accordion-body{display:none;padding:9px;padding-top:0;}
+.accordion-section.open .accordion-body{display:flex;flex-direction:column;gap:9px;padding-top:9px;}
 .prop-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);display:flex;align-items:center;gap:11px;padding:11px;cursor:pointer;position:relative;overflow:hidden;}
 .prop-card:active{transform:scale(0.98);}.prop-card.owned{border-color:var(--green);}.prop-card.partial{border-color:var(--gold);}
 .prop-emoji-wrap{width:50px;height:50px;background:var(--surface3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
@@ -145,9 +156,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .act-item{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);}
 .act-icon{font-size:13px;flex-shrink:0;margin-top:1px;}.act-text{font-size:12px;color:var(--text2);flex:1;line-height:1.4;}.act-time{font-size:10px;color:var(--text3);flex-shrink:0;}
 .empty{text-align:center;padding:50px 20px;}.empty-icon{font-size:36px;margin-bottom:10px;}.empty-text{font-size:14px;color:var(--text3);}
-.market-ticker{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding-bottom:4px;scrollbar-width:none;}.market-ticker::-webkit-scrollbar{display:none;}
-.ticker-chip{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:5px 9px;white-space:nowrap;font-size:11px;flex-shrink:0;}
-.ticker-chip span{font-weight:600;margin-left:3px;}.ticker-chip span.up{color:var(--green);}.ticker-chip span.dn{color:var(--red);}
 /* AUTH */
 #auth-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:300;padding:20px;}
 .auth-box{background:var(--surface);border-radius:20px;width:100%;max-width:420px;padding:28px 24px;max-height:90vh;overflow-y:auto;}
@@ -330,22 +338,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
       <div class="screen-inner">
         <div id="daily-wrap"></div>
         <div class="section-hdr"><h2 id="lbl-market-title">Property Market</h2><p id="boost-status"></p></div>
-        <div class="market-ticker" id="ticker"></div>
-        <div class="chip-scroll" id="cat-chips">
-          <div class="chip active" onclick="filterCat('all',this)" id="cat-all">🌍 All</div>
-          <div class="chip" onclick="filterCat('byt',this)" id="cat-byt">🏠 Apartments</div>
-          <div class="chip" onclick="filterCat('komercny',this)" id="cat-kom">🏢 Commercial</div>
-          <div class="chip" onclick="filterCat('luxus',this)" id="cat-lux">💎 Luxury</div>
-          <div class="chip" onclick="filterCat('priemysel',this)" id="cat-pri">🏭 Industrial</div>
-          <div class="chip" onclick="filterCat('mesto',this)" id="cat-mes">🌆 Cities</div>
+        <div class="market-scope-tabs">
+          <div class="scope-tab active" id="scope-personal" onclick="setMarketScope('personal',this)">🏠 <span id="lbl-personal">Personal</span></div>
+          <div class="scope-tab" id="scope-global" onclick="setMarketScope('global',this)">🌍 <span id="lbl-global">Global</span></div>
         </div>
-        <div class="chip-scroll">
-          <div class="chip active" id="fc-all" onclick="setFilter('all',this)">All</div>
-          <div class="chip" id="fc-available" onclick="setFilter('available',this)">Available</div>
-          <div class="chip" id="fc-partial" onclick="setFilter('partial',this)">Partial</div>
-          <div class="chip" id="fc-taken" onclick="setFilter('taken',this)">Taken</div>
-        </div>
-        <div class="prop-list" id="prop-grid"></div>
+        <div id="prop-accordion"></div>
       </div>
     </div>
 
@@ -385,9 +382,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
             <div class="powerup-info"><div class="powerup-name" id="lbl-disc">-20% Discount</div><div class="powerup-desc" id="lbl-disc-desc">All property purchases 20% cheaper</div><div class="powerup-timer" id="pu-discount-timer"></div></div>
             <div class="powerup-cost"><div class="powerup-coins">400 🪙</div><div class="powerup-label">3 days</div></div>
           </div>
-          <div class="powerup-card" id="pu-insight" onclick="buyPowerup('insight')">
-            <div class="powerup-icon">🔮</div>
-            <div class="powerup-info"><div class="powerup-name" id="lbl-ins">Market Insight</div><div class="powerup-desc" id="lbl-ins-desc">See future price trends for 24h</div><div class="powerup-timer" id="pu-insight-timer"></div></div>
+          <div class="powerup-card" id="pu-lucky" onclick="buyPowerup('lucky')">
+            <div class="powerup-icon">🍀</div>
+            <div class="powerup-info"><div class="powerup-name" id="lbl-lucky">Lucky Charm</div><div class="powerup-desc" id="lbl-lucky-desc">20% chance to double every ad reward for 24h</div><div class="powerup-timer" id="pu-lucky-timer"></div></div>
             <div class="powerup-cost"><div class="powerup-coins">200 🪙</div><div class="powerup-label">24h</div></div>
           </div>
         </div>
@@ -475,8 +472,8 @@ document.head.appendChild(supaScript);
 
 // ===== TRANSLATIONS =====
 const LANGS = {
-  en:{flag:'🇬🇧',name:'English',login:'Login',register:'Register',loginBtn:'Sign In',registerBtn:'Sign Up',email:'Email',password:'Password',username:'Username',market:'Market',portfolio:'Portfolio',store:'Store',skills:'Skills',offers:'Offers',leaderboard:'Top',cash:'Cash',income:'Income/hr',networth:'Net Worth',free:'free',daily:'daily',powerups:'Power-ups',buyCoins:'Buy Gold Coins',convert:'Convert to Cash',convertDesc:'Convert Gold Coins to game cash',best:'BEST VALUE',skillsNote:'💡 Skills are permanent — not time limited',available:'Available',partial:'Partial',taken:'Taken',all:'All',apartments:'Apartments',commercial:'Commercial',luxury:'Luxury',industrial:'Industrial',cities:'Cities',activity:'Activity',logout:'Sign Out',noOffers:'No offers from players',emptyPortfolio:"You don't own any properties yet",watchAd:'Watch Ad',dailyReward:'Daily Reward',dailyDesc:'Sign in every day for bonus',sub:'Build your real estate empire.',fillFields:'⚠️ Fill in email and password',connError:'❌ Connection error. Try again.',welcome:(n)=>`🌐 Welcome back, ${n}!`,buyOk:(pct,name,price)=>`✅ Bought ${pct}% of ${name} for ${price}`,sold:(p)=>`💰 Sold for ${p}`,offerSent:(p,n)=>`📩 Offer ${p} sent to ${n}!`,accepted:(p)=>`✅ Accepted! You received ${p}`,rejected:'❌ Rejected',skillUp:(n,l)=>`✅ ${n} → Level ${l}!`,skillMax:'✅ Already maxed',noCoins:(n)=>`❌ Need ${n} 🪙`,puActive:(n)=>`✅ ${n} activated!`,converted:(c,v)=>`💱 ${c} 🪙 → ${v}`,need100:'❌ Need at least 100 🪙',adReward:(n)=>`🎉 Reward: +${n} 🪙`,dailyGot:(n)=>`🎁 Daily reward: +${n} 🪙`,dailyClaimed:'⏳ Daily reward already claimed',rentIncome:(v)=>`💰 Rent income: +${v}`,stayBtn:'Stay in game',exitBtn:'Close game',exitTitle:'Exit game?',exitSub:'Your progress is saved.',checkEmail:'📧 Registration OK! Check your email then sign in.',buyBtn:(pct,price)=>`Buy ${pct}% for ${price}`,noFunds:(p)=>`Insufficient funds (${p})`,lbProps:(n)=>`${n} properties`,remainingTime:(t)=>`⏳ Remaining: ${t}`,myShare:(n)=>`My share (${n}%)`,ownership:'Ownership',makeOffer:'Make offer',offerFrom:(n)=>`From: ${n}`,offerWants:(pct)=>`Wants: ${pct}% of your share`,accept:'✅ Accept',reject:'❌ Reject',marketValue:'Market Value',rentHr:'Rent/hr',myShareLbl:'My Share',available2:'Available',propValue:'Value',propIncome:'Income/hr',propCount:'Properties',chooseAvatar:'Choose your avatar',permaBoost:'2× All Profits Forever',permaBoostDesc:'Permanently doubles all your income — one-time purchase',permaBoostTag:'forever',level:'LEVEL',nextLevelAt:(nw)=>`Next level at ${nw} net worth`,levelReward:(c,cash)=>`Reward: +${c} 🪙 +${cash}`,maxLevelReached:'Maximum level reached! 🏆',levelUp:(l,c,cash)=>`🎉 Level ${l}! +${c} 🪙 +${cash}`,yourOfferPrice:'Your offer price (€)',weeklyReward:(c,cash,d)=>`🎁 +${c} 🪙 +${cash} in ${d}`},
-  sk:{flag:'🇸🇰',name:'Slovenčina',login:'Prihlásenie',register:'Registrácia',loginBtn:'Prihlásiť sa',registerBtn:'Registrovať sa',email:'Email',password:'Heslo',username:'Herné meno',market:'Trh',portfolio:'Portfólio',store:'Store',skills:'Zručnosti',offers:'Ponuky',leaderboard:'Top',cash:'Hotovosť',income:'Príjem/hod',networth:'Net Worth',free:'zadarmo',daily:'denne',powerups:'Power-upy',buyCoins:'Kúpiť Gold Coins',convert:'Premeniť Coins',convertDesc:'Premeň Gold Coins na hernú hotovosť',best:'NAJLEPŠIA CENA',skillsNote:'💡 Zručnosti zostávajú navždy — nie sú časovo obmedzené',available:'Voľné',partial:'Čiastočné',taken:'Obsadené',all:'Všetko',apartments:'Byty',commercial:'Komerčné',luxury:'Luxusné',industrial:'Priemysel',cities:'Mestá',activity:'Aktivita',logout:'Odhlásiť sa',noOffers:'Žiadne ponuky od hráčov',emptyPortfolio:'Zatiaľ nevlastníš žiadnu nehnuteľnosť',watchAd:'Pozerať reklamu',dailyReward:'Denná odmena',dailyDesc:'Prihlás sa každý deň pre bonus',sub:'Buduj realitné impérium. Súpeř s celým svetom.',fillFields:'⚠️ Vyplň email a heslo',connError:'❌ Chyba pripojenia. Skús znova.',welcome:(n)=>`🌐 Vitaj späť, ${n}!`,buyOk:(pct,name,price)=>`✅ Kúpil si ${pct}% z ${name} za ${price}`,sold:(p)=>`💰 Predaný za ${p}`,offerSent:(p,n)=>`📩 Ponuka ${p} odoslaná ${n}!`,accepted:(p)=>`✅ Prijatá! Získal si ${p}`,rejected:'❌ Odmietnuté',skillUp:(n,l)=>`✅ ${n} → Úroveň ${l}!`,skillMax:'✅ Zručnosť je na maxime',noCoins:(n)=>`❌ Potrebuješ ${n} 🪙`,puActive:(n)=>`✅ ${n} aktivovaný!`,converted:(c,v)=>`💱 ${c} 🪙 → ${v}`,need100:'❌ Potrebuješ aspoň 100 🪙',adReward:(n)=>`🎉 Odmena: +${n} 🪙`,dailyGot:(n)=>`🎁 Denná odmena: +${n} 🪙`,dailyClaimed:'⏳ Denná odmena bola už vyzdvihnutá',rentIncome:(v)=>`💰 Príjem z nájmu: +${v}`,stayBtn:'Zostať v hre',exitBtn:'Zatvoriť hru',exitTitle:'Ukončiť hru?',exitSub:'Tvoj postup je uložený.',checkEmail:'📧 Registrácia OK! Skontroluj email a potom sa prihlás.',buyBtn:(pct,price)=>`Kúpiť ${pct}% za ${price}`,noFunds:(p)=>`Nedostatok (${p})`,lbProps:(n)=>`${n} nehnuteľností`,remainingTime:(t)=>`⏳ Zostatok: ${t}`,myShare:(n)=>`Môj podiel (${n}%)`,ownership:'Vlastníctvo',makeOffer:'Ponúknuť',offerFrom:(n)=>`Od: ${n}`,offerWants:(pct)=>`Chce: ${pct}% tvojho podielu`,accept:'✅ Prijať',reject:'❌ Odmietnuť',marketValue:'Trhová cena',rentHr:'Rent/hod',myShareLbl:'Môj podiel',available2:'Dostupné',propValue:'Hodnota',propIncome:'Príjem/hod',propCount:'Nehnuteľnosti',chooseAvatar:'Vyber si profilovku',permaBoost:'2× Všetky zisky navždy',permaBoostDesc:'Natrvalo zdvojnásobí všetok tvoj príjem — jednorazový nákup',permaBoostTag:'navždy',level:'LEVEL',nextLevelAt:(nw)=>`Ďalší level pri majetku ${nw}`,levelReward:(c,cash)=>`Odmena: +${c} 🪙 +${cash}`,maxLevelReached:'Maximálny level dosiahnutý! 🏆',levelUp:(l,c,cash)=>`🎉 Level ${l}! +${c} 🪙 +${cash}`,yourOfferPrice:'Tvoja ponúkaná cena (€)',weeklyReward:(c,cash,d)=>`🎁 +${c} 🪙 +${cash} o ${d}`},
+  en:{flag:'🇬🇧',name:'English',login:'Login',register:'Register',loginBtn:'Sign In',registerBtn:'Sign Up',email:'Email',password:'Password',username:'Username',market:'Market',portfolio:'Portfolio',store:'Store',skills:'Skills',offers:'Offers',leaderboard:'Top',cash:'Cash',income:'Income/hr',networth:'Net Worth',free:'free',daily:'daily',powerups:'Power-ups',buyCoins:'Buy Gold Coins',convert:'Convert to Cash',convertDesc:'Convert Gold Coins to game cash',best:'BEST VALUE',skillsNote:'💡 Skills are permanent — not time limited',available:'Available',partial:'Partial',taken:'Taken',all:'All',apartments:'Apartments',commercial:'Commercial',luxury:'Luxury',industrial:'Industrial',cities:'Cities',activity:'Activity',logout:'Sign Out',noOffers:'No offers from players',emptyPortfolio:"You don't own any properties yet",watchAd:'Watch Ad',dailyReward:'Daily Reward',dailyDesc:'Sign in every day for bonus',sub:'Build your real estate empire.',fillFields:'⚠️ Fill in email and password',connError:'❌ Connection error. Try again.',welcome:(n)=>`🌐 Welcome back, ${n}!`,buyOk:(pct,name,price)=>`✅ Bought ${pct}% of ${name} for ${price}`,sold:(p)=>`💰 Sold for ${p}`,offerSent:(p,n)=>`📩 Offer ${p} sent to ${n}!`,accepted:(p)=>`✅ Accepted! You received ${p}`,rejected:'❌ Rejected',skillUp:(n,l)=>`✅ ${n} → Level ${l}!`,skillMax:'✅ Already maxed',noCoins:(n)=>`❌ Need ${n} 🪙`,puActive:(n)=>`✅ ${n} activated!`,converted:(c,v)=>`💱 ${c} 🪙 → ${v}`,need100:'❌ Need at least 100 🪙',adReward:(n)=>`🎉 Reward: +${n} 🪙`,dailyGot:(n)=>`🎁 Daily reward: +${n} 🪙`,dailyClaimed:'⏳ Daily reward already claimed',rentIncome:(v)=>`💰 Rent income: +${v}`,stayBtn:'Stay in game',exitBtn:'Close game',exitTitle:'Exit game?',exitSub:'Your progress is saved.',checkEmail:'📧 Registration OK! Check your email then sign in.',buyBtn:(pct,price)=>`Buy ${pct}% for ${price}`,noFunds:(p)=>`Insufficient funds (${p})`,lbProps:(n)=>`${n} properties`,remainingTime:(t)=>`⏳ Remaining: ${t}`,myShare:(n)=>`My share (${n}%)`,ownership:'Ownership',makeOffer:'Make offer',offerFrom:(n)=>`From: ${n}`,offerWants:(pct)=>`Wants: ${pct}% of your share`,accept:'✅ Accept',reject:'❌ Reject',marketValue:'Market Value',rentHr:'Rent/hr',myShareLbl:'My Share',available2:'Available',propValue:'Value',propIncome:'Income/hr',propCount:'Properties',chooseAvatar:'Choose your avatar',permaBoost:'2× All Profits Forever',permaBoostDesc:'Permanently doubles all your income — one-time purchase',permaBoostTag:'forever',level:'LEVEL',nextLevelAt:(nw)=>`Next level at ${nw} net worth`,levelReward:(c,cash)=>`Reward: +${c} 🪙 +${cash}`,maxLevelReached:'Maximum level reached! 🏆',levelUp:(l,c,cash)=>`🎉 Level ${l}! +${c} 🪙 +${cash}`,yourOfferPrice:'Your offer price (€)',weeklyReward:(c,cash,d)=>`🎁 +${c} 🪙 +${cash} in ${d}`,personal:'Personal',global:'Global',tierHouses:'Houses',tierCities:'Cities',tierCountries:'Countries',tierContinents:'Continents',luckyCharm:'Lucky Charm',luckyCharmDesc:'20% chance to double every ad reward for 24h',owned:'Owned'},
+  sk:{flag:'🇸🇰',name:'Slovenčina',login:'Prihlásenie',register:'Registrácia',loginBtn:'Prihlásiť sa',registerBtn:'Registrovať sa',email:'Email',password:'Heslo',username:'Herné meno',market:'Trh',portfolio:'Portfólio',store:'Store',skills:'Zručnosti',offers:'Ponuky',leaderboard:'Top',cash:'Hotovosť',income:'Príjem/hod',networth:'Net Worth',free:'zadarmo',daily:'denne',powerups:'Power-upy',buyCoins:'Kúpiť Gold Coins',convert:'Premeniť Coins',convertDesc:'Premeň Gold Coins na hernú hotovosť',best:'NAJLEPŠIA CENA',skillsNote:'💡 Zručnosti zostávajú navždy — nie sú časovo obmedzené',available:'Voľné',partial:'Čiastočné',taken:'Obsadené',all:'Všetko',apartments:'Byty',commercial:'Komerčné',luxury:'Luxusné',industrial:'Priemysel',cities:'Mestá',activity:'Aktivita',logout:'Odhlásiť sa',noOffers:'Žiadne ponuky od hráčov',emptyPortfolio:'Zatiaľ nevlastníš žiadnu nehnuteľnosť',watchAd:'Pozerať reklamu',dailyReward:'Denná odmena',dailyDesc:'Prihlás sa každý deň pre bonus',sub:'Buduj realitné impérium. Súpeř s celým svetom.',fillFields:'⚠️ Vyplň email a heslo',connError:'❌ Chyba pripojenia. Skús znova.',welcome:(n)=>`🌐 Vitaj späť, ${n}!`,buyOk:(pct,name,price)=>`✅ Kúpil si ${pct}% z ${name} za ${price}`,sold:(p)=>`💰 Predaný za ${p}`,offerSent:(p,n)=>`📩 Ponuka ${p} odoslaná ${n}!`,accepted:(p)=>`✅ Prijatá! Získal si ${p}`,rejected:'❌ Odmietnuté',skillUp:(n,l)=>`✅ ${n} → Úroveň ${l}!`,skillMax:'✅ Zručnosť je na maxime',noCoins:(n)=>`❌ Potrebuješ ${n} 🪙`,puActive:(n)=>`✅ ${n} aktivovaný!`,converted:(c,v)=>`💱 ${c} 🪙 → ${v}`,need100:'❌ Potrebuješ aspoň 100 🪙',adReward:(n)=>`🎉 Odmena: +${n} 🪙`,dailyGot:(n)=>`🎁 Denná odmena: +${n} 🪙`,dailyClaimed:'⏳ Denná odmena bola už vyzdvihnutá',rentIncome:(v)=>`💰 Príjem z nájmu: +${v}`,stayBtn:'Zostať v hre',exitBtn:'Zatvoriť hru',exitTitle:'Ukončiť hru?',exitSub:'Tvoj postup je uložený.',checkEmail:'📧 Registrácia OK! Skontroluj email a potom sa prihlás.',buyBtn:(pct,price)=>`Kúpiť ${pct}% za ${price}`,noFunds:(p)=>`Nedostatok (${p})`,lbProps:(n)=>`${n} nehnuteľností`,remainingTime:(t)=>`⏳ Zostatok: ${t}`,myShare:(n)=>`Môj podiel (${n}%)`,ownership:'Vlastníctvo',makeOffer:'Ponúknuť',offerFrom:(n)=>`Od: ${n}`,offerWants:(pct)=>`Chce: ${pct}% tvojho podielu`,accept:'✅ Prijať',reject:'❌ Odmietnuť',marketValue:'Trhová cena',rentHr:'Rent/hod',myShareLbl:'Môj podiel',available2:'Dostupné',propValue:'Hodnota',propIncome:'Príjem/hod',propCount:'Nehnuteľnosti',chooseAvatar:'Vyber si profilovku',permaBoost:'2× Všetky zisky navždy',permaBoostDesc:'Natrvalo zdvojnásobí všetok tvoj príjem — jednorazový nákup',permaBoostTag:'navždy',level:'LEVEL',nextLevelAt:(nw)=>`Ďalší level pri majetku ${nw}`,levelReward:(c,cash)=>`Odmena: +${c} 🪙 +${cash}`,maxLevelReached:'Maximálny level dosiahnutý! 🏆',levelUp:(l,c,cash)=>`🎉 Level ${l}! +${c} 🪙 +${cash}`,yourOfferPrice:'Tvoja ponúkaná cena (€)',weeklyReward:(c,cash,d)=>`🎁 +${c} 🪙 +${cash} o ${d}`,personal:'Personal',global:'Global',tierHouses:'Domy',tierCities:'Mestá',tierCountries:'Krajiny',tierContinents:'Kontinenty',luckyCharm:'Šťastný Trojlístok',luckyCharmDesc:'20% šanca na dvojnásobnú odmenu z reklamy, 24h',owned:'Vlastníš'},
   cs:{flag:'🇨🇿',name:'Čeština',login:'Přihlášení',register:'Registrace',loginBtn:'Přihlásit se',registerBtn:'Registrovat se',email:'Email',password:'Heslo',username:'Herní jméno',market:'Trh',portfolio:'Portfólio',store:'Obchod',skills:'Dovednosti',offers:'Nabídky',leaderboard:'Top',cash:'Hotovost',income:'Příjem/hod',networth:'Net Worth',free:'zdarma',daily:'denně',powerups:'Power-upy',buyCoins:'Koupit Gold Coins',convert:'Převést Coins',convertDesc:'Převeď Gold Coins na herní hotovost',best:'NEJLEPŠÍ CENA',skillsNote:'💡 Dovednosti jsou trvalé',available:'Volné',partial:'Částečné',taken:'Obsazené',all:'Vše',apartments:'Byty',commercial:'Komerční',luxury:'Luxusní',industrial:'Průmysl',cities:'Města',activity:'Aktivita',logout:'Odhlásit se',noOffers:'Žádné nabídky',emptyPortfolio:'Zatím nevlastníš žádnou nemovitost',watchAd:'Sledovat reklamu',dailyReward:'Denní odměna',dailyDesc:'Přihlašuj se každý den',sub:'Buduj realitní impérium.',fillFields:'⚠️ Vyplň email a heslo',connError:'❌ Chyba připojení.',welcome:(n)=>`🌐 Vítej zpět, ${n}!`,buyOk:(pct,name,price)=>`✅ Koupil jsi ${pct}% z ${name} za ${price}`,sold:(p)=>`💰 Prodáno za ${p}`,offerSent:(p,n)=>`📩 Nabídka ${p} odeslána ${n}!`,accepted:(p)=>`✅ Přijato! Získal jsi ${p}`,rejected:'❌ Odmítnuto',skillUp:(n,l)=>`✅ ${n} → Úroveň ${l}!`,skillMax:'✅ Na maximu',noCoins:(n)=>`❌ Potřebuješ ${n} 🪙`,puActive:(n)=>`✅ ${n} aktivován!`,converted:(c,v)=>`💱 ${c} 🪙 → ${v}`,need100:'❌ Potřebuješ alespoň 100 🪙',adReward:(n)=>`🎉 Odměna: +${n} 🪙`,dailyGot:(n)=>`🎁 Denní odměna: +${n} 🪙`,dailyClaimed:'⏳ Denní odměna již vyzvednuta',rentIncome:(v)=>`💰 Příjem z nájmu: +${v}`,stayBtn:'Zůstat',exitBtn:'Zavřít',exitTitle:'Ukončit hru?',exitSub:'Tvůj postup je uložen.',checkEmail:'📧 Registrace OK! Zkontroluj email.',buyBtn:(pct,price)=>`Koupit ${pct}% za ${price}`,noFunds:(p)=>`Nedostatek (${p})`,lbProps:(n)=>`${n} nemovitostí`,remainingTime:(t)=>`⏳ Zbývá: ${t}`,myShare:(n)=>`Můj podíl (${n}%)`,ownership:'Vlastnictví',makeOffer:'Nabídnout',offerFrom:(n)=>`Od: ${n}`,offerWants:(pct)=>`Chce: ${pct}% tvého podílu`,accept:'✅ Přijmout',reject:'❌ Odmítnout',marketValue:'Tržní cena',rentHr:'Nájem/hod',myShareLbl:'Můj podíl',available2:'Dostupné',propValue:'Hodnota',propIncome:'Příjem/hod',propCount:'Nemovitosti'},
   de:{flag:'🇩🇪',name:'Deutsch',login:'Anmeldung',register:'Registrierung',loginBtn:'Anmelden',registerBtn:'Registrieren',email:'E-Mail',password:'Passwort',username:'Spielername',market:'Markt',portfolio:'Portfolio',store:'Shop',skills:'Fähigkeiten',offers:'Angebote',leaderboard:'Top',cash:'Bargeld',income:'Einnahmen/Std',networth:'Nettowert',free:'kostenlos',daily:'täglich',powerups:'Power-ups',buyCoins:'Gold Coins kaufen',convert:'Coins umwandeln',convertDesc:'Gold Coins in Spielgeld umwandeln',best:'BESTES ANGEBOT',skillsNote:'💡 Fähigkeiten sind dauerhaft',available:'Verfügbar',partial:'Teilweise',taken:'Belegt',all:'Alle',apartments:'Wohnungen',commercial:'Gewerbe',luxury:'Luxus',industrial:'Industrie',cities:'Städte',activity:'Aktivität',logout:'Abmelden',noOffers:'Keine Angebote',emptyPortfolio:'Du besitzt noch keine Immobilien',watchAd:'Werbung ansehen',dailyReward:'Tagesbonus',dailyDesc:'Täglich anmelden für Bonus',sub:'Bau dein Immobilienimperium.',fillFields:'⚠️ E-Mail und Passwort eingeben',connError:'❌ Verbindungsfehler.',welcome:(n)=>`🌐 Willkommen zurück, ${n}!`,buyOk:(pct,name,price)=>`✅ ${pct}% von ${name} für ${price} gekauft`,sold:(p)=>`💰 Verkauft für ${p}`,offerSent:(p,n)=>`📩 Angebot ${p} an ${n} gesendet!`,accepted:(p)=>`✅ Angenommen! Du erhältst ${p}`,rejected:'❌ Abgelehnt',skillUp:(n,l)=>`✅ ${n} → Stufe ${l}!`,skillMax:'✅ Bereits maximal',noCoins:(n)=>`❌ Benötige ${n} 🪙`,puActive:(n)=>`✅ ${n} aktiviert!`,converted:(c,v)=>`💱 ${c} 🪙 → ${v}`,need100:'❌ Mindestens 100 🪙',adReward:(n)=>`🎉 Belohnung: +${n} 🪙`,dailyGot:(n)=>`🎁 Tagesbonus: +${n} 🪙`,dailyClaimed:'⏳ Tagesbonus bereits abgeholt',rentIncome:(v)=>`💰 Mieteinnahmen: +${v}`,stayBtn:'Bleiben',exitBtn:'Beenden',exitTitle:'Spiel beenden?',exitSub:'Dein Fortschritt ist gespeichert.',checkEmail:'📧 Registrierung OK! E-Mail prüfen.',buyBtn:(pct,price)=>`${pct}% kaufen für ${price}`,noFunds:(p)=>`Nicht genug (${p})`,lbProps:(n)=>`${n} Immobilien`,remainingTime:(t)=>`⏳ Verbleibend: ${t}`,myShare:(n)=>`Mein Anteil (${n}%)`,ownership:'Eigentum',makeOffer:'Anbieten',offerFrom:(n)=>`Von: ${n}`,offerWants:(pct)=>`Möchte: ${pct}% deines Anteils`,accept:'✅ Annehmen',reject:'❌ Ablehnen',marketValue:'Marktwert',rentHr:'Miete/Std',myShareLbl:'Mein Anteil',available2:'Verfügbar',propValue:'Wert',propIncome:'Einnahmen/Std',propCount:'Immobilien'},
   es:{flag:'🇪🇸',name:'Español',login:'Iniciar sesión',register:'Registrarse',loginBtn:'Entrar',registerBtn:'Registrarse',email:'Correo',password:'Contraseña',username:'Nombre',market:'Mercado',portfolio:'Portafolio',store:'Tienda',skills:'Habilidades',offers:'Ofertas',leaderboard:'Top',cash:'Efectivo',income:'Ingreso/hr',networth:'Valor neto',free:'gratis',daily:'diario',powerups:'Potenciadores',buyCoins:'Comprar Coins',convert:'Convertir Coins',convertDesc:'Convierte Coins en efectivo',best:'MEJOR PRECIO',skillsNote:'💡 Las habilidades son permanentes',available:'Disponible',partial:'Parcial',taken:'Ocupado',all:'Todo',apartments:'Apartamentos',commercial:'Comercial',luxury:'Lujo',industrial:'Industrial',cities:'Ciudades',activity:'Actividad',logout:'Cerrar sesión',noOffers:'Sin ofertas',emptyPortfolio:'Aún no posees propiedades',watchAd:'Ver anuncio',dailyReward:'Recompensa diaria',dailyDesc:'Inicia sesión cada día',sub:'Construye tu imperio inmobiliario.',fillFields:'⚠️ Completa email y contraseña',connError:'❌ Error de conexión.',welcome:(n)=>`🌐 Bienvenido de vuelta, ${n}!`,buyOk:(pct,name,price)=>`✅ Compraste ${pct}% de ${name} por ${price}`,sold:(p)=>`💰 Vendido por ${p}`,offerSent:(p,n)=>`📩 Oferta ${p} enviada a ${n}!`,accepted:(p)=>`✅ Aceptado! Recibiste ${p}`,rejected:'❌ Rechazado',skillUp:(n,l)=>`✅ ${n} → Nivel ${l}!`,skillMax:'✅ Al máximo',noCoins:(n)=>`❌ Necesitas ${n} 🪙`,puActive:(n)=>`✅ ${n} activado!`,converted:(c,v)=>`💱 ${c} 🪙 → ${v}`,need100:'❌ Necesitas 100 🪙',adReward:(n)=>`🎉 Recompensa: +${n} 🪙`,dailyGot:(n)=>`🎁 Recompensa diaria: +${n} 🪙`,dailyClaimed:'⏳ Ya reclamada',rentIncome:(v)=>`💰 Renta: +${v}`,stayBtn:'Quedarme',exitBtn:'Salir',exitTitle:'¿Salir?',exitSub:'Tu progreso está guardado.',checkEmail:'📧 Registro OK! Revisa tu email.',buyBtn:(pct,price)=>`Comprar ${pct}% por ${price}`,noFunds:(p)=>`Sin fondos (${p})`,lbProps:(n)=>`${n} propiedades`,remainingTime:(t)=>`⏳ Restante: ${t}`,myShare:(n)=>`Mi parte (${n}%)`,ownership:'Propiedad',makeOffer:'Ofrecer',offerFrom:(n)=>`De: ${n}`,offerWants:(pct)=>`Quiere: ${pct}%`,accept:'✅ Aceptar',reject:'❌ Rechazar',marketValue:'Valor de mercado',rentHr:'Renta/hr',myShareLbl:'Mi parte',available2:'Disponible',propValue:'Valor',propIncome:'Ingreso/hr',propCount:'Propiedades'},
@@ -548,22 +545,16 @@ function applyLang() {
   setText('lbl-permaboost', T('permaBoost'));
   setText('lbl-permaboost-desc', T('permaBoostDesc'));
   setText('lbl-permaboost-tag', T('permaBoostTag'));
+  setText('lbl-lucky', T('luckyCharm'));
+  setText('lbl-lucky-desc', T('luckyCharmDesc'));
   setText('lbl-level', T('level'));
   setText('lbl-best', T('best'));
   // Skills
   setText('lbl-skills-note', T('skillsNote'));
-  // Category chips
-  setText('cat-all', '🌍 ' + T('all'));
-  setText('cat-byt', '🏠 ' + T('apartments'));
-  setText('cat-kom', '🏢 ' + T('commercial'));
-  setText('cat-lux', '💎 ' + T('luxury'));
-  setText('cat-pri', '🏭 ' + T('industrial'));
-  setText('cat-mes', '🌆 ' + T('cities'));
-  // Filter chips
-  setText('fc-all', T('all'));
-  setText('fc-available', T('available'));
-  setText('fc-partial', T('partial'));
-  setText('fc-taken', T('taken'));
+  // Market scope tabs
+  setText('lbl-personal', T('personal'));
+  setText('lbl-global', T('global'));
+  if(document.getElementById('prop-accordion'))renderGrid();
   // Logout
   setText('logout-btn', T('logout'));
   setText('um-nw-label', T('networth'));
@@ -585,59 +576,86 @@ const SKILLS_DEF = [
 
 // ===== PROPERTIES =====
 const PROPS = [
-  {id:1,name:'Garsónka Bratislava',emoji:'🏠',cat:'byt',loc:'Bratislava, SK',price:45000,rent:320},
-  {id:2,name:'Rodinný dom Košice',emoji:'🏡',cat:'byt',loc:'Košice, SK',price:120000,rent:780},
-  {id:3,name:'Penthouse Praha',emoji:'🏙️',cat:'byt',loc:'Praha, CZ',price:380000,rent:2200},
-  {id:4,name:'Chata Tatry',emoji:'🏔️',cat:'byt',loc:'Tatry, SK',price:95000,rent:650},
-  {id:5,name:'Bytový dom Žilina',emoji:'🏢',cat:'byt',loc:'Žilina, SK',price:280000,rent:1800},
-  {id:6,name:'Obchodný priestor Bratislava',emoji:'🏪',cat:'komercny',loc:'Bratislava, SK',price:180000,rent:1400},
-  {id:7,name:'Kancelársky komplex Aupark',emoji:'🏬',cat:'komercny',loc:'Bratislava, SK',price:650000,rent:4200},
-  {id:8,name:'Reštaurácia Wien',emoji:'🍽️',cat:'komercny',loc:'Viedeň, AT',price:420000,rent:3100},
-  {id:9,name:'Supermarket Tesco',emoji:'🛒',cat:'komercny',loc:'Nitra, SK',price:1200000,rent:8500},
-  {id:10,name:'Sídlo Toskánsko',emoji:'🏰',cat:'luxus',loc:'Toskánsko, IT',price:2500000,rent:14000},
-  {id:11,name:'Malibu Beach House',emoji:'🏖️',cat:'luxus',loc:'Malibu, USA',price:8500000,rent:42000},
-  {id:12,name:'Penthouse Monaco',emoji:'👑',cat:'luxus',loc:'Monte Carlo, MC',price:15000000,rent:85000},
-  {id:13,name:'Súkromný ostrov Maledívy',emoji:'🏝️',cat:'luxus',loc:'Maledívy',price:45000000,rent:240000},
-  {id:14,name:'Sklad Senec',emoji:'🏭',cat:'priemysel',loc:'Senec, SK',price:320000,rent:2100},
-  {id:15,name:'Výrobná hala Trnava',emoji:'⚙️',cat:'priemysel',loc:'Trnava, SK',price:850000,rent:5200},
-  {id:16,name:'Dátové centrum Frankfurt',emoji:'💻',cat:'priemysel',loc:'Frankfurt, DE',price:4200000,rent:28000},
-  {id:17,name:'Obchodná zóna Bratislava',emoji:'🌆',cat:'mesto',loc:'Bratislava, SK',price:12000000,rent:65000},
-  {id:18,name:'Centrum Dubrovník',emoji:'🏯',cat:'mesto',loc:'Dubrovník, HR',price:35000000,rent:180000},
-  {id:19,name:'Ostrov Santorini',emoji:'🌋',cat:'mesto',loc:'Santorini, GR',price:120000000,rent:620000},
-  {id:20,name:'Manhattan North',emoji:'🗽',cat:'mesto',loc:'New York, USA',price:500000000,rent:2500000},
-  {id:21,name:'Štúdio Berlín',emoji:'🏠',cat:'byt',loc:'Berlín, DE',price:85000,rent:580},
-  {id:22,name:'Vila Barcelona',emoji:'🏡',cat:'byt',loc:'Barcelona, ES',price:650000,rent:3800},
-  {id:23,name:'Apartmán Paríž',emoji:'🗼',cat:'byt',loc:'Paríž, FR',price:1200000,rent:6500},
-  {id:24,name:'Byt Amsterdam',emoji:'⛵',cat:'byt',loc:'Amsterdam, NL',price:480000,rent:2800},
-  {id:25,name:'Dom Dubaj Marina',emoji:'🌴',cat:'byt',loc:'Dubaj, UAE',price:920000,rent:5200},
-  {id:26,name:'Chalupa Provence',emoji:'🌻',cat:'byt',loc:'Provence, FR',price:340000,rent:1900},
-  {id:27,name:'Byt Singapur',emoji:'🇸🇬',cat:'byt',loc:'Singapur',price:1800000,rent:9500},
-  {id:28,name:'Chata Švajčiarske Alpy',emoji:'⛷️',cat:'byt',loc:'Zermatt, CH',price:780000,rent:4200},
-  {id:29,name:'Hotel Budapešť 4*',emoji:'🏨',cat:'komercny',loc:'Budapešť, HU',price:3200000,rent:19000},
-  {id:30,name:'Nákupné centrum Bratislava',emoji:'🛍️',cat:'komercny',loc:'Bratislava, SK',price:8500000,rent:48000},
-  {id:31,name:'Kancelársky park Varšava',emoji:'🏢',cat:'komercny',loc:'Varšava, PL',price:4200000,rent:26000},
-  {id:32,name:'Reštaurácia Tokio',emoji:'🍣',cat:'komercny',loc:'Tokio, JP',price:580000,rent:3600},
-  {id:33,name:'Čerpacia stanica D1',emoji:'⛽',cat:'komercny',loc:'Senec, SK',price:420000,rent:2800},
-  {id:34,name:'Coworking Viedeň',emoji:'💼',cat:'komercny',loc:'Viedeň, AT',price:1100000,rent:6800},
-  {id:35,name:'Marina Chorvátsko',emoji:'⛵',cat:'komercny',loc:'Split, HR',price:2800000,rent:15000},
-  {id:36,name:'Zámok Loire',emoji:'🏰',cat:'luxus',loc:'Loire, FR',price:18000000,rent:92000},
-  {id:37,name:'Penthouse Burj Khalifa',emoji:'🌃',cat:'luxus',loc:'Dubaj, UAE',price:32000000,rent:165000},
-  {id:38,name:'Rezort Bali',emoji:'🌺',cat:'luxus',loc:'Bali, ID',price:5500000,rent:32000},
-  {id:39,name:'Villa Cannes',emoji:'🎬',cat:'luxus',loc:'Cannes, FR',price:22000000,rent:115000},
-  {id:40,name:'Pláž Seychely',emoji:'🐠',cat:'luxus',loc:'Seychely',price:68000000,rent:340000},
-  {id:41,name:'Ski chalet Aspen',emoji:'🎿',cat:'luxus',loc:'Aspen, USA',price:12000000,rent:62000},
-  {id:42,name:'Solárna farma Španielsko',emoji:'☀️',cat:'priemysel',loc:'Andalúzia, ES',price:6500000,rent:38000},
-  {id:43,name:'Veterná farma Dánsko',emoji:'💨',cat:'priemysel',loc:'Dánsko',price:18000000,rent:95000},
-  {id:44,name:'Amazon logistický hub',emoji:'📦',cat:'priemysel',loc:'Lipsko, DE',price:12000000,rent:72000},
-  {id:45,name:'Ropná platforma Nórsko',emoji:'🛢️',cat:'priemysel',loc:'Nórsko',price:85000000,rent:450000},
-  {id:46,name:'Bitcoin ťažobňa Island',emoji:'₿',cat:'priemysel',loc:'Reykjavík, IS',price:4800000,rent:28000},
-  {id:47,name:'Turistická zóna Benátky',emoji:'🚤',cat:'mesto',loc:'Benátky, IT',price:280000000,rent:1400000},
-  {id:48,name:'Las Vegas Strip',emoji:'🎰',cat:'mesto',loc:'Las Vegas, USA',price:850000000,rent:4200000},
-  {id:49,name:'Ostrov Ibiza',emoji:'🎉',cat:'mesto',loc:'Ibiza, ES',price:420000000,rent:2100000},
-  {id:50,name:'Celé Monako',emoji:'🏎️',cat:'mesto',loc:'Monako',price:2000000000,rent:9000000},
-  {id:51,name:'Downtown Dubaj',emoji:'🌇',cat:'mesto',loc:'Dubaj, UAE',price:1200000000,rent:5500000},
-  {id:52,name:'Centrum Singapuru',emoji:'🦁',cat:'mesto',loc:'Singapur',price:950000000,rent:4200000},
-  {id:53,name:'Celá Maldívska republika',emoji:'🏝️',cat:'mesto',loc:'Maledívy',price:5000000000,rent:20000000},
+  {id:1,name:'Garsónka Bratislava',emoji:'🏠',cat:'byt',loc:'Bratislava, SK',price:45000,rent:320,scope:'global',tier:'house'},
+  {id:2,name:'Rodinný dom Košice',emoji:'🏡',cat:'byt',loc:'Košice, SK',price:120000,rent:780,scope:'global',tier:'house'},
+  {id:3,name:'Penthouse Praha',emoji:'🏙️',cat:'byt',loc:'Praha, CZ',price:380000,rent:2200,scope:'global',tier:'house'},
+  {id:4,name:'Chata Tatry',emoji:'🏔️',cat:'byt',loc:'Tatry, SK',price:95000,rent:650,scope:'global',tier:'house'},
+  {id:5,name:'Bytový dom Žilina',emoji:'🏢',cat:'byt',loc:'Žilina, SK',price:280000,rent:1800,scope:'global',tier:'house'},
+  {id:6,name:'Obchodný priestor Bratislava',emoji:'🏪',cat:'komercny',loc:'Bratislava, SK',price:180000,rent:1400,scope:'global',tier:'house'},
+  {id:7,name:'Kancelársky komplex Aupark',emoji:'🏬',cat:'komercny',loc:'Bratislava, SK',price:650000,rent:4200,scope:'global',tier:'house'},
+  {id:8,name:'Reštaurácia Wien',emoji:'🍽️',cat:'komercny',loc:'Viedeň, AT',price:420000,rent:3100,scope:'global',tier:'house'},
+  {id:9,name:'Supermarket Tesco',emoji:'🛒',cat:'komercny',loc:'Nitra, SK',price:1200000,rent:8500,scope:'global',tier:'house'},
+  {id:10,name:'Sídlo Toskánsko',emoji:'🏰',cat:'luxus',loc:'Toskánsko, IT',price:2500000,rent:14000,scope:'global',tier:'house'},
+  {id:11,name:'Malibu Beach House',emoji:'🏖️',cat:'luxus',loc:'Malibu, USA',price:8500000,rent:42000,scope:'global',tier:'house'},
+  {id:12,name:'Penthouse Monaco',emoji:'👑',cat:'luxus',loc:'Monte Carlo, MC',price:15000000,rent:85000,scope:'global',tier:'house'},
+  {id:13,name:'Súkromný ostrov Maledívy',emoji:'🏝️',cat:'luxus',loc:'Maledívy',price:45000000,rent:240000,scope:'global',tier:'house'},
+  {id:14,name:'Sklad Senec',emoji:'🏭',cat:'priemysel',loc:'Senec, SK',price:320000,rent:2100,scope:'global',tier:'house'},
+  {id:15,name:'Výrobná hala Trnava',emoji:'⚙️',cat:'priemysel',loc:'Trnava, SK',price:850000,rent:5200,scope:'global',tier:'house'},
+  {id:16,name:'Dátové centrum Frankfurt',emoji:'💻',cat:'priemysel',loc:'Frankfurt, DE',price:4200000,rent:28000,scope:'global',tier:'house'},
+  {id:17,name:'Obchodná zóna Bratislava',emoji:'🌆',cat:'mesto',loc:'Bratislava, SK',price:12000000,rent:65000,scope:'global',tier:'city'},
+  {id:18,name:'Centrum Dubrovník',emoji:'🏯',cat:'mesto',loc:'Dubrovník, HR',price:35000000,rent:180000,scope:'global',tier:'city'},
+  {id:19,name:'Ostrov Santorini',emoji:'🌋',cat:'mesto',loc:'Santorini, GR',price:120000000,rent:620000,scope:'global',tier:'city'},
+  {id:20,name:'Manhattan North',emoji:'🗽',cat:'mesto',loc:'New York, USA',price:500000000,rent:2500000,scope:'global',tier:'city'},
+  {id:21,name:'Štúdio Berlín',emoji:'🏠',cat:'byt',loc:'Berlín, DE',price:85000,rent:580,scope:'global',tier:'house'},
+  {id:22,name:'Vila Barcelona',emoji:'🏡',cat:'byt',loc:'Barcelona, ES',price:650000,rent:3800,scope:'global',tier:'house'},
+  {id:23,name:'Apartmán Paríž',emoji:'🗼',cat:'byt',loc:'Paríž, FR',price:1200000,rent:6500,scope:'global',tier:'house'},
+  {id:24,name:'Byt Amsterdam',emoji:'⛵',cat:'byt',loc:'Amsterdam, NL',price:480000,rent:2800,scope:'global',tier:'house'},
+  {id:25,name:'Dom Dubaj Marina',emoji:'🌴',cat:'byt',loc:'Dubaj, UAE',price:920000,rent:5200,scope:'global',tier:'house'},
+  {id:26,name:'Chalupa Provence',emoji:'🌻',cat:'byt',loc:'Provence, FR',price:340000,rent:1900,scope:'global',tier:'house'},
+  {id:27,name:'Byt Singapur',emoji:'🇸🇬',cat:'byt',loc:'Singapur',price:1800000,rent:9500,scope:'global',tier:'house'},
+  {id:28,name:'Chata Švajčiarske Alpy',emoji:'⛷️',cat:'byt',loc:'Zermatt, CH',price:780000,rent:4200,scope:'global',tier:'house'},
+  {id:29,name:'Hotel Budapešť 4*',emoji:'🏨',cat:'komercny',loc:'Budapešť, HU',price:3200000,rent:19000,scope:'global',tier:'house'},
+  {id:30,name:'Nákupné centrum Bratislava',emoji:'🛍️',cat:'komercny',loc:'Bratislava, SK',price:8500000,rent:48000,scope:'global',tier:'house'},
+  {id:31,name:'Kancelársky park Varšava',emoji:'🏢',cat:'komercny',loc:'Varšava, PL',price:4200000,rent:26000,scope:'global',tier:'house'},
+  {id:32,name:'Reštaurácia Tokio',emoji:'🍣',cat:'komercny',loc:'Tokio, JP',price:580000,rent:3600,scope:'global',tier:'house'},
+  {id:33,name:'Čerpacia stanica D1',emoji:'⛽',cat:'komercny',loc:'Senec, SK',price:420000,rent:2800,scope:'global',tier:'house'},
+  {id:34,name:'Coworking Viedeň',emoji:'💼',cat:'komercny',loc:'Viedeň, AT',price:1100000,rent:6800,scope:'global',tier:'house'},
+  {id:35,name:'Marina Chorvátsko',emoji:'⛵',cat:'komercny',loc:'Split, HR',price:2800000,rent:15000,scope:'global',tier:'house'},
+  {id:36,name:'Zámok Loire',emoji:'🏰',cat:'luxus',loc:'Loire, FR',price:18000000,rent:92000,scope:'global',tier:'house'},
+  {id:37,name:'Penthouse Burj Khalifa',emoji:'🌃',cat:'luxus',loc:'Dubaj, UAE',price:32000000,rent:165000,scope:'global',tier:'house'},
+  {id:38,name:'Rezort Bali',emoji:'🌺',cat:'luxus',loc:'Bali, ID',price:5500000,rent:32000,scope:'global',tier:'house'},
+  {id:39,name:'Villa Cannes',emoji:'🎬',cat:'luxus',loc:'Cannes, FR',price:22000000,rent:115000,scope:'global',tier:'house'},
+  {id:40,name:'Pláž Seychely',emoji:'🐠',cat:'luxus',loc:'Seychely',price:68000000,rent:340000,scope:'global',tier:'house'},
+  {id:41,name:'Ski chalet Aspen',emoji:'🎿',cat:'luxus',loc:'Aspen, USA',price:12000000,rent:62000,scope:'global',tier:'house'},
+  {id:42,name:'Solárna farma Španielsko',emoji:'☀️',cat:'priemysel',loc:'Andalúzia, ES',price:6500000,rent:38000,scope:'global',tier:'house'},
+  {id:43,name:'Veterná farma Dánsko',emoji:'💨',cat:'priemysel',loc:'Dánsko',price:18000000,rent:95000,scope:'global',tier:'house'},
+  {id:44,name:'Amazon logistický hub',emoji:'📦',cat:'priemysel',loc:'Lipsko, DE',price:12000000,rent:72000,scope:'global',tier:'house'},
+  {id:45,name:'Ropná platforma Nórsko',emoji:'🛢️',cat:'priemysel',loc:'Nórsko',price:85000000,rent:450000,scope:'global',tier:'house'},
+  {id:46,name:'Bitcoin ťažobňa Island',emoji:'₿',cat:'priemysel',loc:'Reykjavík, IS',price:4800000,rent:28000,scope:'global',tier:'house'},
+  {id:47,name:'Turistická zóna Benátky',emoji:'🚤',cat:'mesto',loc:'Benátky, IT',price:280000000,rent:1400000,scope:'global',tier:'city'},
+  {id:48,name:'Las Vegas Strip',emoji:'🎰',cat:'mesto',loc:'Las Vegas, USA',price:850000000,rent:4200000,scope:'global',tier:'city'},
+  {id:49,name:'Ostrov Ibiza',emoji:'🎉',cat:'mesto',loc:'Ibiza, ES',price:420000000,rent:2100000,scope:'global',tier:'city'},
+  {id:50,name:'Celé Monako',emoji:'🏎️',cat:'mesto',loc:'Monako',price:2000000000,rent:9000000,scope:'global',tier:'country'},
+  {id:51,name:'Downtown Dubaj',emoji:'🌇',cat:'mesto',loc:'Dubaj, UAE',price:1200000000,rent:5500000,scope:'global',tier:'city'},
+  {id:52,name:'Centrum Singapuru',emoji:'🦁',cat:'mesto',loc:'Singapur',price:950000000,rent:4200000,scope:'global',tier:'city'},
+  {id:53,name:'Celá Maldívska republika',emoji:'🏝️',cat:'mesto',loc:'Maledívy',price:5000000000,rent:20000000,scope:'global',tier:'country'},
+  // Global — Countries (new)
+  {id:54,name:'Celé Švajčiarsko',emoji:'🇨🇭',cat:'mesto',loc:'Švajčiarsko',price:3200000000,rent:14000000,scope:'global',tier:'country'},
+  {id:55,name:'Celé Japonsko',emoji:'🇯🇵',cat:'mesto',loc:'Japonsko',price:4800000000,rent:22000000,scope:'global',tier:'country'},
+  {id:56,name:'Celý Nový Zéland',emoji:'🇳🇿',cat:'mesto',loc:'Nový Zéland',price:1800000000,rent:9000000,scope:'global',tier:'country'},
+  {id:57,name:'Celé Islandsko',emoji:'🇮🇸',cat:'mesto',loc:'Island',price:1400000000,rent:7000000,scope:'global',tier:'country'},
+  {id:58,name:'Celé Portugalsko',emoji:'🇵🇹',cat:'mesto',loc:'Portugalsko',price:2200000000,rent:11000000,scope:'global',tier:'country'},
+  {id:59,name:'Celé Fínsko',emoji:'🇫🇮',cat:'mesto',loc:'Fínsko',price:1700000000,rent:8500000,scope:'global',tier:'country'},
+  // Global — Continents (new, exactly 7)
+  {id:60,name:'Európa',emoji:'🇪🇺',cat:'mesto',loc:'Európa',price:50000000000,rent:220000000,scope:'global',tier:'continent'},
+  {id:61,name:'Ázia',emoji:'🌏',cat:'mesto',loc:'Ázia',price:80000000000,rent:350000000,scope:'global',tier:'continent'},
+  {id:62,name:'Afrika',emoji:'🌍',cat:'mesto',loc:'Afrika',price:40000000000,rent:180000000,scope:'global',tier:'continent'},
+  {id:63,name:'Severná Amerika',emoji:'🌎',cat:'mesto',loc:'Severná Amerika',price:65000000000,rent:280000000,scope:'global',tier:'continent'},
+  {id:64,name:'Južná Amerika',emoji:'🌎',cat:'mesto',loc:'Južná Amerika',price:35000000000,rent:150000000,scope:'global',tier:'continent'},
+  {id:65,name:'Austrália a Oceánia',emoji:'🏝️',cat:'mesto',loc:'Oceánia',price:25000000000,rent:110000000,scope:'global',tier:'continent'},
+  {id:66,name:'Antarktída',emoji:'🧊',cat:'mesto',loc:'Antarktída',price:15000000000,rent:60000000,scope:'global',tier:'continent'},
+  // Personal — Houses (new, always available, only contested by yourself)
+  {id:200,name:'Rodinný dom Prešov',emoji:'🏡',cat:'byt',loc:'Prešov, SK',price:50000,rent:380,scope:'personal',tier:'house'},
+  {id:201,name:'Byt Ružomberok',emoji:'🏠',cat:'byt',loc:'Ružomberok, SK',price:65000,rent:460,scope:'personal',tier:'house'},
+  {id:202,name:'Chata Liptov',emoji:'🏔️',cat:'byt',loc:'Liptovský Mikuláš, SK',price:80000,rent:550,scope:'personal',tier:'house'},
+  {id:203,name:'Apartmán Krakov',emoji:'🏢',cat:'byt',loc:'Krakov, PL',price:95000,rent:650,scope:'personal',tier:'house'},
+  {id:204,name:'Vila Split',emoji:'🏡',cat:'byt',loc:'Split, HR',price:110000,rent:720,scope:'personal',tier:'house'},
+  // Personal — Cities (new, always available, only contested by yourself)
+  {id:205,name:'Mesto Trnava',emoji:'🏙️',cat:'mesto',loc:'Trnava, SK',price:500000,rent:3200,scope:'personal',tier:'city'},
+  {id:206,name:'Mesto Plzeň',emoji:'🏙️',cat:'mesto',loc:'Plzeň, CZ',price:650000,rent:4100,scope:'personal',tier:'city'},
+  {id:207,name:'Mesto Katowice',emoji:'🏙️',cat:'mesto',loc:'Katowice, PL',price:800000,rent:5000,scope:'personal',tier:'city'},
+  {id:208,name:'Mesto Graz',emoji:'🏙️',cat:'mesto',loc:'Graz, AT',price:950000,rent:6000,scope:'personal',tier:'city'},
+  {id:209,name:'Mesto Brno',emoji:'🏙️',cat:'mesto',loc:'Brno, CZ',price:1100000,rent:6800,scope:'personal',tier:'city'},
 ];
 
 const COLORS=['#c9a84c','#5a9fe0','#4caf7d','#e05a5a','#9b59b6','#e67e22','#1abc9c','#e91e63'];
@@ -679,10 +697,9 @@ let S = {
   cash:50000, user:null, username:'Player', avatar:'🌟', levelClaimed:1,
   own:{}, offers:[], coins:0, skills:{},
   powerups:{}, lastDaily:null, dailyStreak:0,
-  screen:'market', filter:'all', cat:'all',
-  market:{}, dbOwn:null, dbProfiles:null,
+  screen:'market', marketScope:'personal', openSection:null,
+  dbOwn:null, dbProfiles:null,
 };
-PROPS.forEach(p => S.market[p.id] = {mult:1+(Math.random()-0.5)*0.1, trend:Math.random()>0.5?'up':'dn'});
 
 // ===== AUTH =====
 let authMode = 'login';
@@ -836,9 +853,9 @@ function fmt(n){if(n>=1e9)return'€'+(n/1e9).toFixed(1)+'B';if(n>=1e6)return'�
 function fmtRent(n){if(n>=1e6)return'+€'+(n/1e6).toFixed(1)+'M/h';if(n>=1000)return'+€'+Math.round(n/1000)+'K/h';return'+€'+n+'/h';}
 function fmtTime(ms){const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000);return h>0?`${h}h ${m}m`:`${m}m`;}
 function getOwn(id){return S.own[id]||S.own[String(id)]||S.own[Number(id)]||0;}
-function getOtherOwn(id){if(S.dbOwn)return S.dbOwn.filter(o=>o.property_id==id&&o.user_id!==S.user?.id).reduce((s,o)=>s+o.pct,0);return 0;}
+function getOtherOwn(id){const p=PROPS.find(x=>x.id==id);if(p&&p.scope==='personal')return 0;if(S.dbOwn)return S.dbOwn.filter(o=>o.property_id==id&&o.user_id!==S.user?.id).reduce((s,o)=>s+o.pct,0);return 0;}
 function getAvail(id){return Math.max(0,100-getOwn(id)-getOtherOwn(id));}
-function marketValue(p){return Math.round(p.price*S.market[p.id].mult);}
+function marketValue(p){return p.price;}
 function getPrice(p){return Math.round(marketValue(p)*priceMult());}
 function rentMult(){let m=1;const rl=S.skills.rent_boost||0;if(rl)m+=SKILLS_DEF[0].bonus(rl);const pl=S.skills.portfolio||0;if(pl)m+=SKILLS_DEF[4].bonus(pl);if(S.powerups['2xrent']&&new Date()<new Date(S.powerups['2xrent']))m*=2;return m;}
 function priceMult(){let m=1;const dl=S.skills.price_disc||0;if(dl)m-=SKILLS_DEF[1].bonus(dl);if(S.powerups.discount&&new Date()<new Date(S.powerups.discount))m-=0.2;return Math.max(0.3,m);}
@@ -863,25 +880,34 @@ function setScreen(name, el) {
   if(name==='store')renderStore();
   if(name==='market')renderGrid();
 }
-function filterCat(cat,el){S.cat=cat;document.querySelectorAll('#cat-chips .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderGrid();}
-function setFilter(f,el){S.filter=f;['all','available','partial','taken'].forEach(x=>{const e=document.getElementById('fc-'+x);if(e)e.classList.remove('active');});el.classList.add('active');renderGrid();}
+function setMarketScope(scope,el){S.marketScope=scope;S.openSection=null;document.querySelectorAll('.scope-tab').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderGrid();}
+function toggleSection(tier){S.openSection=(S.openSection===tier)?null:tier;renderGrid();}
 
-// ===== RENDER GRID =====
+// ===== RENDER GRID (Personal / Global accordion) =====
+const TIER_ORDER={personal:['house','city'],global:['house','city','country','continent']};
+function tierLabel(tier){return {house:T('tierHouses'),city:T('tierCities'),country:T('tierCountries'),continent:T('tierContinents')}[tier];}
+function tierIcon(tier){return {house:'🏠',city:'🏙️',country:'🗺️',continent:'🌐'}[tier];}
 function renderGrid(){
-  const grid=document.getElementById('prop-grid');
-  let ps=PROPS;
-  if(S.cat!=='all')ps=ps.filter(p=>p.cat===S.cat);
-  if(S.filter==='available')ps=ps.filter(p=>getPropStatus(p.id)==='available');
-  if(S.filter==='partial')ps=ps.filter(p=>getOtherOwn(p.id)>0||getOwn(p.id)>0);
-  if(S.filter==='taken')ps=ps.filter(p=>getPropStatus(p.id)==='taken');
-  grid.innerHTML='';
-  if(!ps.length){grid.innerHTML=`<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">${T('all')}</div></div>`;return;}
-  ps.forEach(p=>{
-    const st=getPropStatus(p.id),m=getOwn(p.id),o=getOtherOwn(p.id),tot=m+o,price=getPrice(p);
-    const badge=st==='mine'?`<span class="prop-status-badge badge-mine">✓ ${T('all')}</span>`:st==='partial'&&m>0?`<span class="prop-status-badge badge-mine">${T('partial')}</span>`:st==='partial'?`<span class="prop-status-badge badge-partial">${T('partial')}</span>`:st==='taken'?`<span class="prop-status-badge badge-taken">${T('taken')}</span>`:`<span class="prop-status-badge badge-available">${T('available')}</span>`;
-    const d=document.createElement('div');d.className='prop-card'+(m>0?(m>=100?' owned':' partial'):'');
-    d.innerHTML=`<div class="prop-emoji-wrap">${p.emoji}</div><div class="prop-info"><div class="prop-name">${p.name}</div><div class="prop-loc">📍 ${p.loc}</div><div class="prop-meta"><span class="prop-price">${fmt(price)}</span><span class="prop-rent-badge">${fmtRent(p.rent)}</span>${badge}</div></div>${tot>0?`<div class="prop-own-bar" style="width:${tot}%"></div>`:''}`;
-    d.onclick=()=>openModal(p.id);grid.appendChild(d);
+  const wrap=document.getElementById('prop-accordion');
+  const tiers=TIER_ORDER[S.marketScope];
+  wrap.innerHTML='';
+  tiers.forEach(tier=>{
+    const ps=PROPS.filter(p=>p.scope===S.marketScope&&p.tier===tier);
+    if(!ps.length)return;
+    const open=S.openSection===tier;
+    const sec=document.createElement('div');sec.className='accordion-section'+(open?' open':'');
+    const header=document.createElement('div');header.className='accordion-header';
+    header.innerHTML=`<div class="accordion-header-left"><span>${tierIcon(tier)}</span><span>${tierLabel(tier)}</span><span class="accordion-count">${ps.length}</span></div><span class="accordion-chevron">▾</span>`;
+    header.onclick=()=>toggleSection(tier);
+    const body=document.createElement('div');body.className='accordion-body';
+    ps.forEach(p=>{
+      const st=getPropStatus(p.id),m=getOwn(p.id),o=getOtherOwn(p.id),tot=m+o,price=getPrice(p);
+      const badge=st==='mine'?`<span class="prop-status-badge badge-mine">✓ ${T('owned')}</span>`:st==='partial'&&m>0?`<span class="prop-status-badge badge-mine">${T('partial')}</span>`:st==='partial'?`<span class="prop-status-badge badge-partial">${T('partial')}</span>`:st==='taken'?`<span class="prop-status-badge badge-taken">${T('taken')}</span>`:`<span class="prop-status-badge badge-available">${T('available')}</span>`;
+      const d=document.createElement('div');d.className='prop-card'+(m>0?(m>=100?' owned':' partial'):'');
+      d.innerHTML=`<div class="prop-emoji-wrap">${p.emoji}</div><div class="prop-info"><div class="prop-name">${p.name}</div><div class="prop-loc">📍 ${p.loc}</div><div class="prop-meta"><span class="prop-price">${fmt(price)}</span><span class="prop-rent-badge">${fmtRent(p.rent)}</span>${badge}</div></div>${tot>0?`<div class="prop-own-bar" style="width:${tot}%"></div>`:''}`;
+      d.onclick=()=>openModal(p.id);body.appendChild(d);
+    });
+    sec.appendChild(header);sec.appendChild(body);wrap.appendChild(sec);
   });
   // boost status
   const bs=document.getElementById('boost-status');if(bs){const a2=S.powerups['2xrent']&&new Date()<new Date(S.powerups['2xrent']);const ad=S.powerups.discount&&new Date()<new Date(S.powerups.discount);bs.innerHTML=(a2?`<span class="boost-badge">⚡ 2× ${T('income')}</span>`:'')+(ad?`<span class="boost-badge">🏷️ -20%</span>`:'');}
@@ -892,16 +918,16 @@ let curProp=null, buyPct=10;
 function openModal(id){
   curProp=id;const p=PROPS.find(x=>x.id===id);if(!p)return;
   const m=getOwn(id),o=getOtherOwn(id),av=getAvail(id),price=getPrice(p);
-  const trend=S.market[id].trend,trendTxt=trend==='up'?`📈 +${(Math.random()*5+1).toFixed(1)}%`:`📉 -${(Math.random()*3+0.5).toFixed(1)}%`;
   document.getElementById('modal-title').textContent=p.name;
   const maxBuy=Math.min(av,100);buyPct=Math.min(10,maxBuy);const cost=Math.round(price*buyPct/100);
   let ownHtml='';
   if(m>0)ownHtml+=`<div class="owner-row"><div class="owner-avatar" style="background:${COLORS[0]}22;color:${COLORS[0]}">👤</div><span>${S.username}</span><span class="owner-pct">${m}%</span></div>`;
-  if(S.dbOwn){S.dbOwn.filter(x=>x.property_id==id&&x.user_id!==S.user?.id).forEach((x,i)=>{const nm=S.dbProfiles?.find(pr=>pr.id===x.user_id)?.username||'Player';const clr=COLORS[(i+1)%COLORS.length];ownHtml+=`<div class="owner-row"><div class="owner-avatar" style="background:${clr}22;color:${clr}">👤</div><span>${nm}</span><span class="owner-pct">${x.pct}%</span><button class="offer-btn" onclick="openOfferModal('${x.user_id}',${id},${x.pct},'${nm}')">${T('makeOffer')}</button></div>`;});}
+  if(p.scope!=='personal'&&S.dbOwn){S.dbOwn.filter(x=>x.property_id==id&&x.user_id!==S.user?.id).forEach((x,i)=>{const nm=S.dbProfiles?.find(pr=>pr.id===x.user_id)?.username||'Player';const clr=COLORS[(i+1)%COLORS.length];ownHtml+=`<div class="owner-row"><div class="owner-avatar" style="background:${clr}22;color:${clr}">👤</div><span>${nm}</span><span class="owner-pct">${x.pct}%</span><button class="offer-btn" onclick="openOfferModal('${x.user_id}',${id},${x.pct},'${nm}')">${T('makeOffer')}</button></div>`;});}
   let buyHtml='';
   if(av>0){const ca=S.cash>=cost;buyHtml=`<div class="divider"></div><div class="share-slider"><label>${T('myShareLbl')} <span id="sl-pct">${buyPct}%</span><span id="sl-cost" style="color:var(--gold)">${fmt(cost)}</span></label><input type="range" min="1" max="${maxBuy}" value="${buyPct}" oninput="updateSlider(this.value,${id})"></div><button class="btn btn-gold" id="buy-btn" onclick="buyShare(${id})" ${!ca?'disabled':''}>${ca?T('buyBtn',buyPct,fmt(cost)):T('noFunds',fmt(cost))}</button>`;}
   const sellHtml=m>0?`<button class="btn btn-outline" onclick="sellShare(${id})">${T('myShare',m)}</button>`:'';
-  document.getElementById('modal-body').innerHTML=`<span class="modal-emoji">${p.emoji}</span><div class="modal-loc">📍 ${p.loc} | ${trendTxt}</div><div class="info-grid"><div class="info-cell"><div class="info-cell-label">${T('marketValue')}</div><div class="info-cell-val gold">${fmt(price)}</div></div><div class="info-cell"><div class="info-cell-label">${T('rentHr')}</div><div class="info-cell-val g">${fmt(p.rent)}</div></div><div class="info-cell"><div class="info-cell-label">${T('myShareLbl')}</div><div class="info-cell-val">${m}%</div></div><div class="info-cell"><div class="info-cell-label">${T('available2')}</div><div class="info-cell-val">${av}%</div></div></div><div class="own-bar-wrap"><div class="own-bar-label"><span>${T('ownership')}</span><span>${100-av}% owned</span></div><div class="own-bar"><div class="own-bar-mine" style="width:${m}%"></div><div class="own-bar-others" style="width:${o}%"></div></div></div>${ownHtml?'<div class="owner-list">'+ownHtml+'</div>':''}${buyHtml}${sellHtml}`;
+  const scopeBadge=p.scope==='personal'?`<span class="prop-status-badge badge-available">🔒 ${T('personal')}</span>`:'';
+  document.getElementById('modal-body').innerHTML=`<span class="modal-emoji">${p.emoji}</span><div class="modal-loc">📍 ${p.loc} ${scopeBadge}</div><div class="info-grid"><div class="info-cell"><div class="info-cell-label">${T('marketValue')}</div><div class="info-cell-val gold">${fmt(price)}</div></div><div class="info-cell"><div class="info-cell-label">${T('rentHr')}</div><div class="info-cell-val g">${fmt(p.rent)}</div></div><div class="info-cell"><div class="info-cell-label">${T('myShareLbl')}</div><div class="info-cell-val">${m}%</div></div><div class="info-cell"><div class="info-cell-label">${T('available2')}</div><div class="info-cell-val">${av}%</div></div></div><div class="own-bar-wrap"><div class="own-bar-label"><span>${T('ownership')}</span><span>${100-av}% owned</span></div><div class="own-bar"><div class="own-bar-mine" style="width:${m}%"></div><div class="own-bar-others" style="width:${o}%"></div></div></div>${ownHtml?'<div class="owner-list">'+ownHtml+'</div>':''}${buyHtml}${sellHtml}`;
   document.getElementById('modal-overlay').classList.add('open');
 }
 function updateSlider(val,id){
@@ -1056,7 +1082,7 @@ function renderStore(){
   const adAmt=50+coinBonus();
   const dEl=document.getElementById('watch-ad-desc');if(dEl)dEl.textContent=`30s → ${adAmt} 🪙`;
   const cEl=document.getElementById('watch-ad-coins');if(cEl)cEl.textContent=`+${adAmt} 🪙`;
-  ['2xrent','discount','insight'].forEach(id=>{
+  ['2xrent','discount','lucky'].forEach(id=>{
     const card=document.getElementById('pu-'+id);if(!card)return;
     const exp=S.powerups[id]?new Date(S.powerups[id]):null;const active=exp&&now<exp;
     card.classList.toggle('active-pu',active);
@@ -1064,11 +1090,11 @@ function renderStore(){
   });
 }
 async function buyPowerup(id){
-  const costs={'2xrent':500,'discount':400,'insight':200};const cost=costs[id];
+  const costs={'2xrent':500,'discount':400,'lucky':200};const cost=costs[id];
   if(S.coins<cost){toast(T('noCoins',cost));return;}
-  const dur={'2xrent':7*24*3600000,'discount':3*24*3600000,'insight':24*3600000};
+  const dur={'2xrent':7*24*3600000,'discount':3*24*3600000,'lucky':24*3600000};
   S.coins-=cost;const exp=new Date(Date.now()+dur[id]);S.powerups[id]=exp.toISOString();
-  const names={'2xrent':'2× Rent','discount':'-20%','insight':'Market Insight'};
+  const names={'2xrent':'2× Rent','discount':'-20%','lucky':'Lucky Charm'};
   toast(T('puActive',names[id]));renderStore();updateTopbar();await saveProfile();
 }
 function buyCoins(amt,price){toast(`💳 Payment ${price} — payment system coming soon!`,4000);}
@@ -1089,7 +1115,15 @@ function watchAd(){
   let secs=30;document.getElementById('ad-timer').textContent=secs;document.getElementById('ad-bar-fill').style.width='100%';
   adIv=setInterval(async()=>{
     secs--;document.getElementById('ad-timer').textContent=secs;document.getElementById('ad-bar-fill').style.width=(secs/30*100)+'%';
-    if(secs<=0){clearInterval(adIv);document.getElementById('ad-overlay').classList.remove('open');S.coins+=bonus;toast(T('adReward',bonus));updateTopbar();await saveProfile();}
+    if(secs<=0){
+      clearInterval(adIv);document.getElementById('ad-overlay').classList.remove('open');
+      const luckyActive=S.powerups.lucky&&new Date()<new Date(S.powerups.lucky);
+      const lucky=luckyActive&&Math.random()<0.2;
+      const gain=lucky?bonus*2:bonus;
+      S.coins+=gain;
+      toast(lucky?`🍀 ${T('adReward',gain)}`:T('adReward',gain));
+      updateTopbar();await saveProfile();
+    }
   },1000);
 }
 
@@ -1167,15 +1201,6 @@ function updateTopbar(){
   checkLevelUp();
 }
 
-// ===== TICKER =====
-function renderTicker(){
-  const t=document.getElementById('ticker');if(!t)return;t.innerHTML='';
-  [{n:'Bratislava',id:1},{n:'Praha',id:3},{n:'Wien',id:8},{n:'Monaco',id:12},{n:'Manhattan',id:20},{n:'Dubai',id:25},{n:'Santorini',id:19}].forEach(c=>{
-    const tr=S.market[c.id]?.trend||'up';const chg=(Math.random()*4+0.5).toFixed(1);
-    const d=document.createElement('div');d.className='ticker-chip';d.innerHTML=`${c.n}<span class="${tr==='up'?'up':'dn'}">${tr==='up'?'+':'-'}${chg}%</span>`;t.appendChild(d);
-  });
-}
-
 // ===== EXIT CONFIRM =====
 function showExitConfirm(){
   if(document.getElementById('exit-confirm'))return;
@@ -1194,10 +1219,6 @@ function startTicks(){
     if(data&&data.cash!==S.cash){const diff=data.cash-S.cash;S.cash=data.cash;if(diff>0)toast(T('rentIncome',fmt(diff)));renderAll();}
     if(data)S.coins=data.coins||S.coins;updateTopbar();
   },300000);
-  setInterval(()=>{
-    PROPS.forEach(p=>{const d=(Math.random()-0.48)*0.04;S.market[p.id].mult=Math.max(0.7,Math.min(1.5,S.market[p.id].mult+d));S.market[p.id].trend=d>0?'up':'dn';});
-    renderTicker();
-  },45000);
 }
 
 function renderAll(){
@@ -1205,7 +1226,7 @@ function renderAll(){
   if(S.screen==='portfolio')renderPortfolio();
   if(S.screen==='store')renderStore();
   if(S.screen==='skills')renderSkills();
-  updateTopbar();renderTicker();
+  updateTopbar();
 }
 
 // ===== COIN ICON (consistent across all devices) =====
