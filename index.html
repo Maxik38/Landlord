@@ -25,27 +25,20 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .screen{position:absolute;inset:0;overflow-y:auto;display:none;-webkit-overflow-scrolling:touch;}
 .screen.active{display:block;}
 .screen-inner{padding:16px;padding-bottom:calc(var(--nav-h) + 20px + var(--safe-b));}
-#bottom-nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav-h) + var(--safe-b));background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:var(--safe-b);}
-#bottom-nav::before{content:'';position:absolute;top:10px;left:4%;right:4%;height:18px;background:linear-gradient(90deg,#f5a742,#ff6b6b,#4dd9ec,#6fdc8c,#b57bf0,#ffd23f);filter:blur(14px);opacity:0.18;pointer-events:none;z-index:-1;}
-.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;position:relative;padding:8px 2px;}
-.bnav-icon{font-size:20px;transition:transform 0.15s;display:flex;align-items:center;justify-content:center;}.bnav-label{font-size:9px;color:var(--text3);font-weight:600;transition:opacity 0.15s;}
-.bnav-icon svg{width:23px;height:23px;display:block;}
-.bnav-item .bnav-icon{opacity:0.75;}
-.bnav-item .bnav-label{opacity:0.75;}
-.bnav-item.active .bnav-icon,.bnav-item.active .bnav-label{opacity:1;}
-.bnav-item.active .bnav-icon{transform:translateY(-2px);}
-.bnav-item[data-s="market"] .bnav-icon{color:#f5a742;filter:drop-shadow(0 0 7px rgba(245,167,66,0.85));}
-.bnav-item[data-s="market"] .bnav-label{color:#f5a742;}
-.bnav-item[data-s="portfolio"] .bnav-icon{color:#ff6b6b;filter:drop-shadow(0 0 7px rgba(255,107,107,0.85));}
-.bnav-item[data-s="portfolio"] .bnav-label{color:#ff6b6b;}
-.bnav-item[data-s="store"] .bnav-icon{color:#4dd9ec;filter:drop-shadow(0 0 7px rgba(77,217,236,0.85));}
-.bnav-item[data-s="store"] .bnav-label{color:#4dd9ec;}
-.bnav-item[data-s="skills"] .bnav-icon{color:#6fdc8c;filter:drop-shadow(0 0 7px rgba(111,220,140,0.85));}
-.bnav-item[data-s="skills"] .bnav-label{color:#6fdc8c;}
-.bnav-item[data-s="offers"] .bnav-icon{color:#b57bf0;filter:drop-shadow(0 0 7px rgba(181,123,240,0.85));}
-.bnav-item[data-s="offers"] .bnav-label{color:#b57bf0;}
-.bnav-item[data-s="leaderboard"] .bnav-icon{color:#ffd23f;filter:drop-shadow(0 0 7px rgba(255,210,63,0.85));}
-.bnav-item[data-s="leaderboard"] .bnav-label{color:#ffd23f;}
+#bottom-nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav-h) + var(--safe-b));display:flex;align-items:center;justify-content:space-around;z-index:100;padding:14px 8px calc(20px + var(--safe-b));background:linear-gradient(90deg,oklch(30% 0.08 25 / .35),oklch(30% 0.09 85 / .35),oklch(28% 0.08 155 / .3),oklch(28% 0.09 250 / .3));border-top:1px solid oklch(78% 0.1 85 / .25);}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;position:relative;background:none;border:none;opacity:.45;}
+.bnav-icon{transition:transform 0.15s;display:flex;align-items:center;justify-content:center;}
+.bnav-label{font:600 9.5px 'DM Sans',sans-serif;transition:opacity 0.15s;}
+.bnav-icon svg{width:19px;height:19px;display:block;}
+.bnav-item.active{opacity:1;}
+.bnav-item.active .bnav-label{font-weight:700;}
+.bnav-item.active .bnav-icon{transform:translateY(-2px);filter:drop-shadow(0 0 5px currentColor);}
+.bnav-item[data-s="market"] .bnav-icon,.bnav-item[data-s="market"] .bnav-label{color:oklch(80% 0.14 85);}
+.bnav-item[data-s="portfolio"] .bnav-icon,.bnav-item[data-s="portfolio"] .bnav-label{color:oklch(78% 0.13 40);}
+.bnav-item[data-s="store"] .bnav-icon,.bnav-item[data-s="store"] .bnav-label{color:oklch(75% 0.14 220);}
+.bnav-item[data-s="skills"] .bnav-icon,.bnav-item[data-s="skills"] .bnav-label{color:oklch(74% 0.15 155);}
+.bnav-item[data-s="offers"] .bnav-icon,.bnav-item[data-s="offers"] .bnav-label{color:oklch(72% 0.14 300);}
+.bnav-item[data-s="leaderboard"] .bnav-icon,.bnav-item[data-s="leaderboard"] .bnav-label{color:oklch(78% 0.14 60);}
 .bnav-dot{position:absolute;top:6px;right:calc(50% - 14px);width:7px;height:7px;background:var(--red);border-radius:50%;display:none;border:2px solid var(--surface);}
 .bnav-dot.show{display:block;}
 .chip-scroll{display:flex;gap:7px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none;}.chip-scroll::-webkit-scrollbar{display:none;}
@@ -531,12 +524,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
   </div>
 
   <div id="bottom-nav">
-    <div class="bnav-item active" data-s="market" onclick="setScreen('market',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="bnav-label" id="bnav-market">Market</span></div>
-    <div class="bnav-item" data-s="portfolio" onclick="setScreen('portfolio',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linejoin="round"/></svg></span><span class="bnav-label" id="bnav-portfolio">Portfolio</span></div>
-    <div class="bnav-item" data-s="store" onclick="setScreen('store',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linejoin="round"/><path d="M2 9h20M9 3l-2 6 5 12 5-12-2-6" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linejoin="round"/></svg></span><span class="bnav-label" id="bnav-store">Store</span></div>
-    <div class="bnav-item" data-s="skills" onclick="setScreen('skills',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24"><path d="M12 2l2 7 7 2-7 2-2 7-2-7-7-2 7-2z" stroke="currentColor" fill="none" stroke-width="1.6" stroke-linejoin="round"/></svg></span><span class="bnav-label" id="bnav-skills">Skills</span></div>
-    <div class="bnav-item" data-s="offers" onclick="setScreen('offers',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" fill="none" stroke-width="1.8"/><path d="M3 7l9 6 9-6" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="bnav-label" id="bnav-offers">Offers</span><div class="bnav-dot" id="offers-dot"></div></div>
-    <div class="bnav-item" data-s="leaderboard" onclick="setScreen('leaderboard',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" stroke="currentColor" fill="none" stroke-width="1.6" stroke-linejoin="round"/></svg></span><span class="bnav-label" id="bnav-lb">Top</span></div>
+    <div class="bnav-item active" data-s="market" onclick="setScreen('market',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="10" width="18" height="10"/><path d="M3 10 12 4l9 6"/></svg></span><span class="bnav-label" id="bnav-market">Market</span></div>
+    <div class="bnav-item" data-s="portfolio" onclick="setScreen('portfolio',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7h6l2 2h10v11H3z"/></svg></span><span class="bnav-label" id="bnav-portfolio">Portfolio</span></div>
+    <div class="bnav-item" data-s="store" onclick="setScreen('store',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 4 9l8 13 8-13z"/></svg></span><span class="bnav-label" id="bnav-store">Store</span></div>
+    <div class="bnav-item" data-s="skills" onclick="setScreen('skills',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v6M12 15v6M5 12h3M16 12h3M7 7l2 2M15 15l2 2M17 7l-2 2M9 15l-2 2"/></svg></span><span class="bnav-label" id="bnav-skills">Skills</span></div>
+    <div class="bnav-item" data-s="offers" onclick="setScreen('offers',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="13"/><path d="M3 7l9 6 9-6"/></svg></span><span class="bnav-label" id="bnav-offers">Offers</span><div class="bnav-dot" id="offers-dot"></div></div>
+    <div class="bnav-item" data-s="leaderboard" onclick="setScreen('leaderboard',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 14.5 8.5 21 9.3l-5 4.4 1.5 6.8L12 17.5 6.5 20.5 8 13.7 3 9.3l6.5-.8z"/></svg></span><span class="bnav-label" id="bnav-lb">Top</span></div>
   </div>
 </div>
 
