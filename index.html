@@ -27,8 +27,24 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .screen-inner{padding:16px;padding-bottom:calc(var(--nav-h) + 20px + var(--safe-b));}
 #bottom-nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav-h) + var(--safe-b));background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:var(--safe-b);}
 .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;position:relative;padding:8px 2px;}
-.bnav-icon{font-size:20px;transition:transform 0.15s;}.bnav-label{font-size:9px;color:var(--text3);font-weight:500;}
-.bnav-item.active .bnav-icon{transform:translateY(-2px);}.bnav-item.active .bnav-label{color:var(--gold);}
+.bnav-icon{font-size:20px;transition:transform 0.15s;display:flex;align-items:center;justify-content:center;}.bnav-label{font-size:9px;color:var(--text3);font-weight:600;transition:opacity 0.15s;}
+.bnav-icon svg{width:23px;height:23px;display:block;}
+.bnav-item .bnav-icon{opacity:0.55;}
+.bnav-item .bnav-label{opacity:0.55;}
+.bnav-item.active .bnav-icon,.bnav-item.active .bnav-label{opacity:1;}
+.bnav-item.active .bnav-icon{transform:translateY(-2px);}
+.bnav-item[data-s="market"] .bnav-icon{color:#f5a742;filter:drop-shadow(0 0 7px rgba(245,167,66,0.85));}
+.bnav-item[data-s="market"] .bnav-label{color:#f5a742;}
+.bnav-item[data-s="portfolio"] .bnav-icon{color:#ff6b6b;filter:drop-shadow(0 0 7px rgba(255,107,107,0.85));}
+.bnav-item[data-s="portfolio"] .bnav-label{color:#ff6b6b;}
+.bnav-item[data-s="store"] .bnav-icon{color:#4dd9ec;filter:drop-shadow(0 0 7px rgba(77,217,236,0.85));}
+.bnav-item[data-s="store"] .bnav-label{color:#4dd9ec;}
+.bnav-item[data-s="skills"] .bnav-icon{color:#6fdc8c;filter:drop-shadow(0 0 7px rgba(111,220,140,0.85));}
+.bnav-item[data-s="skills"] .bnav-label{color:#6fdc8c;}
+.bnav-item[data-s="offers"] .bnav-icon{color:#b57bf0;filter:drop-shadow(0 0 7px rgba(181,123,240,0.85));}
+.bnav-item[data-s="offers"] .bnav-label{color:#b57bf0;}
+.bnav-item[data-s="leaderboard"] .bnav-icon{color:#ffd23f;filter:drop-shadow(0 0 7px rgba(255,210,63,0.85));}
+.bnav-item[data-s="leaderboard"] .bnav-label{color:#ffd23f;}
 .bnav-dot{position:absolute;top:6px;right:calc(50% - 14px);width:7px;height:7px;background:var(--red);border-radius:50%;display:none;border:2px solid var(--surface);}
 .bnav-dot.show{display:block;}
 .chip-scroll{display:flex;gap:7px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none;}.chip-scroll::-webkit-scrollbar{display:none;}
@@ -36,18 +52,18 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .chip.active{border-color:var(--gold);color:var(--gold);background:var(--gold-dim);}
 .prop-list{display:flex;flex-direction:column;gap:9px;}
 .market-scope-tabs{display:flex;gap:8px;margin-bottom:14px;}
-.scope-tab{flex:1;text-align:center;padding:12px;border-radius:var(--radius-sm);background:var(--surface2);border:1px solid var(--border2);font-size:14px;font-weight:600;color:var(--text2);cursor:pointer;transition:all 0.15s;}
-.scope-tab.active{background:var(--gold-dim);border-color:var(--gold);color:var(--gold);}
+.scope-tab{flex:1;text-align:center;padding:13px;border-radius:16px;background:var(--surface2);border:1.5px solid var(--border2);font-size:15px;font-weight:600;color:var(--text3);cursor:pointer;transition:all 0.15s;}
+.scope-tab.active{background:rgba(201,168,76,0.08);border-color:var(--gold);color:var(--gold);}
 .accordion-section{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:9px;overflow:hidden;}
 .accordion-header{display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--surface2);cursor:pointer;position:relative;background-size:cover;background-position:center;}
 .accordion-header-themed{color:#fff;padding:22px 14px;}
 .accordion-header-themed::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,10,15,0.5),rgba(10,10,15,0.15));}
 .accordion-header-themed .accordion-header-left,.accordion-header-themed .accordion-chevron{position:relative;z-index:1;}
 .accordion-header-themed .accordion-header-left{color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.85),0 0 12px rgba(0,0,0,0.5);}
-.accordion-header-themed .accordion-count{color:rgba(255,255,255,0.75);}
+.accordion-header-themed .accordion-count{color:rgba(255,255,255,0.9);}
 .accordion-header-themed .accordion-chevron{color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.7);}
-.accordion-header-left{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;}
-.accordion-count{font-size:11px;color:var(--text3);font-weight:400;}
+.accordion-header-left{display:flex;align-items:baseline;gap:9px;font-size:19px;font-weight:700;color:var(--text);}
+.accordion-count{font-size:15px;color:var(--text2);font-weight:600;}
 .accordion-chevron{font-size:11px;color:var(--text3);transition:transform 0.2s;}
 .accordion-section.open .accordion-chevron{transform:rotate(180deg);}
 .accordion-body{display:none;padding:9px;padding-top:0;}
@@ -389,8 +405,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
         <div id="daily-wrap"></div>
         <div class="section-hdr"><h2 id="lbl-market-title">Property Market</h2><p id="boost-status"></p></div>
         <div class="market-scope-tabs">
-          <div class="scope-tab active" id="scope-personal" onclick="setMarketScope('personal',this)">🏠 <span id="lbl-personal">Personal</span></div>
-          <div class="scope-tab" id="scope-global" onclick="setMarketScope('global',this)">🌍 <span id="lbl-global">Global</span></div>
+          <div class="scope-tab active" id="scope-personal" onclick="setMarketScope('personal',this)"><span id="lbl-personal">Personal</span></div>
+          <div class="scope-tab" id="scope-global" onclick="setMarketScope('global',this)"><span id="lbl-global">Global</span></div>
         </div>
         <div id="prop-accordion"></div>
       </div>
@@ -514,12 +530,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
   </div>
 
   <div id="bottom-nav">
-    <div class="bnav-item active" data-s="market" onclick="setScreen('market',this)"><span class="bnav-icon">🏪</span><span class="bnav-label" id="bnav-market">Market</span></div>
-    <div class="bnav-item" data-s="portfolio" onclick="setScreen('portfolio',this)"><span class="bnav-icon">📁</span><span class="bnav-label" id="bnav-portfolio">Portfolio</span></div>
-    <div class="bnav-item" data-s="store" onclick="setScreen('store',this)"><span class="bnav-icon">💎</span><span class="bnav-label" id="bnav-store">Store</span></div>
-    <div class="bnav-item" data-s="skills" onclick="setScreen('skills',this)"><span class="bnav-icon">🧠</span><span class="bnav-label" id="bnav-skills">Skills</span></div>
-    <div class="bnav-item" data-s="offers" onclick="setScreen('offers',this)"><span class="bnav-icon">📩</span><span class="bnav-label" id="bnav-offers">Offers</span><div class="bnav-dot" id="offers-dot"></div></div>
-    <div class="bnav-item" data-s="leaderboard" onclick="setScreen('leaderboard',this)"><span class="bnav-icon">🏆</span><span class="bnav-label" id="bnav-lb">Top</span></div>
+    <div class="bnav-item active" data-s="market" onclick="setScreen('market',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="bnav-label" id="bnav-market">Market</span></div>
+    <div class="bnav-item" data-s="portfolio" onclick="setScreen('portfolio',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linejoin="round"/></svg></span><span class="bnav-label" id="bnav-portfolio">Portfolio</span></div>
+    <div class="bnav-item" data-s="store" onclick="setScreen('store',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linejoin="round"/><path d="M2 9h20M9 3l-2 6 5 12 5-12-2-6" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linejoin="round"/></svg></span><span class="bnav-label" id="bnav-store">Store</span></div>
+    <div class="bnav-item" data-s="skills" onclick="setScreen('skills',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24"><path d="M12 2l2 7 7 2-7 2-2 7-2-7-7-2 7-2z" stroke="currentColor" fill="none" stroke-width="1.6" stroke-linejoin="round"/></svg></span><span class="bnav-label" id="bnav-skills">Skills</span></div>
+    <div class="bnav-item" data-s="offers" onclick="setScreen('offers',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" fill="none" stroke-width="1.8"/><path d="M3 7l9 6 9-6" stroke="currentColor" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="bnav-label" id="bnav-offers">Offers</span><div class="bnav-dot" id="offers-dot"></div></div>
+    <div class="bnav-item" data-s="leaderboard" onclick="setScreen('leaderboard',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" stroke="currentColor" fill="none" stroke-width="1.6" stroke-linejoin="round"/></svg></span><span class="bnav-label" id="bnav-lb">Top</span></div>
   </div>
 </div>
 
@@ -1174,7 +1190,7 @@ function renderGrid(){
     const themeBg=tier==='house'?HOUSES_BG:tier==='city'?CITIES_BG:null;
     const header=document.createElement('div');header.className='accordion-header'+(themeBg?' accordion-header-themed':'');
     if(themeBg)header.style.backgroundImage=`url('${themeBg}')`;
-    header.innerHTML=`<div class="accordion-header-left"><span>${tierIcon(tier)}</span><span>${tierLabel(tier)}</span><span class="accordion-count">${ps.length}</span></div><span class="accordion-chevron">▾</span>`;
+    header.innerHTML=`<div class="accordion-header-left"><span>${tierLabel(tier)}</span><span class="accordion-count">${ps.length}</span></div><span class="accordion-chevron">▾</span>`;
     header.onclick=()=>toggleSection(tier);
     const body=document.createElement('div');body.className='accordion-body';
     ps.forEach(p=>{
