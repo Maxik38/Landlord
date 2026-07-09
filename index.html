@@ -974,7 +974,7 @@ function setScreen(name, el) {
   document.getElementById('screen-'+name).classList.add('active');
   el.classList.add('active');
   if(name==='portfolio')renderPortfolio();
-  if(name==='offers')renderOffers();
+  if(name==='offers')refreshOffers();
   if(name==='leaderboard')renderLeaderboard();
   if(name==='skills')renderSkills();
   if(name==='store')renderStore();
@@ -1093,6 +1093,14 @@ function updateOfferPct(val){
   document.getElementById('om-suggested').textContent=T('marketValue')+': '+fmt(Math.round(marketValue(p)*val/100));
 }
 function closeOfferModal(){document.getElementById('offer-modal').classList.remove('open');offerTarget=null;}
+async function refreshOffers(){
+  if(!supa||!S.user)return;
+  const {data:off} = await supa.from('offers').select('*').eq('to_id',S.user.id).eq('status','pending');
+  S.offers=off||[]; updateDot();
+  const {data:sent} = await supa.from('offers').select('*').eq('from_id',S.user.id).eq('status','pending');
+  S.sentOffers=sent||[];
+  renderOffers();
+}
 async function sendOffer(){
   if(!offerTarget)return;
   const pct=parseInt(document.getElementById('om-pct-slider').value);
@@ -1101,16 +1109,15 @@ async function sendOffer(){
   if(!supa||!S.user){toast('❌ Login required');return;}
   const {tid,tname,id,editId}=offerTarget;
   if(editId){
-    await supa.from('offers').update({pct,amount:price}).eq('id',editId);
-    const idx=(S.sentOffers||[]).findIndex(o=>o.id===editId);
-    if(idx>-1){S.sentOffers[idx].pct=pct;S.sentOffers[idx].amount=price;}
+    const {data,error}=await supa.from('offers').update({pct,amount:price}).eq('id',editId).eq('from_id',S.user.id).select();
+    if(error||!data||!data.length){toast('❌ '+T('offerCancelled').replace('🗑️','').trim()+' — update failed');closeOfferModal();closeModal();await refreshOffers();return;}
     toast(T('offerUpdated'));
   }else{
     const {data}=await supa.from('offers').insert({from_id:S.user.id,to_id:tid,property_id:id,pct,amount:price,status:'pending'}).select().single();
-    if(data){S.sentOffers=S.sentOffers||[];S.sentOffers.push(data);}
+    if(!data){toast('❌ Failed to send offer');closeOfferModal();closeModal();return;}
     toast(T('offerSent',fmt(price),tname));
   }
-  closeOfferModal();closeModal();renderOffers();
+  closeOfferModal();closeModal();await refreshOffers();
 }
 function editOffer(o){
   const p=PROPS.find(x=>x.id==o.property_id);if(!p)return;
@@ -1120,9 +1127,8 @@ function editOffer(o){
   openOfferModal(o.to_id,o.property_id,maxPct,toName,o.id,o.pct,o.amount);
 }
 async function cancelOffer(o){
-  await supa.from('offers').delete().eq('id',o.id);
-  S.sentOffers=(S.sentOffers||[]).filter(x=>x.id!==o.id);
-  toast(T('offerCancelled'));renderOffers();
+  await supa.from('offers').delete().eq('id',o.id).eq('from_id',S.user.id);
+  toast(T('offerCancelled'));await refreshOffers();
 }
 async function acceptOffer(o){
   const p=PROPS.find(x=>x.id==o.property_id);const m=getOwn(o.property_id);
@@ -1133,12 +1139,12 @@ async function acceptOffer(o){
   await supa.from('profiles').update({cash:Math.max(0,(buyerProf?.cash||0)-o.amount)}).eq('id',o.from_id);
   const {data:bOwn}=await supa.from('ownerships').select('pct').eq('user_id',o.from_id).eq('property_id',o.property_id).single();
   await supa.from('ownerships').upsert({user_id:o.from_id,property_id:o.property_id,pct:(bOwn?.pct||0)+o.pct},{onConflict:'user_id,property_id'});
-  S.offers=S.offers.filter(x=>x.id!==o.id);updateDot();
-  toast(T('accepted',fmt(o.amount)));renderAll();renderOffers();
+  updateDot();
+  toast(T('accepted',fmt(o.amount)));renderAll();await refreshOffers();
 }
 async function rejectOffer(o){
   await supa.from('offers').update({status:'rejected'}).eq('id',o.id);
-  S.offers=S.offers.filter(x=>x.id!==o.id);updateDot();toast(T('rejected'));renderOffers();
+  updateDot();toast(T('rejected'));await refreshOffers();
 }
 function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
 
