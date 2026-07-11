@@ -147,6 +147,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .store-icon-box{width:36px;height:36px;border-radius:10px;background:#232323;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .store-icon-box svg{width:18px;height:18px;display:block;}
 .powerup-card.pc-green{border-color:rgba(74,222,128,.5);background:rgba(74,222,128,.06);}
+.powerup-card.pc-gold{border-color:rgba(240,180,41,.5);background:rgba(240,180,41,.06);}
+.store-icon-box.gold-box{background:rgba(240,180,41,.1);border:1px solid rgba(240,180,41,.4);}
 .convert-row{display:flex;align-items:center;justify-content:space-between;border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;border:1px solid transparent;background:var(--surface2);cursor:pointer;}
 .convert-row.blue{background:rgba(56,189,248,.06);border-color:rgba(56,189,248,.45);}
 .convert-row.green{background:rgba(74,222,128,.06);border-color:rgba(74,222,128,.45);}
@@ -457,18 +459,18 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
             <div class="powerup-info"><div class="powerup-name" id="lbl-disc">-20% Discount</div><div class="powerup-desc" id="lbl-disc-desc">All property purchases 20% cheaper</div><div class="powerup-timer" id="pu-discount-timer"></div></div>
             <div class="powerup-cost"><div class="powerup-coins">400 🪙</div><div class="powerup-label">3 days</div></div>
           </div>
-          <div class="powerup-card" id="pu-lucky" onclick="buyPowerup('lucky')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.8" width="19" height="19" style="flex-shrink:0"><circle cx="9" cy="8" r="3.2"/><circle cx="15" cy="8" r="3.2"/><circle cx="9" cy="14" r="3.2"/><path d="M15 14a3.2 3.2 0 1 0 -2 2.9"/><path d="M12 17v4"/></svg>
+          <div class="powerup-card pc-green" id="pu-lucky" onclick="buyPowerup('lucky')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.8" width="19" height="19" style="flex-shrink:0"><circle cx="8" cy="8" r="3.3"/><circle cx="16" cy="8" r="3.3"/><circle cx="8" cy="16" r="3.3"/><circle cx="16" cy="16" r="3.3"/><path d="M12 12v6" stroke-linecap="round"/></svg>
             <div class="powerup-info"><div class="powerup-name" id="lbl-lucky">Lucky Charm</div><div class="powerup-desc" id="lbl-lucky-desc">20% chance to double every ad reward for 24h</div><div class="powerup-timer" id="pu-lucky-timer"></div></div>
             <div class="powerup-cost"><div class="powerup-coins">200 🪙</div><div class="powerup-label">24h</div></div>
           </div>
-          <div class="powerup-card" id="pu-contractor12" onclick="buyPowerup('contractor12')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#f0b429" stroke-width="1.8" width="19" height="19" style="flex-shrink:0"><path d="M21 7a5 5 0 0 1-6.94 4.6L7 18.66a2 2 0 1 1-2.83-2.83l7.07-7.06A5 5 0 1 1 21 7z"/></svg>
+          <div class="powerup-card pc-gold" id="pu-contractor12" onclick="buyPowerup('contractor12')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#f0b429" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="19" height="19" style="flex-shrink:0"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/></svg>
             <div class="powerup-info"><div class="powerup-name" id="lbl-c12">Hire Contractor (12h)</div><div class="powerup-desc" id="lbl-c12-desc">Offline earnings cap extended to 12h for 7 days</div><div class="powerup-timer" id="pu-contractor12-timer"></div></div>
             <div class="powerup-cost"><div class="powerup-coins">400 🪙</div><div class="powerup-label">7 days</div></div>
           </div>
-          <div class="powerup-card" id="pu-contractor24" onclick="buyPowerup('contractor24')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#f0b429" stroke-width="1.8" width="19" height="19" style="flex-shrink:0"><path d="M4 18a8 8 0 0 1 16 0z"/><path d="M2 18h20"/><path d="M12 6v4"/></svg>
+          <div class="powerup-card pc-gold" id="pu-contractor24" onclick="buyPowerup('contractor24')">
+            <svg viewBox="0 0 24 24" width="19" height="19" style="flex-shrink:0"><path d="M4 18a8 8 0 0 1 16 0z" fill="rgba(240,180,41,.25)" stroke="#f0b429" stroke-width="1.6"/><path d="M2.5 18h19" stroke="#f0b429" stroke-width="1.6" stroke-linecap="round"/><path d="M12 5v4" stroke="#f0b429" stroke-width="1.6" stroke-linecap="round"/></svg>
             <div class="powerup-info"><div class="powerup-name" id="lbl-c24">Hire Contractor (24h)</div><div class="powerup-desc" id="lbl-c24-desc">Offline earnings cap extended to 24h for 7 days</div><div class="powerup-timer" id="pu-contractor24-timer"></div></div>
             <div class="powerup-cost"><div class="powerup-coins">900 🪙</div><div class="powerup-label">7 days</div></div>
           </div>
@@ -484,13 +486,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
         </div>
         <div class="store-section">
           <div class="store-section-title" id="lbl-convert">Convert Coins to Cash</div>
-          <div class="powerup-card" onclick="convertCoins()">
-            <div class="powerup-icon">💱</div>
+          <div class="powerup-card pc-gold" onclick="convertCoins()">
+            <div class="store-icon-box gold-box"><svg viewBox="0 0 24 24" fill="none" stroke="#f0b429" stroke-width="1.8"><path d="M4 8h13l-3-3M4 8l3 3M20 16H7l3 3M20 16l-3-3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             <div class="powerup-info"><div class="powerup-name">100 🪙 → €50 000</div><div class="powerup-desc" id="lbl-convert-desc">Convert Gold Coins to game cash</div></div>
             <div class="powerup-cost"><div class="powerup-coins">100 🪙</div><div class="powerup-label">per €50K</div></div>
           </div>
           <div class="convert-row blue" onclick="convertDiamond()">
-            <div><div class="convert-name">€1B → 1 💎</div><div class="convert-desc" id="lbl-convertd-desc">Convert game cash to premium Diamonds</div></div>
+            <div><div class="convert-name">€ 1 000 000 000 → 1 💎</div><div class="convert-desc" id="lbl-convertd-desc">Convert game cash to premium Diamonds</div></div>
             <div><div class="convert-amount c-blue">€1B</div><div class="convert-meta">per 💎1</div></div>
           </div>
           <div class="convert-row green" onclick="convertAlien()">
