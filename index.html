@@ -1693,7 +1693,7 @@ async function buyShare(id){
   const np=getOwn(id)+buyPct;S.own[Number(id)]=np;
   broadcastAction(`${S.username} bought ${buyPct}% of ${propName(p)}`);
   toast(T('buyOk',buyPct,propName(p),special?(cost+' '+icon):fmt(cost)));closeModal();renderAll();
-  await saveOwn(id,np);await saveProfile();openModal(id);
+  await saveOwn(id,np);await saveProfile();
 }
 async function sellShare(id,pct){
   const p=PROPS.find(x=>x.id===id);const m=getOwn(id);
