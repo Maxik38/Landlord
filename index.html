@@ -1314,12 +1314,18 @@ async function loadState() {
 
 async function saveProfile() {
   if (!supa||!S.user) return;
-  await supa.from('profiles').upsert({id:S.user.id,username:S.username,cash:S.cash,coins:S.coins,diamonds:S.diamonds,aliens:S.aliens,skills:S.skills,powerups:S.powerups,last_daily:S.lastDaily,daily_streak:S.dailyStreak,avatar:S.avatar,level_claimed:S.levelClaimed,perma_boost_2x:S.permaBoost2x,perma_contractor_48:S.permaContractor48,chroma_coins:S.chromaCoins,event_own:S.eventOwn,chroma_skills:S.chromaSkills,updated_at:new Date().toISOString()},{onConflict:'id'});
+  const {error} = await supa.from('profiles').upsert({id:S.user.id,username:S.username,cash:S.cash,coins:S.coins,diamonds:S.diamonds,aliens:S.aliens,skills:S.skills,powerups:S.powerups,last_daily:S.lastDaily,daily_streak:S.dailyStreak,avatar:S.avatar,level_claimed:S.levelClaimed,perma_boost_2x:S.permaBoost2x,perma_contractor_48:S.permaContractor48,chroma_coins:S.chromaCoins,event_own:S.eventOwn,chroma_skills:S.chromaSkills,updated_at:new Date().toISOString()},{onConflict:'id'});
+  if(error){
+    console.error('saveProfile failed:', error);
+    toast('⚠️ Save failed — check your connection or contact support (see console for details)',5000);
+  }
 }
 async function saveOwn(pid,pct) {
   if (!supa||!S.user) return;
-  if(pct<=0) await supa.from('ownerships').delete().eq('user_id',S.user.id).eq('property_id',pid);
-  else await supa.from('ownerships').upsert({user_id:S.user.id,property_id:pid,pct,updated_at:new Date().toISOString()},{onConflict:'user_id,property_id'});
+  let error;
+  if(pct<=0){({error}=await supa.from('ownerships').delete().eq('user_id',S.user.id).eq('property_id',pid));}
+  else{({error}=await supa.from('ownerships').upsert({user_id:S.user.id,property_id:pid,pct,updated_at:new Date().toISOString()},{onConflict:'user_id,property_id'}));}
+  if(error){console.error('saveOwn failed:', error); toast('⚠️ Save failed — check your connection',4000);}
 }
 function setupRealtime() {
   if (!supa) return;
