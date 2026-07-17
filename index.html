@@ -1606,9 +1606,14 @@ function renderGrid(){
 }
 
 // ===== WEEKLY EVENT PROPERTIES =====
+function fmtEventCountdown(ms){
+  const totalMin=Math.max(0,Math.floor(ms/60000));
+  if(totalMin<60)return `${totalMin}m`;
+  return `${Math.floor(ms/3600000)}h`;
+}
 function updateEventCountdown(){
   const ms=nextRewardDate()-new Date();
-  window.__eventCountdownTxt=T('eventResetIn',fmtTime(ms));
+  window.__eventCountdownTxt=T('eventResetIn',fmtEventCountdown(ms));
 }
 function renderEventTierSection(wrap){
   updateEventCountdown();
@@ -1620,7 +1625,7 @@ function renderEventTierSection(wrap){
   const locked=(S.levelClaimed||1)<EVENT_UNLOCK_LEVEL;
   const header=document.createElement('div');header.className='accordion-header'+(theme.bg&&!locked?' accordion-header-themed':'');
   if(theme.bg&&!locked)header.style.backgroundImage=`url('${theme.bg}')`;
-  header.innerHTML=`<div class="accordion-header-left"><span>${theme.icon} ${label} <span style="opacity:.65;font-weight:400;font-size:11px;">· ${window.__eventCountdownTxt}</span></span><span class="accordion-count">${locked?'🔒':theme.props.length}</span></div><span class="accordion-chevron">▾</span>`;
+  header.innerHTML=`<div class="accordion-header-left"><span>${label} <span style="opacity:.65;font-weight:400;font-size:11px;">· ${window.__eventCountdownTxt}</span></span><span class="accordion-count">${locked?'🔒':theme.props.length}</span></div><span class="accordion-chevron">▾</span>`;
   header.onclick=()=>toggleSection('event');
   const body=document.createElement('div');body.className='accordion-body';
   if(open){
