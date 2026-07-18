@@ -240,13 +240,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .auth-logo{font-family:'DM Serif Display',serif;font-size:28px;color:var(--gold);text-align:center;margin-bottom:4px;}
 .auth-sub{font-size:13px;color:var(--text3);text-align:center;margin-bottom:16px;}
 .lang-grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:18px;}
-.um-bottom-row{display:flex;align-items:center;justify-content:space-between;margin-top:14px;}
+.user-menu-sheet{position:relative;}
+.um-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .lang-picker-wrap{position:relative;}
 .lang-current-btn{display:flex;align-items:center;gap:3px;font-size:22px;background:var(--surface2);border:1px solid var(--gold);border-radius:10px;padding:6px 10px;cursor:pointer;line-height:1;}
 .lang-arrow{font-size:14px;font-weight:700;color:var(--gold);transition:transform 0.15s;}
 .lang-current-btn.open .lang-arrow{transform:rotate(90deg);}
-.lang-flyout{position:absolute;left:calc(100% + 8px);top:0;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:7px;display:none;flex-wrap:wrap;gap:6px;max-width:190px;z-index:20;box-shadow:0 4px 20px rgba(0,0,0,0.5);}
-.lang-flyout.open{display:flex;}
+.lang-flyout{position:absolute;left:0;top:calc(100% + 8px);background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:7px;display:none;grid-template-columns:repeat(2,1fr);gap:6px;width:128px;z-index:20;box-shadow:0 4px 20px rgba(0,0,0,0.5);}
+.lang-flyout.open{display:grid;}
 .settings-gear-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:10px;width:38px;height:38px;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .settings-gear-btn:active{transform:scale(0.94);}
 #settings-modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:250;display:none;align-items:flex-end;}
@@ -355,6 +356,17 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 <!-- USER MENU -->
 <div id="user-menu" onclick="if(event.target===this)closeUserMenu()">
   <div class="user-menu-sheet">
+    <div class="um-top-row">
+      <div class="lang-picker-wrap">
+        <button class="lang-current-btn" id="lang-current-btn" onclick="toggleLangFlyout()">
+          <span id="lang-current-flag">🏳️</span><span class="lang-arrow">›</span>
+        </button>
+        <div class="lang-flyout" id="lang-flyout"></div>
+      </div>
+      <button class="settings-gear-btn" onclick="openSettingsModal()" title="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="19" height="19"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
     <div class="avatar-pick-circle" id="um-avatar" onclick="openAvatarPicker()">🌟</div>
     <div class="user-menu-name" id="um-name"></div>
     <div class="user-menu-email" id="um-email"></div>
@@ -384,17 +396,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
       <span style="font-size:10px;color:var(--text3)" id="lbl-chroma">Chroma Coins</span>
     </div>
     <button class="btn btn-outline" id="logout-btn" onclick="logout()">Sign Out</button>
-    <div class="um-bottom-row">
-      <div class="lang-picker-wrap">
-        <button class="lang-current-btn" id="lang-current-btn" onclick="toggleLangFlyout()">
-          <span id="lang-current-flag">🏳️</span><span class="lang-arrow">›</span>
-        </button>
-        <div class="lang-flyout" id="lang-flyout"></div>
-      </div>
-      <button class="settings-gear-btn" onclick="openSettingsModal()" title="Settings">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="19" height="19"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      </button>
-    </div>
   </div>
 </div>
 
