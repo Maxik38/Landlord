@@ -629,18 +629,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
   </div>
 
   <div id="main-content">
-    <div class="screen" id="screen-market">
-      <div class="screen-inner">
-        <div id="daily-wrap"></div>
-        <div class="section-hdr"><h2 id="lbl-market-title">Property Market</h2><p id="boost-status"></p></div>
-        <div class="market-scope-tabs">
-          <div class="scope-tab active" id="scope-personal" onclick="setMarketScope('personal',this)"><span id="lbl-personal">Personal</span></div>
-          <div class="scope-tab" id="scope-global" onclick="setMarketScope('global',this)"><span id="lbl-global">Global</span></div>
-        </div>
-        <div id="prop-accordion"></div>
-      </div>
-    </div>
-
     <div class="screen" id="screen-portfolio">
       <div class="screen-inner">
         <div class="section-hdr"><h2 id="lbl-port-title">My Portfolio</h2><p id="lbl-port-sub">Your properties and income</p></div>
@@ -799,16 +787,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
           <div><div class="bp-option-title">Prejsť na mapu</div><div class="bp-option-sub">Prezri si celý svet a vyber ľubovoľnú krajinu</div></div>
         </div>
         <div class="bp-gps-list" id="bp-gps-list"></div>
-        <div class="ov-section-label" style="margin-top:20px">Iné</div>
-        <div class="bp-option-card" style="opacity:.75" onclick="setScreen('market', null)">
-          <div class="bp-option-icon">🏘️</div>
-          <div><div class="bp-option-title">Klasický trh</div><div class="bp-option-sub">Domy, mestá, moria, kontinenty, planéty a týždenné eventy</div></div>
-        </div>
+        <div class="ov-section-label" style="margin-top:20px" id="lbl-bp-events">Týždenné eventové nehnuteľnosti</div>
+        <div id="bp-events-wrap"></div>
       </div>
     </div>
     <div class="screen active" id="screen-overview">
       <div class="screen-inner">
         <div class="section-hdr"><h2>📊 Overview</h2><p>Tvoje impérium na jednom mieste</p></div>
+        <div id="daily-wrap"></div>
         <div class="ov-hero">
           <div class="ov-hero-label">Hodnota impéria</div>
           <div class="ov-hero-value" id="ov-empire-value">€0</div>
@@ -2039,8 +2025,8 @@ function setScreen(name, el) {
   if(name==='leaderboard')renderLeaderboard();
   if(name==='skills')renderSkills();
   if(name==='store')renderStore();
-  if(name==='market')renderGrid();
   if(name==='map')initWorldMap();
+  if(name==='buyproperty')renderBuyPropertyEvents();
   if(name==='overview')renderOverview();
 }
 function setPortfolioTab(tab,el){
@@ -2051,13 +2037,7 @@ function setPortfolioTab(tab,el){
   document.getElementById('portfolio-offers-view').style.display=tab==='offers'?'':'none';
   if(tab==='offers')refreshOffers(); else renderPortfolio();
 }
-function setMarketScope(scope,el){
-  S.marketScope=scope;S.openSection=null;
-  document.querySelectorAll('.scope-tab').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
-  renderGrid();
-}
-function toggleSection(tier){S.openSection=(S.openSection===tier)?null:tier;renderGrid();}
+function toggleSection(tier){S.openSection=(S.openSection===tier)?null:tier;renderBuyPropertyEvents();}
 
 // ===== WORLD MAP =====
 let wmMap=null, wmCluster=null, wmMarkersByIso={};
@@ -2203,6 +2183,7 @@ function tierLabel(tier){return {house:T('tierHouses'),city:T('tierCities'),coun
 function tierIcon(tier){return {house:'🏠',city:'🏙️',country:'🗺️',sea:'🌊',continent:'🌐',planet:'🪐'}[tier];}
 function renderGrid(){
   const wrap=document.getElementById('prop-accordion');
+  if(!wrap){updateEventCountdown();return;}
   const tiers=TIER_ORDER[S.marketScope];
   if(!tiers){updateEventCountdown();return;}
   wrap.innerHTML='';
@@ -2242,6 +2223,12 @@ function fmtEventCountdown(ms){
 function updateEventCountdown(){
   const ms=nextRewardDate()-new Date();
   window.__eventCountdownTxt=T('eventResetIn',fmtEventCountdown(ms));
+}
+function renderBuyPropertyEvents(){
+  const wrap=document.getElementById('bp-events-wrap');
+  if(!wrap)return;
+  wrap.innerHTML='';
+  renderEventTierSection(wrap);
 }
 function renderEventTierSection(wrap){
   updateEventCountdown();
@@ -2323,7 +2310,7 @@ async function confirmEventBuy(){
   S.eventOwn[themeId][key]=(S.eventOwn[themeId][key]||0)+pct;
   toast(T('eventBoughtPending',pct,pct*CHROMA_PER_PCT));
   closeModal();
-  renderGrid();updateTopbar();await saveProfile();
+  renderBuyPropertyEvents();updateTopbar();await saveProfile();
 }
 
 
