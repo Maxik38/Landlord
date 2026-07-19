@@ -771,7 +771,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
         <div id="map-legend">
           <div class="lg-row"><span class="lg-dot" style="background:var(--green)"></span><span id="lbl-lg-country">Štát (celé územie)</span></div>
           <div class="lg-row"><span class="lg-dot" style="background:var(--gold)"></span><span id="lbl-lg-capital">Hlavné mesto</span></div>
-          <div class="lg-row" style="opacity:.5"><span class="lg-dot" style="background:var(--blue)"></span><span id="lbl-lg-city">Okresné mesto (pripravujeme)</span></div>
+          <div class="lg-row"><span class="lg-dot" style="background:var(--blue)"></span><span id="lbl-lg-city">Krajské mesto (zatiaľ len Európa)</span></div>
         </div>
       </div>
     </div>
@@ -972,7 +972,7 @@ const WORLD_COUNTRIES = [
 ["PE","Peru","Lima",-12.0464,-77.0428,-9.2,-75.0,34],["KN","Saint Kitts and Nevis","Basseterre",17.3026,-62.7177,17.3,-62.75,0.05],
 ["LC","Saint Lucia","Castries",14.0101,-60.9875,13.9,-60.98,0.18],["VC","Saint Vincent and the Grenadines","Kingstown",13.1600,-61.2248,13.25,-61.2,0.1],
 ["SR","Suriname","Paramaribo",5.8520,-55.2038,4.1,-56.0,0.6],["TT","Trinidad and Tobago","Port of Spain",10.6549,-61.5019,10.5,-61.3,1.4],
-["US","United States","Washington, D.C.",38.9072,-77.0369,39.8,-98.6,335],["UY","Uruguay","Montevideo",-34.9011,-56.1645,-32.8,-56.0,3.4],
+["UY","Uruguay","Montevideo",-34.9011,-56.1645,-32.8,-56.0,3.4],
 ["VE","Venezuela","Caracas",10.4806,-66.9036,7.0,-66.0,28],["AU","Australia","Canberra",-35.2809,149.1300,-25.3,133.8,26],
 ["FJ","Fiji","Suva",-18.1416,178.4419,-17.7,178.0,0.93],["KI","Kiribati","South Tarawa",1.3291,172.9791,1.4,173.0,0.13],
 ["MH","Marshall Islands","Majuro",7.1164,171.1858,7.1,171.2,0.04],["FM","Micronesia","Palikir",6.9248,158.1611,6.9,158.2,0.11],
@@ -981,6 +981,79 @@ const WORLD_COUNTRIES = [
 ["WS","Samoa","Apia",-13.8506,-171.7513,-13.75,-172.1,0.22],["SB","Solomon Islands","Honiara",-9.4280,159.9498,-9.6,160.2,0.74],
 ["TO","Tonga","Nuku'alofa",-21.1393,-175.2018,-21.2,-175.2,0.1],["TV","Tuvalu","Funafuti",-8.5211,179.1983,-7.5,178.7,0.01],
 ["VU","Vanuatu","Port Vila",-17.7333,168.3273,-16.0,167.9,0.33]
+];
+// ===== US STATES (USA is NOT a single property — each state is its own "štát" + its own "hlavné mesto") =====
+// [postal code, name, capital, capitalLat, capitalLng, stateCenterLat, stateCenterLng, populationMillions]
+const US_STATES = [
+["AL","Alabama","Montgomery",32.3792,-86.3077,32.8,-86.8,5.1],["AK","Alaska","Juneau",58.3019,-134.4197,64.0,-153.0,0.73],
+["AZ","Arizona","Phoenix",33.4484,-112.0740,34.2,-111.7,7.4],["AR","Arkansas","Little Rock",34.7465,-92.2896,34.9,-92.4,3.0],
+["CA","California","Sacramento",38.5816,-121.4944,37.2,-119.7,39.0],["CO","Colorado","Denver",39.7392,-104.9903,39.0,-105.5,5.8],
+["CT","Connecticut","Hartford",41.7658,-72.6734,41.6,-72.7,3.6],["DE","Delaware","Dover",39.1582,-75.5244,39.0,-75.5,1.0],
+["FL","Florida","Tallahassee",30.4383,-84.2807,28.6,-82.4,22.6],["GA","Georgia","Atlanta",33.7490,-84.3880,32.6,-83.4,11.0],
+["HI","Hawaii","Honolulu",21.3069,-157.8583,20.5,-157.0,1.44],["ID","Idaho","Boise",43.6150,-116.2023,44.4,-114.6,1.96],
+["IL","Illinois","Springfield",39.7817,-89.6501,40.0,-89.2,12.5],["IN","Indiana","Indianapolis",39.7684,-86.1581,40.0,-86.3,6.8],
+["IA","Iowa","Des Moines",41.5868,-93.6250,42.0,-93.5,3.2],["KS","Kansas","Topeka",39.0473,-95.6752,38.5,-98.4,2.9],
+["KY","Kentucky","Frankfort",38.2009,-84.8733,37.5,-85.3,4.5],["LA","Louisiana","Baton Rouge",30.4515,-91.1871,31.0,-92.0,4.6],
+["ME","Maine","Augusta",44.3106,-69.7795,45.4,-69.2,1.4],["MD","Maryland","Annapolis",38.9784,-76.4922,39.0,-76.7,6.2],
+["MA","Massachusetts","Boston",42.3601,-71.0589,42.3,-71.8,7.0],["MI","Michigan","Lansing",42.7325,-84.5555,44.3,-85.4,10.0],
+["MN","Minnesota","Saint Paul",44.9537,-93.0900,46.3,-94.3,5.7],["MS","Mississippi","Jackson",32.2988,-90.1848,32.7,-89.7,2.96],
+["MO","Missouri","Jefferson City",38.5767,-92.1735,38.5,-92.5,6.2],["MT","Montana","Helena",46.5891,-112.0391,47.0,-109.6,1.1],
+["NE","Nebraska","Lincoln",40.8136,-96.7026,41.5,-99.8,2.0],["NV","Nevada","Carson City",39.1638,-119.7674,39.3,-116.6,3.2],
+["NH","New Hampshire","Concord",43.2081,-71.5376,43.7,-71.6,1.4],["NJ","New Jersey","Trenton",40.2206,-74.7597,40.1,-74.7,9.3],
+["NM","New Mexico","Santa Fe",35.6870,-105.9378,34.5,-106.1,2.1],["NY","New York","Albany",42.6526,-73.7562,42.9,-75.5,19.6],
+["NC","North Carolina","Raleigh",35.7796,-78.6382,35.5,-79.4,10.7],["ND","North Dakota","Bismarck",46.8083,-100.7837,47.5,-100.5,0.78],
+["OH","Ohio","Columbus",39.9612,-82.9988,40.4,-82.8,11.8],["OK","Oklahoma","Oklahoma City",35.4676,-97.5164,35.5,-98.0,4.0],
+["OR","Oregon","Salem",44.9429,-123.0351,43.9,-120.6,4.2],["PA","Pennsylvania","Harrisburg",40.2732,-76.8867,40.9,-77.8,13.0],
+["RI","Rhode Island","Providence",41.8240,-71.4128,41.7,-71.5,1.1],["SC","South Carolina","Columbia",34.0007,-81.0348,33.9,-80.9,5.3],
+["SD","South Dakota","Pierre",44.3683,-100.3510,44.5,-100.2,0.9],["TN","Tennessee","Nashville",36.1627,-86.7816,35.9,-86.4,7.1],
+["TX","Texas","Austin",30.2672,-97.7431,31.5,-99.3,30.5],["UT","Utah","Salt Lake City",40.7608,-111.8910,39.3,-111.7,3.4],
+["VT","Vermont","Montpelier",44.2601,-72.5754,44.0,-72.7,0.65],["VA","Virginia","Richmond",37.5407,-77.4360,37.5,-78.7,8.7],
+["WA","Washington","Olympia",47.0379,-122.9007,47.4,-120.5,7.8],["WV","West Virginia","Charleston",38.3498,-81.6326,38.9,-80.7,1.77],
+["WI","Wisconsin","Madison",43.0731,-89.4012,44.6,-89.9,5.9],["WY","Wyoming","Cheyenne",41.1400,-104.8202,43.0,-107.5,0.58],
+["DC","District of Columbia","Washington, D.C.",38.9072,-77.0369,38.9072,-77.0369,0.68]
+];
+// ===== EUROPEAN REGIONAL/DISTRICT CITIES (3rd map tier — Europe only for now) =====
+// [countryISO2, cityName, lat, lng, populationMillions]
+const EU_REGIONAL_CITIES = [
+["AL","Durrës",41.3231,19.4414,0.11],
+["AT","Graz",47.0707,15.4395,0.29],["AT","Salzburg",47.8095,13.0550,0.15],
+["BE","Antwerp",51.2194,4.4025,0.53],["BE","Ghent",51.0500,3.7303,0.26],
+["BA","Banja Luka",44.7722,17.1910,0.14],
+["BG","Plovdiv",42.1354,24.7453,0.35],["BG","Varna",43.2141,27.9147,0.34],
+["HR","Split",43.5081,16.4402,0.16],["HR","Rijeka",45.3271,14.4422,0.13],
+["CY","Limassol",34.7071,33.0226,0.24],
+["CZ","Brno",49.1951,16.6068,0.38],["CZ","Ostrava",49.8209,18.2625,0.29],
+["DK","Aarhus",56.1629,10.2039,0.28],["DK","Odense",55.4038,10.4024,0.18],
+["EE","Tartu",58.3776,26.7290,0.09],
+["FI","Tampere",61.4978,23.7610,0.24],["FI","Turku",60.4518,22.2666,0.19],
+["FR","Marseille",43.2965,5.3698,0.87],["FR","Lyon",45.7640,4.8357,0.52],["FR","Toulouse",43.6047,1.4442,0.49],
+["DE","Hamburg",53.5511,9.9937,1.85],["DE","Munich",48.1351,11.5820,1.49],["DE","Cologne",50.9375,6.9603,1.09],
+["GR","Thessaloniki",40.6401,22.9444,0.32],
+["HU","Debrecen",47.5316,21.6273,0.2],["HU","Szeged",46.2530,20.1414,0.16],
+["IE","Cork",51.8985,-8.4756,0.22],
+["IT","Milan",45.4642,9.1900,1.35],["IT","Naples",40.8518,14.2681,0.91],["IT","Turin",45.0703,7.6869,0.85],
+["XK","Prizren",42.2139,20.7397,0.09],
+["LV","Daugavpils",55.8714,26.5161,0.08],
+["LT","Kaunas",54.8985,23.9036,0.29],
+["LU","Esch-sur-Alzette",49.4958,5.9806,0.036],
+["MT","Birkirkara",35.8972,14.4611,0.02],
+["MD","Bălți",47.7622,27.9291,0.10],
+["ME","Nikšić",42.7731,18.9447,0.06],
+["NL","Rotterdam",51.9244,4.4777,0.65],["NL","The Hague",52.0705,4.3007,0.55],
+["MK","Bitola",41.0297,21.3347,0.07],
+["NO","Bergen",60.3913,5.3221,0.29],["NO","Trondheim",63.4305,10.3951,0.21],
+["PL","Kraków",50.0647,19.9450,0.78],["PL","Łódź",51.7592,19.4560,0.65],["PL","Wrocław",51.1079,17.0385,0.64],
+["PT","Porto",41.1579,-8.6291,0.24],
+["RO","Cluj-Napoca",46.7712,23.6236,0.32],["RO","Timișoara",45.7489,21.2087,0.32],
+["RU","Saint Petersburg",59.9311,30.3609,5.4],["RU","Novosibirsk",55.0084,82.9357,1.6],
+["RS","Novi Sad",45.2671,19.8335,0.37],
+["SK","Košice",48.7164,21.2611,0.24],["SK","Prešov",48.9985,21.2393,0.09],
+["SI","Maribor",46.5547,15.6459,0.11],
+["ES","Barcelona",41.3874,2.1686,1.62],["ES","Valencia",39.4699,-0.3763,0.79],["ES","Seville",37.3891,-5.9845,0.69],
+["SE","Gothenburg",57.7089,11.9746,0.58],["SE","Malmö",55.6050,13.0038,0.35],
+["CH","Geneva",46.2044,6.1432,0.2],["CH","Basel",47.5596,7.5886,0.17],
+["UA","Kharkiv",49.9935,36.2304,1.4],["UA","Odesa",46.4825,30.7233,1.0],
+["GB","Birmingham",52.4862,-1.8904,1.14],["GB","Manchester",53.4808,-2.2426,0.55]
 ];
 function countryFlagEmoji(iso2){
   if(!iso2||iso2.length!==2) return '🏳️';
@@ -992,20 +1065,28 @@ function formatPopM(popM){
   return Math.round(popM*1000)+'K';
 }
 // price scales roughly onto the old country/city tiers, weighted by population (log scale, since
-// population spans ~6 orders of magnitude from Vatican to India/China)
+// population spans several orders of magnitude — from Vatican/small regional towns to India/China)
 function mapPropertyPrice(popM,kind){
-  const minPop=0.001, maxPop=1428;
+  const ranges = {
+    country:[350000000,7000000000],
+    capital:[500000,1300000000],
+    city:[300000,600000000]
+  };
+  const pops = { country:[0.001,1428], capital:[0.001,1428], city:[0.02,16] };
+  const [minPop,maxPop]=pops[kind]||pops.capital;
   let t=(Math.log(popM+1)-Math.log(minPop+1))/(Math.log(maxPop+1)-Math.log(minPop+1));
   t=Math.max(0,Math.min(1,t));
-  const range = kind==='country' ? [350000000,7000000000] : [500000,1300000000];
+  const range = ranges[kind]||ranges.capital;
   const raw = range[0]+t*(range[1]-range[0]);
   return Math.round(raw/10000)*10000;
 }
 function mapPropertyRent(price){ return Math.round(price/200/1000)*1000; }
-function wmPropertyId(iso2,kind){
-  const base=(iso2.charCodeAt(0)-64)*26+(iso2.charCodeAt(1)-64); // 1..676
-  return (kind==='country'?900000:950000)+base;
+const WM_ID_OFFSET = {country:900000, usstate:910000, capital:950000, usstatecapital:960000, city:990000};
+function wmPropertyId(code,kind){
+  const base=(code.charCodeAt(0)-64)*26+(code.charCodeAt(1)-64); // 1..676
+  return WM_ID_OFFSET[kind]+base;
 }
+function wmCityId(idx){ return WM_ID_OFFSET.city + idx + 1; }
 
 // ===== TRANSLATIONS =====
 const LANGS = {
@@ -1422,6 +1503,21 @@ WORLD_COUNTRIES.forEach(row=>{
   const kPrice = mapPropertyPrice(popM,'capital');
   MAP_PROPS.push({id:wmPropertyId(iso2,'country'),name:`Celý štát: ${name}`,emoji:flag,cat:'mesto',loc:name,price:cPrice,rent:mapPropertyRent(cPrice),scope:'global',tier:'mapcountry',iso2,mapLat:cLat,mapLng:cLng});
   MAP_PROPS.push({id:wmPropertyId(iso2,'capital'),name:`Hlavné mesto: ${capital}`,emoji:'🏛️',cat:'mesto',loc:`${capital}, ${name}`,price:kPrice,rent:mapPropertyRent(kPrice),scope:'global',tier:'mapcapital',iso2,mapLat:capLat,mapLng:capLng});
+});
+// USA is deliberately NOT one property — every US state (+ DC) is its own "štát" + "hlavné mesto" pair
+US_STATES.forEach(row=>{
+  const [code,name,capital,capLat,capLng,cLat,cLng,popM] = row;
+  const cPrice = mapPropertyPrice(popM,'country');
+  const kPrice = mapPropertyPrice(popM,'capital');
+  MAP_PROPS.push({id:wmPropertyId(code,'usstate'),name:`Štát: ${name}`,emoji:'🇺🇸',cat:'mesto',loc:`${name}, USA`,price:cPrice,rent:mapPropertyRent(cPrice),scope:'global',tier:'mapcountry',iso2:code,mapLat:cLat,mapLng:cLng});
+  MAP_PROPS.push({id:wmPropertyId(code,'usstatecapital'),name:`Hlavné mesto: ${capital}`,emoji:'🏛️',cat:'mesto',loc:`${capital}, ${name}`,price:kPrice,rent:mapPropertyRent(kPrice),scope:'global',tier:'mapcapital',iso2:code,mapLat:capLat,mapLng:capLng});
+});
+// European regional/district cities (3rd map tier) — Europe only for now
+EU_REGIONAL_CITIES.forEach((row,idx)=>{
+  const [iso2,name,lat,lng,popM] = row;
+  const flag = countryFlagEmoji(iso2);
+  const price = mapPropertyPrice(popM,'city');
+  MAP_PROPS.push({id:wmCityId(idx),name:`Mesto: ${name}`,emoji:'🏢',cat:'mesto',loc:`${name}`,price,rent:mapPropertyRent(price),scope:'global',tier:'mapcity',iso2,mapLat:lat,mapLng:lng});
 });
 PROPS.push(...MAP_PROPS);
 
@@ -2123,6 +2219,34 @@ function initWorldMap(){
       wmCluster.addLayer(capitalMarker);
     });
 
+    // USA — jednotlivé štáty (nie jedna nehnuteľnosť za celé USA)
+    US_STATES.forEach(row=>{
+      const [code,name,capital,capLat,capLng,cLat,cLng,popM] = row;
+      const stateId = wmPropertyId(code,'usstate');
+      const capitalId = wmPropertyId(code,'usstatecapital');
+
+      const stateMarker = L.marker([cLat,cLng], { icon: wmTierIcon('country') });
+      stateMarker.bindPopup(()=>wmPopupHtml(stateId,'🇺🇸',name,`🏳️ Štát USA · 👥 ~${formatPopM(popM)}`));
+
+      const capitalMarker = L.marker([capLat,capLng], { icon: wmTierIcon('capital') });
+      capitalMarker.bindPopup(()=>wmPopupHtml(capitalId,'🇺🇸',capital,`🏛️ Hlavné mesto štátu ${name}`));
+
+      wmMarkersByIso['US-'+code] = { country:stateMarker, capital:capitalMarker, countryId:stateId, capitalId, cLat, cLng, capLat, capLng };
+      wmCluster.addLayer(stateMarker);
+      wmCluster.addLayer(capitalMarker);
+    });
+
+    // Krajské/okresné mestá — zatiaľ len Európa
+    EU_REGIONAL_CITIES.forEach((row,idx)=>{
+      const [iso2,name,lat,lng,popM] = row;
+      const flag = countryFlagEmoji(iso2);
+      const cityId = wmCityId(idx);
+      const cityMarker = L.marker([lat,lng], { icon: wmTierIcon('city') });
+      cityMarker.bindPopup(()=>wmPopupHtml(cityId,flag,name,`🏢 Krajské mesto · 👥 ~${formatPopM(popM)}`));
+      wmMarkersByIso['CITY-'+idx] = { country:cityMarker, countryId:cityId, cLat:lat, cLng:lng };
+      wmCluster.addLayer(cityMarker);
+    });
+
     wmMap.addLayer(wmCluster);
     setTimeout(()=>wmMap.invalidateSize(),50);
   });
@@ -2146,6 +2270,15 @@ function bpFindNearby(){
       results.push({id:wmPropertyId(iso2,'country'),emoji:flag,title:name,sub:'🏳️ Celý štát',dist:haversineKm(ulat,ulng,cLat,cLng),lat:cLat,lng:cLng});
       results.push({id:wmPropertyId(iso2,'capital'),emoji:'🏛️',title:capital,sub:`Hlavné mesto ${name}`,dist:haversineKm(ulat,ulng,capLat,capLng),lat:capLat,lng:capLng});
     });
+    US_STATES.forEach(row=>{
+      const [code,name,capital,capLat,capLng,cLat,cLng,popM]=row;
+      results.push({id:wmPropertyId(code,'usstate'),emoji:'🇺🇸',title:name,sub:'🏳️ Štát USA',dist:haversineKm(ulat,ulng,cLat,cLng),lat:cLat,lng:cLng});
+      results.push({id:wmPropertyId(code,'usstatecapital'),emoji:'🏛️',title:capital,sub:`Hlavné mesto ${name}`,dist:haversineKm(ulat,ulng,capLat,capLng),lat:capLat,lng:capLng});
+    });
+    EU_REGIONAL_CITIES.forEach((row,idx)=>{
+      const [iso2,name,lat,lng,popM]=row;
+      results.push({id:wmCityId(idx),emoji:countryFlagEmoji(iso2),title:name,sub:'🏢 Krajské mesto',dist:haversineKm(ulat,ulng,lat,lng),lat,lng});
+    });
     results.sort((a,b)=>a.dist-b.dist);
     const top=results.slice(0,10);
     list.innerHTML='';
@@ -2164,6 +2297,26 @@ function bpFindNearby(){
 function mapSearchCountry(query){
   if(!wmMap || !query || query.length<2) return;
   const q = query.trim().toLowerCase();
+  const cityIdx = EU_REGIONAL_CITIES.findIndex(row => row[1].toLowerCase().startsWith(q));
+  if(cityIdx>=0){
+    const [,,lat,lng]=EU_REGIONAL_CITIES[cityIdx];
+    wmMap.flyTo([lat,lng], 7, { duration: 0.8 });
+    const entry = wmMarkersByIso['CITY-'+cityIdx];
+    if(entry) wmCluster.zoomToShowLayer(entry.country, ()=>{ entry.country.openPopup(); });
+    return;
+  }
+  const stateHit = US_STATES.find(row => row[1].toLowerCase().startsWith(q) || row[2].toLowerCase().startsWith(q));
+  if(stateHit){
+    const [code,name,capital,capLat,capLng,cLat,cLng] = stateHit;
+    const matchedCapital = capital.toLowerCase().startsWith(q) && !name.toLowerCase().startsWith(q);
+    wmMap.flyTo(matchedCapital?[capLat,capLng]:[cLat,cLng], 6, { duration: 0.8 });
+    const entry = wmMarkersByIso['US-'+code];
+    if(entry){
+      const marker = matchedCapital ? entry.capital : entry.country;
+      wmCluster.zoomToShowLayer(marker, ()=>{ marker.openPopup(); });
+    }
+    return;
+  }
   const hit = WORLD_COUNTRIES.find(row => row[1].toLowerCase().startsWith(q) || row[2].toLowerCase().startsWith(q));
   if(!hit) return;
   const [iso2,name,capital,capLat,capLng,cLat,cLng] = hit;
