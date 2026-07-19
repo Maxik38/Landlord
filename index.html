@@ -371,6 +371,25 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .bp-gps-item:active{transform:scale(0.98);}
 .bp-gps-dist{font-size:11px;color:var(--gold2);background:oklch(20% 0.02 90 / .5);border-radius:8px;padding:2px 7px;flex-shrink:0;}
 .bp-gps-status{text-align:center;color:var(--text2);font-size:13px;padding:24px 12px;}
+
+/* ===== OVERVIEW DASHBOARD (TEMP TEST SCREEN) ===== */
+.ov-hero{background:linear-gradient(135deg,var(--surface2),var(--surface3));border:1px solid var(--gold);border-radius:var(--radius);padding:18px;margin-bottom:14px;}
+.ov-hero-label{font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;}
+.ov-hero-value{font-family:'DM Serif Display',serif;font-size:32px;color:var(--gold2);margin-top:2px;}
+.ov-level-row{display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:12px;color:var(--text2);}
+.ov-level-bar{height:8px;border-radius:5px;background:var(--surface3);margin-top:6px;overflow:hidden;}
+.ov-level-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:5px;transition:width .4s ease;}
+.ov-stats-row{display:flex;gap:10px;margin-bottom:14px;}
+.ov-stat{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center;}
+.ov-stat-val{font-size:16px;font-weight:700;color:var(--text);}
+.ov-stat-label{font-size:11px;color:var(--text2);margin-top:2px;}
+.ov-section-label{font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin:16px 0 8px;}
+.ov-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.ov-tile{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:14px 12px;cursor:pointer;text-align:center;}
+.ov-tile:active{transform:scale(0.97);}
+.ov-tile-icon{font-size:22px;}
+.ov-tile-label{font-size:12px;color:var(--text);margin-top:6px;font-weight:600;}
+#ov-test-fab{position:fixed;top:calc(82px + env(safe-area-inset-top,0px));right:10px;z-index:200;background:var(--surface2);color:var(--gold2);border:1px solid var(--gold);border-radius:20px;padding:8px 14px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.4);cursor:pointer;}
 </style>
 </head>
 <body>
@@ -783,8 +802,34 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
         <div class="bp-gps-list" id="bp-gps-list"></div>
       </div>
     </div>
+    <div class="screen" id="screen-overview">
+      <div class="screen-inner">
+        <div class="section-hdr"><h2>📊 Overview</h2><p>Tvoje impérium na jednom mieste</p></div>
+        <div class="ov-hero">
+          <div class="ov-hero-label">Hodnota impéria</div>
+          <div class="ov-hero-value" id="ov-empire-value">€0</div>
+          <div class="ov-level-row"><span>Level <b id="ov-level-num" style="color:var(--gold2)">1</b></span><span id="ov-level-next"></span></div>
+          <div class="ov-level-bar"><div class="ov-level-bar-fill" id="ov-level-bar-fill" style="width:0%"></div></div>
+        </div>
+        <div class="ov-stats-row">
+          <div class="ov-stat"><div class="ov-stat-val" id="ov-cash">€0</div><div class="ov-stat-label">Hotovosť</div></div>
+          <div class="ov-stat"><div class="ov-stat-val" id="ov-rent" style="color:var(--green)">+€0/h</div><div class="ov-stat-label">Príjem</div></div>
+          <div class="ov-stat"><div class="ov-stat-val" id="ov-prop-count">0</div><div class="ov-stat-label">Nehnuteľnosti</div></div>
+        </div>
+        <div class="ov-section-label">Rýchle akcie</div>
+        <div class="ov-actions">
+          <div class="ov-tile" onclick="setScreen('buyproperty', document.querySelector('.bnav-item.active'))"><div class="ov-tile-icon">🏠</div><div class="ov-tile-label">Kúpiť nehnuteľnosť</div></div>
+          <div class="ov-tile" onclick="setScreen('map', document.querySelector('.bnav-item.active'))"><div class="ov-tile-icon">🗺️</div><div class="ov-tile-label">Mapa sveta</div></div>
+          <div class="ov-tile" onclick="watchAd()"><div class="ov-tile-icon">📺</div><div class="ov-tile-label">Boost príjmu (reklama)</div></div>
+          <div class="ov-tile" onclick="claimDaily()"><div class="ov-tile-icon">🎁</div><div class="ov-tile-label">Denná odmena</div></div>
+          <div class="ov-tile" onclick="setScreen('portfolio', document.querySelector('.bnav-item.active'))"><div class="ov-tile-icon">📁</div><div class="ov-tile-label">Portfólio</div></div>
+          <div class="ov-tile" onclick="setScreen('store', document.querySelector('.bnav-item.active'))"><div class="ov-tile-icon">🪙</div><div class="ov-tile-label">Store</div></div>
+        </div>
+      </div>
+    </div>
   <button id="map-test-fab" onclick="setScreen('map', document.querySelector('.bnav-item.active'))">🗺️ Mapa (test)</button>
   <button id="bp-test-fab" onclick="setScreen('buyproperty', document.querySelector('.bnav-item.active'))">🏠 Kúpiť (test)</button>
+  <button id="ov-test-fab" onclick="setScreen('overview', document.querySelector('.bnav-item.active'))">📊 Overview (test)</button>
   <div id="bottom-nav">
     <div class="bnav-item active" data-s="market" onclick="setScreen('market',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="10" width="18" height="10"/><path d="M3 10 12 4l9 6"/></svg></span><span class="bnav-label" id="bnav-market">Market</span></div>
     <div class="bnav-item" data-s="portfolio" onclick="setScreen('portfolio',this)"><span class="bnav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7h6l2 2h10v11H3z"/></svg></span><span class="bnav-label" id="bnav-portfolio">Portfolio</span></div>
@@ -1997,6 +2042,7 @@ function setScreen(name, el) {
   if(name==='store')renderStore();
   if(name==='market')renderGrid();
   if(name==='map')initWorldMap();
+  if(name==='overview')renderOverview();
 }
 function setMarketScope(scope,el){
   S.marketScope=scope;S.openSection=null;
@@ -2951,7 +2997,18 @@ function renderAll(){
   if(S.screen==='portfolio')renderPortfolio();
   if(S.screen==='store')renderStore();
   if(S.screen==='skills')renderSkills();
+  if(S.screen==='overview')renderOverview();
   updateTopbar();
+}
+function renderOverview(){
+  const {level,pct,next}=levelProgress();
+  document.getElementById('ov-empire-value').textContent=fmt(netWorth());
+  document.getElementById('ov-level-num').textContent=level;
+  document.getElementById('ov-level-bar-fill').style.width=(pct*100)+'%';
+  document.getElementById('ov-level-next').textContent = next?T('nextLevelAt',fmt(next.threshold)):T('maxLevelReached');
+  document.getElementById('ov-cash').textContent=fmt(S.cash);
+  document.getElementById('ov-rent').textContent=fmtRent(totalRentIncome());
+  document.getElementById('ov-prop-count').textContent=PROPS.filter(p=>getOwn(p.id)>0).length;
 }
 
 // ===== COIN ICON (consistent across all devices) =====
