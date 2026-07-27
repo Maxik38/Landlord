@@ -393,11 +393,20 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .ov-tile:active{transform:scale(0.97);}
 .ov-tile-icon{font-size:22px;}
 .ov-tile-label{font-size:12px;color:var(--text);margin-top:6px;font-weight:600;}
-.ov-mascot-banner{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,var(--surface2),var(--surface3));border:1px solid var(--border2);border-radius:var(--radius);padding:12px;margin-top:4px;}
-.ov-mascot-img-wrap{width:84px;height:84px;border-radius:50%;flex-shrink:0;background:#0c0c0c;overflow:hidden;}
-.ov-mascot-text{flex:1;min-width:0;}
-.ov-mascot-title{font-family:'DM Serif Display',serif;font-size:16px;color:var(--gold2);}
-.ov-mascot-sub{font-size:12px;color:var(--text2);margin-top:3px;line-height:1.4;}
+.ov-flex-card{margin-top:4px;background:linear-gradient(160deg,#20190f,#1a1a20 55%);border:1px solid #3a2f18;border-radius:16px;padding:18px 18px 20px;position:relative;overflow:hidden;}
+.ov-flex-glow{position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,#d9b24c22,transparent 70%);pointer-events:none;}
+.ov-flex-header{display:flex;align-items:center;gap:8px;position:relative;}
+.ov-flex-icon{font-size:18px;}
+.ov-flex-label{font-size:12px;letter-spacing:.1em;color:#d9b24c;font-weight:700;}
+.ov-flex-main{font-size:20px;font-weight:700;line-height:1.35;margin-top:12px;position:relative;color:#fff;}
+.ov-flex-highlight{color:#d9b24c;}
+.ov-flex-sub{font-size:13px;color:#9a9aa2;margin-top:8px;position:relative;}
+.ov-flex-footer{display:flex;align-items:center;justify-content:space-between;margin-top:16px;position:relative;}
+.ov-flex-dots{display:flex;gap:6px;}
+.ov-flex-dot{width:6px;height:6px;border-radius:50%;background:#3a3a42;transition:background .15s;}
+.ov-flex-dot.active{background:#d9b24c;}
+.ov-flex-btn{background:#d9b24c;color:#1a1400;border:none;border-radius:20px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.ov-flex-btn:active{transform:scale(0.96);}
 </style>
 </head>
 <body>
@@ -812,11 +821,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
           <div class="ov-stat"><div class="ov-stat-val" id="ov-rent" style="color:var(--green)">+€0/h</div><div class="ov-stat-label">Príjem</div></div>
           <div class="ov-stat"><div class="ov-stat-val" id="ov-prop-count">0</div><div class="ov-stat-label">Nehnuteľnosti</div></div>
         </div>
-        <div class="ov-mascot-banner">
-          <div class="ov-mascot-img-wrap"><img class="avatar-img" id="ov-mascot-img" src="" alt="Tvoj avatar"></div>
-          <div class="ov-mascot-text">
-            <div class="ov-mascot-title">Rastieš! 📈</div>
-            <div class="ov-mascot-sub">Tvoje impérium sa rozrastá každou hodinou — drž tempo.</div>
+        <div class="ov-flex-card">
+          <div class="ov-flex-glow"></div>
+          <div class="ov-flex-header"><span class="ov-flex-icon">✨</span><span class="ov-flex-label">FLEX FAKT</span></div>
+          <div class="ov-flex-main">Tvoje impérium má hodnotu ako <span class="ov-flex-highlight" id="ov-flex-highlight">...</span>.</div>
+          <div class="ov-flex-sub" id="ov-flex-sub"></div>
+          <div class="ov-flex-footer">
+            <div class="ov-flex-dots" id="ov-flex-dots"></div>
+            <button class="ov-flex-btn" onclick="nextFlexFact()">Ďalší fakt →</button>
           </div>
         </div>
       </div>
@@ -3254,9 +3266,47 @@ function renderAll(){
   if(S.screen==='overview')renderOverview();
   updateTopbar();
 }
+// ===== FLEX FAKT (Overview) =====
+let flexFactIdx = 0;
+function flexFmtNum(n){
+  if(n>=100) return Math.round(n).toLocaleString('sk-SK');
+  if(n>=10) return Math.round(n).toString();
+  return Math.max(0.1,n).toFixed(1);
+}
+function flexPlural(n,one,few,many){
+  const r=Math.round(n);
+  if(r===1) return one;
+  if(r>=2 && r<=4) return few;
+  return many;
+}
+function computeFlexFacts(){
+  const nw=netWorth();
+  const ferrari=nw/2900000;
+  const salaryYears=nw/200000;
+  const islands=nw/35000000;
+  const rentYears=nw/(400*12);
+  const goldTons=nw/65000000;
+  return [
+    {highlight:`${flexFmtNum(ferrari)} Ferrari 296 GTB`, sub:'Priemerná cena: cca €2.9M / kus'},
+    {highlight:`${flexFmtNum(salaryYears)} ${flexPlural(salaryYears,'rok','roky','rokov')} priemerného platu`, sub:'Pri priemernej mzde €200K/rok'},
+    {highlight:`${flexFmtNum(islands)} ${flexPlural(islands,'súkromný ostrov','súkromné ostrovy','súkromných ostrovov')} v Chorvátsku`, sub:'Menšie ostrovy sa predávajú okolo €30-40M'},
+    {highlight:`${flexFmtNum(rentYears)} ${flexPlural(rentYears,'rok','roky','rokov')} nájmu bytu v Bratislave`, sub:'Pri priemernom nájme €400/mes.'},
+    {highlight:`${flexFmtNum(goldTons)} ${flexPlural(goldTons,'tona','tony','ton')} zlata`, sub:'Pri aktuálnej cene zlata'},
+  ];
+}
+function renderFlexFact(){
+  const hEl=document.getElementById('ov-flex-highlight');
+  if(!hEl)return;
+  const facts=computeFlexFacts();
+  flexFactIdx=((flexFactIdx%facts.length)+facts.length)%facts.length;
+  const f=facts[flexFactIdx];
+  hEl.textContent=f.highlight;
+  document.getElementById('ov-flex-sub').textContent=f.sub;
+  document.getElementById('ov-flex-dots').innerHTML=facts.map((_,i)=>`<div class="ov-flex-dot${i===flexFactIdx?' active':''}"></div>`).join('');
+}
+function nextFlexFact(){ flexFactIdx++; renderFlexFact(); }
 function renderOverview(){
-  const mImg=document.getElementById('ov-mascot-img');
-  if(mImg) mImg.src=avatarSrc(S.avatar);
+  renderFlexFact();
   const {level,pct,next}=levelProgress();
   document.getElementById('ov-empire-value').textContent=fmt(netWorth());
   document.getElementById('ov-level-num').textContent=level;
