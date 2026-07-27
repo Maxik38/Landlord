@@ -127,16 +127,17 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .port-stat{background:var(--surface2);border-radius:var(--radius-sm);padding:10px;text-align:center;}
 .port-stat-val{font-family:'DM Serif Display',serif;font-size:15px;color:var(--gold);}
 .port-stat-label{font-size:9px;color:var(--text3);margin-top:2px;}
-.port-item{display:flex;align-items:center;gap:11px;padding:11px;background:var(--surface2);border-radius:var(--radius);margin-bottom:7px;border:1px solid var(--border);cursor:pointer;}
+.port-item{display:flex;align-items:center;gap:14px;padding:18px;background:linear-gradient(160deg,#1c1c22,#17171b);border-radius:18px;margin-bottom:14px;border:1px solid #26262d;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer;}
 .port-item:active{transform:scale(0.98);}
-.port-emoji{font-size:22px;width:36px;text-align:center;}
-.port-info{flex:1;min-width:0;}.port-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.port-sub{font-size:11px;color:var(--text3);margin-top:1px;}
-.port-pct-bar{height:3px;background:var(--surface3);border-radius:2px;margin-top:4px;}
-.port-pct-fill{height:100%;background:var(--gold);border-radius:2px;}
-.port-right{text-align:right;flex-shrink:0;}.port-rent{font-size:13px;color:var(--green);font-weight:500;}
-.port-val{font-size:11px;color:var(--text3);margin-top:1px;}
-.sell-btn{font-size:11px;padding:3px 7px;background:var(--red-dim);color:var(--red);border:1px solid var(--red);border-radius:5px;cursor:pointer;margin-top:3px;}
+.port-icon-tile{width:48px;height:48px;border-radius:12px;flex-shrink:0;background:linear-gradient(150deg,#3a3a44,#22222a);border:1px solid #3a3a44;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.port-info{flex:1;min-width:0;}.port-name{font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;}
+.port-upgrades{display:flex;gap:8px;margin-top:10px;}
+.port-upg-circle{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;background:transparent;border:1.5px solid #3a3a44;color:#5a5a62;cursor:pointer;}
+.port-upg-circle.owned{background:#d9b24c;border:1px solid #d9b24c;color:#1a1400;}
+.port-right{text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:8px;}
+.port-rent{font-size:13px;color:#4ade80;font-weight:800;white-space:nowrap;}
+.port-val{font-size:11px;color:#9a9aa2;font-weight:600;}
+.sell-btn{font-size:12px;padding:5px 16px;background:#3a1414;color:#f28b8b;border:1px solid #7a2a2a;border-radius:20px;cursor:pointer;font-weight:700;}
 .offer-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin-bottom:9px;}
 .offer-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
 .offer-prop-name{font-size:13px;font-weight:500;}.offer-amount{font-family:'DM Serif Display',serif;font-size:17px;color:var(--gold);}
@@ -1901,7 +1902,7 @@ const DIAMONDS_TYCOON_IMG='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAAC
 // ===== STATE =====
 let S = {
   cash:50000, user:null, username:'Player', avatar:'🌟', levelClaimed:1,
-  own:{}, offers:[], sentOffers:[], coins:0, diamonds:0, aliens:0, skills:{},
+  own:{}, upgrades:{}, offers:[], sentOffers:[], coins:0, diamonds:0, aliens:0, skills:{},
   powerups:{}, lastDaily:null, dailyStreak:0,
   permaBoost2x:false, permaContractor48:false, portfolioSort:'none',
   chromaCoins:0, eventOwn:{}, chromaSkills:{}, pendingLevel2Hint:false, lastEventWeek:null, deletionScheduledAt:null,
@@ -2097,8 +2098,8 @@ async function loadState() {
   }
   updateAvatarUI();
   const {data:own} = await supa.from('ownerships').select('*');
-  S.dbOwn = own||[]; S.own={};
-  (own||[]).forEach(o=>{ if(o.user_id===S.user.id) S.own[Number(o.property_id)]=o.pct; });
+  S.dbOwn = own||[]; S.own={}; S.upgrades={};
+  (own||[]).forEach(o=>{ if(o.user_id===S.user.id){ S.own[Number(o.property_id)]=o.pct; S.upgrades[Number(o.property_id)]=o.upgrades||[false,false,false,false]; } });
   const {data:off} = await supa.from('offers').select('*').eq('to_id',S.user.id).eq('status','pending');
   S.offers=off||[]; updateDot();
   const {data:sent} = await supa.from('offers').select('*').eq('from_id',S.user.id).eq('status','pending');
@@ -2127,8 +2128,8 @@ function setupRealtime() {
   if (!supa) return;
   supa.channel('own-rt').on('postgres_changes',{event:'*',schema:'public',table:'ownerships'},async()=>{
     const {data:own}=await supa.from('ownerships').select('*');
-    S.dbOwn=own||[]; S.own={};
-    (own||[]).forEach(o=>{if(o.user_id===S.user?.id)S.own[Number(o.property_id)]=o.pct;});
+    S.dbOwn=own||[]; S.own={}; S.upgrades={};
+    (own||[]).forEach(o=>{if(o.user_id===S.user?.id){S.own[Number(o.property_id)]=o.pct; S.upgrades[Number(o.property_id)]=o.upgrades||[false,false,false,false];}});
     renderAll();
   }).subscribe();
   if(S.user){supa.channel('off-rt').on('postgres_changes',{event:'INSERT',schema:'public',table:'offers',filter:`to_id=eq.${S.user.id}`},async()=>{
@@ -2144,6 +2145,43 @@ function fmt(n){if(n>=1e9)return'€'+(n/1e9).toFixed(1)+'B';if(n>=1e6)return'�
 function fmtRent(n){if(n>=1e6)return'+€'+(n/1e6).toFixed(1)+'M/h';if(n>=1000)return'+€'+Math.round(n/1000)+'K/h';return'+€'+n+'/h';}
 function fmtTime(ms){const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000);return h>0?`${h}h ${m}m`:`${m}m`;}
 function getOwn(id){return S.own[id]||S.own[String(id)]||S.own[Number(id)]||0;}
+function getUpgrades(id){return S.upgrades[id]||S.upgrades[String(id)]||S.upgrades[Number(id)]||[false,false,false,false];}
+function upgradeMult(id){const u=getUpgrades(id);return 1+0.25*u.filter(Boolean).length;}
+const UPGRADE_DEFS={
+  building:[{icon:'💰',label:'Príjem+'},{icon:'🛡️',label:'Ochrana'},{icon:'🎨',label:'Renovácia'},{icon:'👔',label:'Nájomníci'}],
+  city:    [{icon:'💰',label:'Príjem+'},{icon:'🛡️',label:'Ochrana'},{icon:'🎨',label:'Umenie'},{icon:'👔',label:'Úradníci'}],
+  country: [{icon:'💰',label:'Príjem+'},{icon:'🛡️',label:'Ochrana'},{icon:'🎨',label:'Kultúra'},{icon:'👔',label:'Úradníci'}],
+};
+function upgradeCategory(p){
+  if(['mapcountry','country','continent','planet','sea'].includes(p.tier))return 'country';
+  if(['mapcapital','mapcity','city'].includes(p.tier))return 'city';
+  return 'building';
+}
+function upgradeCost(p){
+  const myRent=Math.round(p.rent*getOwn(p.id)/100*rentMult());
+  return Math.max(50,Math.round(myRent*0.01/10)*10);
+}
+async function saveUpgrades(pid,upgs){
+  if(!supa||!S.user)return;
+  const {error}=await supa.from('ownerships').update({upgrades:upgs}).eq('user_id',S.user.id).eq('property_id',pid);
+  if(error){console.error('saveUpgrades failed:',error);toast('⚠️ Save failed — check your connection',4000);}
+}
+async function buyUpgrade(pid,slotIdx){
+  const p=PROPS.find(x=>x.id===pid); if(!p)return;
+  if(getOwn(pid)<=0)return;
+  const upgs=getUpgrades(pid).slice();
+  const cat=upgradeCategory(p);
+  const def=UPGRADE_DEFS[cat][slotIdx];
+  if(upgs[slotIdx]){ toast(`✅ ${def.label} je už aktívne (+25% príjem)`); return; }
+  const cost=upgradeCost(p);
+  if(S.coins<cost){ toast(`❌ Potrebuješ ${cost} 🪙 (máš ${S.coins} 🪙)`); return; }
+  S.coins-=cost;
+  upgs[slotIdx]=true;
+  S.upgrades[pid]=upgs;
+  await saveUpgrades(pid,upgs);
+  toast(`✅ ${def.label} kúpené za ${cost} 🪙 — príjem z tejto nehnuteľnosti +25%!`);
+  updateTopbar();renderPortfolio();await saveProfile();
+}
 function getOtherOwn(id){const p=PROPS.find(x=>x.id==id);if(p&&p.scope==='personal')return 0;if(S.dbOwn)return S.dbOwn.filter(o=>o.property_id==id&&o.user_id!==S.user?.id).reduce((s,o)=>s+o.pct,0);return 0;}
 function getAvail(id){return Math.max(0,100-getOwn(id)-getOtherOwn(id));}
 function marketValue(p){return p.price;}
@@ -2151,7 +2189,7 @@ function getPrice(p){return Math.round(marketValue(p)*priceMult());}
 function rentMult(){let m=1;const rl=S.skills.rent_boost||0;if(rl)m+=SKILLS_DEF[0].bonus(rl);const pl=S.skills.portfolio||0;if(pl)m+=SKILLS_DEF[4].bonus(pl);const cf=S.chromaSkills.chroma_fortune||0;if(cf)m+=CHROMA_SKILLS_DEF[0].bonus(cf);if(S.powerups['2xrent']&&new Date()<new Date(S.powerups['2xrent']))m*=2;if(S.permaBoost2x)m*=2;return m;}
 function priceMult(){let m=1;const dl=S.skills.price_disc||0;if(dl)m-=SKILLS_DEF[1].bonus(dl);if(S.powerups.discount&&new Date()<new Date(S.powerups.discount))m-=0.2;return Math.max(0.3,m);}
 function coinBonus(){const cl=S.skills.coin_master||0;const base=cl?SKILLS_DEF[5].bonus(cl):0;const chl=S.chromaSkills.chroma_luck||0;const chromaBonus=chl?CHROMA_SKILLS_DEF[2].bonus(chl):0;return base+chromaBonus;}
-function totalRentIncome(){return Math.round(PROPS.reduce((s,p)=>{const m=getOwn(p.id);return m?s+Math.round(p.rent*m/100):s;},0)*rentMult());}
+function totalRentIncome(){return Math.round(PROPS.reduce((s,p)=>{const m=getOwn(p.id);return m?s+Math.round(p.rent*m/100*upgradeMult(p.id)):s;},0)*rentMult());}
 
 // ===== OFFLINE EARNINGS (capped) =====
 function offlineCapHours(){
@@ -2788,7 +2826,7 @@ function setPortfolioSort(mode,el){
 }
 function renderPortfolio(){
   const myP=PROPS.filter(p=>getOwn(p.id)>0);
-  const tRent=myP.reduce((s,p)=>s+Math.round(p.rent*getOwn(p.id)/100*rentMult()),0);
+  const tRent=myP.reduce((s,p)=>s+Math.round(p.rent*getOwn(p.id)/100*rentMult()*upgradeMult(p.id)),0);
   const tVal=myP.reduce((s,p)=>s+Math.round(marketValue(p)*getOwn(p.id)/100),0);
   document.getElementById('port-summary').innerHTML=`<div class="port-stat"><div class="port-stat-val">${fmt(tVal)}</div><div class="port-stat-label">${T('propValue')}</div></div><div class="port-stat"><div class="port-stat-val" style="color:var(--green)">${fmtRent(tRent)}</div><div class="port-stat-label">${T('propIncome')}</div></div><div class="port-stat"><div class="port-stat-val">${myP.length}</div><div class="port-stat-label">${T('propCount')}</div></div>`;
   const list=document.getElementById('portfolio-list');
@@ -2797,9 +2835,11 @@ function renderPortfolio(){
   else if(S.portfolioSort==='desc')myP.sort((a,b)=>Math.round(marketValue(b)*getOwn(b.id)/100)-Math.round(marketValue(a)*getOwn(a.id)/100));
   list.innerHTML='';
   myP.forEach(p=>{
-    const m=getOwn(p.id),rent=Math.round(p.rent*m/100*rentMult()),val=Math.round(marketValue(p)*m/100);
+    const m=getOwn(p.id),rent=Math.round(p.rent*m/100*rentMult()*upgradeMult(p.id)),val=Math.round(marketValue(p)*m/100);
     const d=document.createElement('div');d.className='port-item';
-    d.innerHTML=`<div class="port-emoji">${p.emoji}</div><div class="port-info"><div class="port-name">${propName(p)}</div><div class="port-sub">📍 ${p.loc} · ${m}%</div><div class="port-pct-bar"><div class="port-pct-fill" style="width:${m}%"></div></div></div><div class="port-right"><div class="port-rent">${fmtRent(rent)}</div><div class="port-val">${fmt(val)}</div><button class="sell-btn" onclick="event.stopPropagation();openSellModal(${p.id})">${T('sell')}</button></div>`;
+    const cat=upgradeCategory(p),defs=UPGRADE_DEFS[cat],owned=getUpgrades(p.id);
+    const upgradesHtml=defs.map((u,i)=>`<div class="port-upg-circle${owned[i]?' owned':''}" title="${u.label}" onclick="event.stopPropagation();buyUpgrade(${p.id},${i})">${u.icon}</div>`).join('');
+    d.innerHTML=`<div class="port-icon-tile">${p.emoji}</div><div class="port-info"><div class="port-name">${propName(p)} · ${m}%</div><div class="port-upgrades">${upgradesHtml}</div></div><div class="port-right"><div class="port-rent">${fmtRent(rent)} <span class="port-val">(${fmt(val)})</span></div><button class="sell-btn" onclick="event.stopPropagation();openSellModal(${p.id})">${T('sell')}</button></div>`;
     d.onclick=()=>openModal(p.id);list.appendChild(d);
   });
 }
