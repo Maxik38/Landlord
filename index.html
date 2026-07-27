@@ -130,7 +130,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .port-item{display:flex;align-items:center;gap:14px;padding:18px;background:linear-gradient(160deg,#1c1c22,#17171b);border-radius:18px;margin-bottom:14px;border:1px solid #26262d;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer;}
 .port-item:active{transform:scale(0.98);}
 .port-icon-tile{width:48px;height:48px;border-radius:12px;flex-shrink:0;background:linear-gradient(150deg,#3a3a44,#22222a);border:1px solid #3a3a44;display:flex;align-items:center;justify-content:center;font-size:22px;}
-.port-info{flex:1;min-width:0;}.port-name{font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;}
+.port-info{flex:1;min-width:0;}.port-name{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;}
 .port-upgrades{display:flex;gap:8px;margin-top:10px;}
 .port-upg-circle{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;background:transparent;border:1.5px solid #3a3a44;color:#5a5a62;cursor:pointer;}
 .port-upg-circle.owned{background:#d9b24c;border:1px solid #d9b24c;color:#1a1400;}
@@ -3345,8 +3345,8 @@ function computeFlexFacts(){
   const rentYears=nw/(400*12);
   const goldTons=nw/65000000;
   return [
-    {highlight:`${flexFmtNum(ferrari)} Ferrari 296 GTB`, sub:'Priemerná cena: cca €2.9M / kus'},
     {highlight:`${flexFmtNum(salaryYears)} ${flexPlural(salaryYears,'rok','roky','rokov')} priemerného platu`, sub:'Pri priemernej mzde €200K/rok'},
+    {highlight:`${flexFmtNum(ferrari)} Ferrari 296 GTB`, sub:'Priemerná cena: cca €2.9M / kus'},
     {highlight:`${flexFmtNum(islands)} ${flexPlural(islands,'súkromný ostrov','súkromné ostrovy','súkromných ostrovov')} v Chorvátsku`, sub:'Menšie ostrovy sa predávajú okolo €30-40M'},
     {highlight:`${flexFmtNum(rentYears)} ${flexPlural(rentYears,'rok','roky','rokov')} nájmu bytu v Bratislave`, sub:'Pri priemernom nájme €400/mes.'},
     {highlight:`${flexFmtNum(goldTons)} ${flexPlural(goldTons,'tona','tony','ton')} zlata`, sub:'Pri aktuálnej cene zlata'},
