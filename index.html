@@ -2325,7 +2325,7 @@ function upgradeCategory(p){
 function portfolioDisplayName(p){
   return propName(p).replace(/^(Celý štát|Hlavné mesto|Mesto): /,'');
 }
-function ownedPropertyCount(){ return PROPS.filter(p=>getOwn(p.id)>0).length; }
+function ownedPropertyCount(){ return PROPS.filter(p=>['mapcountry','mapcapital','mapcity'].includes(p.tier)&&getOwn(p.id)>0).length; }
 function maxPropertiesCap(){ const lvl=S.diamondSkills?.prop_cap||0; return 3+DIAMOND_SKILLS_DEF[0].bonus(lvl); }
 function upgradeCost(p){
   const myRent=Math.round(p.rent*getOwn(p.id)/100*rentMult());
@@ -2727,7 +2727,7 @@ function renderPersonalProperties(){
   const wrap=document.getElementById('bp-personal-wrap');
   if(!wrap)return;
   wrap.innerHTML='';
-  const ps=PROPS.filter(p=>p.tier==='house');
+  const ps=PROPS.filter(p=>p.tier==='house').sort((a,b)=>a.price-b.price);
   if(!ps.length)return;
   const sec=document.createElement('div');sec.className='accordion-section'+(personalPropsOpen?' open':'');
   const header=document.createElement('div');header.className='accordion-header accordion-header-themed';
